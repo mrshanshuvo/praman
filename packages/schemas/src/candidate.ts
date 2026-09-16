@@ -1,0 +1,96 @@
+import { z } from 'zod';
+
+export const SkillLevelEnum = z.enum([
+  'EXPERIENCED',
+  'WORKING_KNOWLEDGE',
+  'LEARNING',
+  'NOT_LEARNED',
+]);
+export type SkillLevel = z.infer<typeof SkillLevelEnum>;
+
+export const SkillSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Skill name is required'),
+  level: SkillLevelEnum,
+  evidence: z.string().optional().nullable(),
+});
+export type Skill = z.infer<typeof SkillSchema>;
+
+export const ExperienceSchema = z.object({
+  id: z.string(),
+  company: z.string().min(1, 'Company is required'),
+  title: z.string().min(1, 'Job title is required'),
+  startDate: z.string().optional().nullable(),
+  endDate: z.string().optional().nullable(),
+  isCurrent: z.boolean().default(false),
+  responsibilities: z.array(z.string()).default([]),
+  technologies: z.array(z.string()).default([]),
+  achievements: z.array(z.string()).default([]),
+});
+export type Experience = z.infer<typeof ExperienceSchema>;
+
+export const ProjectSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Project name is required'),
+  description: z.string().min(1, 'Description is required'),
+  technologies: z.array(z.string()).default([]),
+  role: z.string().optional().nullable(),
+  outcomes: z.array(z.string()).default([]),
+  link: z.string().optional().nullable(),
+});
+export type Project = z.infer<typeof ProjectSchema>;
+
+export const EducationSchema = z.object({
+  id: z.string(),
+  institution: z.string().min(1, 'Institution is required'),
+  degree: z.string().min(1, 'Degree is required'),
+  field: z.string().optional().nullable(),
+  startDate: z.string().optional().nullable(),
+  endDate: z.string().optional().nullable(),
+  details: z.string().optional().nullable(),
+});
+export type Education = z.infer<typeof EducationSchema>;
+
+export const CertificationSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Certification name is required'),
+  issuer: z.string().optional().nullable(),
+  date: z.string().optional().nullable(),
+});
+export type Certification = z.infer<typeof CertificationSchema>;
+
+export const CandidatePersonalSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  location: z.string().optional().nullable(),
+  contact: z.record(z.string()).default({}),
+  links: z.record(z.string()).default({}),
+});
+export type CandidatePersonal = z.infer<typeof CandidatePersonalSchema>;
+
+export const CandidateProfileSchema = z.object({
+  id: z.string().optional(),
+  userId: z.string().optional(),
+  personal: CandidatePersonalSchema,
+  educations: z.array(EducationSchema).default([]),
+  experiences: z.array(ExperienceSchema).default([]),
+  projects: z.array(ProjectSchema).default([]),
+  skills: z.array(SkillSchema).default([]),
+  certifications: z.array(CertificationSchema).default([]),
+});
+export type CandidateProfile = z.infer<typeof CandidateProfileSchema>;
+
+// DTOs for adding/editing items (where id may be omitted or generated on backend)
+export const CreateSkillDtoSchema = SkillSchema.omit({ id: true });
+export type CreateSkillDto = z.infer<typeof CreateSkillDtoSchema>;
+
+export const CreateExperienceDtoSchema = ExperienceSchema.omit({ id: true });
+export type CreateExperienceDto = z.infer<typeof CreateExperienceDtoSchema>;
+
+export const CreateProjectDtoSchema = ProjectSchema.omit({ id: true });
+export type CreateProjectDto = z.infer<typeof CreateProjectDtoSchema>;
+
+export const CreateEducationDtoSchema = EducationSchema.omit({ id: true });
+export type CreateEducationDto = z.infer<typeof CreateEducationDtoSchema>;
+
+export const CreateCertificationDtoSchema = CertificationSchema.omit({ id: true });
+export type CreateCertificationDto = z.infer<typeof CreateCertificationDtoSchema>;
