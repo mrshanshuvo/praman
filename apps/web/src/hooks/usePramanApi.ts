@@ -1,0 +1,269 @@
+'use client';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody.message || `Request failed with status ${res.status}`);
+  }
+  return res.json();
+}
+
+// ==========================================
+// Job Descriptions Queries & Mutations
+// ==========================================
+
+export function useJobs() {
+  return useQuery({
+    queryKey: ['jobs'],
+    queryFn: () => fetcher<any[]>(`${API_URL}/job-descriptions`),
+  });
+}
+
+export function useJob(id: string) {
+  return useQuery({
+    queryKey: ['jobs', id],
+    queryFn: () => fetcher<any>(`${API_URL}/job-descriptions/${id}`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useJobResume(id: string) {
+  return useQuery({
+    queryKey: ['jobs', id, 'resume'],
+    queryFn: () => fetcher<any>(`${API_URL}/job-descriptions/${id}/resume`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useCreateJob() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { rawText: string; title?: string; company?: string }) =>
+      fetcher<any>(`${API_URL}/job-descriptions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    },
+  });
+}
+
+export function useRunStage(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (stage: 'match' | 'strategy' | 'resume') =>
+      fetcher<any>(`${API_URL}/job-descriptions/${id}/${stage}`, {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs', id] });
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+    },
+  });
+}
+
+export function useRunFullPipeline(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      fetcher<any>(`${API_URL}/job-descriptions/${id}/run-pipeline`, {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs', id] });
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+    },
+  });
+}
+
+// ==========================================
+// Candidate Profile Queries & Mutations
+// ==========================================
+
+export function useCandidateProfile() {
+  return useQuery({
+    queryKey: ['candidate-profile'],
+    queryFn: () => fetcher<any>(`${API_URL}/candidate-profile`),
+  });
+}
+
+export function useProfileMutations() {
+  const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['candidate-profile'] });
+
+  const updatePersonal = useMutation({
+    mutationFn: (personal: any) =>
+      fetcher(`${API_URL}/candidate-profile/personal`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(personal),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const addExperience = useMutation({
+    mutationFn: (data: any) =>
+      fetcher(`${API_URL}/candidate-profile/experiences`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const updateExperience = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      fetcher(`${API_URL}/candidate-profile/experiences/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const deleteExperience = useMutation({
+    mutationFn: (id: string) =>
+      fetcher(`${API_URL}/candidate-profile/experiences/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: invalidate,
+  });
+
+  const addProject = useMutation({
+    mutationFn: (data: any) =>
+      fetcher(`${API_URL}/candidate-profile/projects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const updateProject = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      fetcher(`${API_URL}/candidate-profile/projects/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const deleteProject = useMutation({
+    mutationFn: (id: string) =>
+      fetcher(`${API_URL}/candidate-profile/projects/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: invalidate,
+  });
+
+  const addSkill = useMutation({
+    mutationFn: (data: any) =>
+      fetcher(`${API_URL}/candidate-profile/skills`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const updateSkill = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      fetcher(`${API_URL}/candidate-profile/skills/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const deleteSkill = useMutation({
+    mutationFn: (id: string) =>
+      fetcher(`${API_URL}/candidate-profile/skills/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: invalidate,
+  });
+
+  const addEducation = useMutation({
+    mutationFn: (data: any) =>
+      fetcher(`${API_URL}/candidate-profile/educations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const updateEducation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      fetcher(`${API_URL}/candidate-profile/educations/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const deleteEducation = useMutation({
+    mutationFn: (id: string) =>
+      fetcher(`${API_URL}/candidate-profile/educations/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: invalidate,
+  });
+
+  const addCertification = useMutation({
+    mutationFn: (data: any) =>
+      fetcher(`${API_URL}/candidate-profile/certifications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const updateCertification = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      fetcher(`${API_URL}/candidate-profile/certifications/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
+  const deleteCertification = useMutation({
+    mutationFn: (id: string) =>
+      fetcher(`${API_URL}/candidate-profile/certifications/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: invalidate,
+  });
+
+  return {
+    updatePersonal,
+    addExperience,
+    updateExperience,
+    deleteExperience,
+    addProject,
+    updateProject,
+    deleteProject,
+    addSkill,
+    updateSkill,
+    deleteSkill,
+    addEducation,
+    updateEducation,
+    deleteEducation,
+    addCertification,
+    updateCertification,
+    deleteCertification,
+  };
+}
