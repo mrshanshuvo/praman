@@ -1,0 +1,62 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { type ResumeStrategy, ResumeStrategySchema } from '@praman/schemas';
+import { AiService } from '../ai/ai.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { RESUME_STRATEGY_SYSTEM_PROMPT_V1 } from '../prompts/resume-strategy.v1.js';
+
+@Injectable()
+export class StrategyService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly aiService: AiService,
+  ) {}
+
+  async runStrategy(jobDescriptionId: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({
+      id: jobDescriptionId,
+    }).first();
+
+    if (!jd) {
+      throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+    }
+
+    const analysis = await this.prisma.client.orm.public.CandidateJdAnalysis.where({
+      jobDescriptionId: jd.id,
+    }).first();
+
+    if (!analysis) {
+      throw new NotFoundException(
+        `Candidate-JD Analysis not found for JD ${jobDescriptionId}. Run match step first.`,
+      );
+    }
+
+    // Run Stage 3: Resume Strategy
+    const strategy = await this.aiService.runStructuredCall<ResumeStrategy>({
+      systemPrompt: RESUME_STRATEGY_SYSTEM_PROMPT_V1,
+      userPrompt: JSON.stringify({
+        structuredJd: jd.structured,
+        matchAnalysis: analysis.result,
+      }),
+      outputSchema: ResumeStrategySchema,
+      schemaName: 'ResumeStrategy',
+    });
+
+    // Check if strategy already exists
+    let strategyRecord = await this.prisma.client.orm.public.ResumeStrategy.where({
+      candidateJdAnalysisId: analysis.id,
+    }).first();
+
+    if (strategyRecord) {
+      strategyRecord = await this.prisma.client.orm.public.ResumeStrategy.where({
+        id: strategyRecord.id,
+      }).update({ result: strategy });
+    } else {
+      strategyRecord = await this.prisma.client.orm.public.ResumeStrategy.create({
+        candidateJdAnalysisId: analysis.id,
+        result: strategy,
+      });
+    }
+
+    return strategyRecord;
+  }
+}
