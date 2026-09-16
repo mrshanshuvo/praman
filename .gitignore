@@ -1,0 +1,15 @@
+node_modules/
+.turbo/
+dist/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+.env
+.env*.local
+.agents/
+.claude/
+.cursor/
+.devin/
+.system_generated/

@@ -1,0 +1,19 @@
+{
+  "name": "praman",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check --write .",
+    "test": "turbo test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.13",
+    "turbo": "^2.10.13"
+  },
+  "packageManager": "pnpm@12.4.2"
+}
