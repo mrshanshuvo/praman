@@ -1,0 +1,146 @@
+// use prisma-8
+
+model User {
+  id              String            @id @default(uuid())
+  email           String            @unique
+  name            String?
+  createdAt       TimestamptzString @default(now())
+  updatedAt       temporal.updatedAtString()
+  profile         CandidateProfile?
+  jobDescriptions JobDescription[]
+}
+
+model CandidateProfile {
+  id             String          @id @default(uuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id])
+  personal       Json
+  educations     Education[]
+  experiences    Experience[]
+  projects       Project[]
+  skills         Skill[]
+  certifications Certification[]
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+}
+
+model Education {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  institution        String
+  degree             String
+  field              String?
+  startDate          String?
+  endDate            String?
+  details            String?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+}
+
+model Experience {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  company            String
+  title              String
+  startDate          String?
+  endDate            String?
+  isCurrent          Boolean          @default(false)
+  responsibilities   String[]
+  technologies       String[]
+  achievements       String[]
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+}
+
+model Project {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  name               String
+  description        String
+  technologies       String[]
+  role               String?
+  outcomes           String[]
+  link               String?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+}
+
+model Skill {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  name               String
+  level              SkillLevel
+  evidence           String?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+}
+
+enum SkillLevel {
+  EXPERIENCED
+  WORKING_KNOWLEDGE
+  LEARNING
+  NOT_LEARNED
+}
+
+model Certification {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  name               String
+  issuer             String?
+  date               String?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+}
+
+model JobDescription {
+  id         String               @id @default(uuid())
+  userId     String
+  user       User                 @relation(fields: [userId], references: [id])
+  rawText    String
+  structured Json
+  createdAt  TimestamptzString    @default(now())
+  updatedAt  temporal.updatedAtString()
+  analysis   CandidateJdAnalysis?
+}
+
+model CandidateJdAnalysis {
+  id               String          @id @default(uuid())
+  jobDescriptionId String          @unique
+  jobDescription   JobDescription  @relation(fields: [jobDescriptionId], references: [id])
+  result           Json
+  createdAt        TimestamptzString @default(now())
+  updatedAt        temporal.updatedAtString()
+  strategy         ResumeStrategy?
+}
+
+model ResumeStrategy {
+  id                    String              @id @default(uuid())
+  candidateJdAnalysisId String              @unique
+  candidateJdAnalysis   CandidateJdAnalysis @relation(fields: [candidateJdAnalysisId], references: [id])
+  result                Json
+  createdAt             TimestamptzString   @default(now())
+  updatedAt             temporal.updatedAtString()
+  resume                Resume?
+}
+
+model Resume {
+  id               String          @id @default(uuid())
+  resumeStrategyId String          @unique
+  resumeStrategy   ResumeStrategy  @relation(fields: [resumeStrategyId], references: [id])
+  resumeJson       Json
+  validationReport Json
+  status           ResumeStatus    @default(DRAFT)
+  createdAt        TimestamptzString @default(now())
+  updatedAt        temporal.updatedAtString()
+}
+
+enum ResumeStatus {
+  DRAFT
+  VALIDATED
+  REJECTED
+}
