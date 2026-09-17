@@ -40,6 +40,15 @@ export function useJobResume(id: string) {
   });
 }
 
+export function useJobResumeLatex(id: string) {
+  return useQuery({
+    queryKey: ['jobs', id, 'resume', 'latex'],
+    queryFn: () => fetcher<{ latex: string }>(`${API_URL}/job-descriptions/${id}/resume/latex`),
+    enabled: Boolean(id),
+  });
+}
+
+
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({

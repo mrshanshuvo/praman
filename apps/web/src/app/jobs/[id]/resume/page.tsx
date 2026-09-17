@@ -1,14 +1,16 @@
 'use client';
 
-import { ArrowLeft, Check, Copy, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Download, FileCode, RefreshCw, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
-import { useJobResume } from '@/hooks/usePramanApi';
+import { useJobResume, useJobResumeLatex } from '@/hooks/usePramanApi';
+import { LatexViewer } from './_components/LatexViewer';
 import { ResumeViewer } from './_components/ResumeViewer';
 
 export default function ResumeAuditPage() {
@@ -22,12 +24,20 @@ export default function ResumeAuditPage() {
     error: fetchError,
     refetch,
   } = useJobResume(id);
+
+  const {
+    data: latexData,
+    isLoading: latexLoading,
+  } = useJobResumeLatex(id);
+
   const [copied, setCopied] = useState(false);
   const error = fetchError ? (fetchError as Error).message : null;
 
   const resume = resumeData?.resumeJson;
   const report = resumeData?.validationReport;
   const status = resumeData?.status;
+  const downloadUrl = resumeData?.downloadUrl;
+  const latex = latexData?.latex;
 
   const handleCopyJson = () => {
     if (!resume) return;
@@ -154,6 +164,22 @@ export default function ResumeAuditPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {downloadUrl && (
+            <a
+              href={downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({
+                size: 'sm',
+                className:
+                  'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-sm gap-1.5',
+              })}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download .tex</span>
+            </a>
+          )}
+
           <Button
             variant="outline"
             size="sm"
@@ -185,10 +211,42 @@ export default function ResumeAuditPage() {
         </div>
       </div>
 
-      {/* Grid: Left = Formatted Resume, Right = Audit Report */}
+      {/* Main Grid: Left = Tabs (Formatted View / LaTeX Code), Right = Evidence Audit Report */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 space-y-6">
-          <ResumeViewer resume={resume} />
+        <div className="lg:col-span-7 space-y-4">
+          <Tabs defaultValue="preview" className="w-full">
+            <TabsList className="mb-3 bg-muted/60 p-1 border border-border">
+              <TabsTrigger value="preview" className="text-xs px-4">
+                Structured Resume
+              </TabsTrigger>
+              <TabsTrigger value="latex" className="text-xs px-4 flex items-center gap-1.5">
+                <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
+                <span>LaTeX Code (.tex)</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="preview">
+              <ResumeViewer resume={resume} />
+            </TabsContent>
+
+            <TabsContent value="latex">
+              {latexLoading ? (
+                <div className="p-8 text-center text-xs text-muted-foreground">
+                  Loading LaTeX source from Cloudflare R2...
+                </div>
+              ) : latex ? (
+                <LatexViewer
+                  latex={latex}
+                  downloadUrl={downloadUrl}
+                  candidateName={resume.personal?.name}
+                />
+              ) : (
+                <div className="p-8 text-center text-xs text-muted-foreground">
+                  LaTeX source not yet generated for this resume.
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
 
         <div className="lg:col-span-5 space-y-4">
@@ -204,3 +262,4 @@ export default function ResumeAuditPage() {
     </div>
   );
 }
+
