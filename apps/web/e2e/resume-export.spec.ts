@@ -48,14 +48,15 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
       await expect(exportBtn).toBeVisible();
       await exportBtn.click();
 
-      // Verify all 6 format options inside the Export Resume Suite modal
+      // Verify all format options inside the Export Resume Suite modal
       await expect(page.locator('text=Export Resume Suite')).toBeVisible();
       await expect(page.locator('text=Formatted PDF')).toBeVisible();
       await expect(page.locator('text=Overleaf Cloud')).toBeVisible();
       await expect(page.locator('text=LaTeX Source (.tex)')).toBeVisible();
-      await expect(page.locator('text=Project Bundle (.zip)')).toBeVisible();
+      await expect(page.locator('text=Complete Archive (.zip)')).toBeVisible();
       await expect(page.locator('text=ATS Plain Text (.txt)')).toBeVisible();
-      await expect(page.locator('text=Verified Data (.json)')).toBeVisible();
+      await expect(page.locator('text=Markdown Resume (.md)')).toBeVisible();
+      await expect(page.locator('text=Canonical ATS JSON (.json)')).toBeVisible();
 
       // Close modal
       const closeBtn = page.getByRole('button', { name: 'Close' });

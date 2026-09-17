@@ -93,6 +93,7 @@ export default function ResumeAuditPage() {
         downloadUrl={downloadUrl}
         resumeJson={resume}
         latexCode={latex}
+        templateId={selectedTemplate}
         matchAnalysis={jd?.analysis?.result || jd?.analysis}
         isFetching={isFetching}
         isRegenerating={runStageMutation.isPending}

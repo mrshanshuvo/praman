@@ -12,8 +12,9 @@ interface ResumeAuditHeaderProps {
   id: string;
   status?: string;
   downloadUrl?: string | null;
-  resumeJson?: any;
+  resumeJson: any;
   latexCode?: string;
+  templateId?: string;
   matchAnalysis?: any;
   isFetching: boolean;
   isRegenerating: boolean;
@@ -27,6 +28,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   downloadUrl,
   resumeJson,
   latexCode = '',
+  templateId = 'modern-developer',
   matchAnalysis,
   isFetching,
   isRegenerating,
@@ -143,6 +145,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
         onOpenChange={setIsExportOpen}
         resumeData={resumeJson}
         latexCode={latexCode}
+        templateId={templateId}
         downloadUrl={downloadUrl}
         candidateName={resumeJson?.personal?.name}
       />
