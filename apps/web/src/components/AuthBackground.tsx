@@ -10,9 +10,8 @@ export function AuthBackground() {
           alt="Auth Backdrop"
           fill
           priority
-          className="object-cover opacity-35 mix-blend-screen scale-105"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background" />
       </div>
 
       {/* Light Mode: Lush natural botanical framing */}
@@ -22,9 +21,8 @@ export function AuthBackground() {
           alt="Auth Backdrop"
           fill
           priority
-          className="object-cover opacity-75"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-transparent to-background/90" />
       </div>
     </div>
   );
