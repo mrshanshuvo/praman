@@ -79,7 +79,7 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
     };
 
     mockCandidateService = {
-      getFullProfile: vi.fn().mockResolvedValue({
+      getProfile: vi.fn().mockResolvedValue({
         personal: {
           name: 'Shahid Hasan Shuvo',
           contact: { email: 'mrshanshuvo@gmail.com', phone: '+8801929346733' },

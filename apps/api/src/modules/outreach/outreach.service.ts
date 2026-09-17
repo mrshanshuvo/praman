@@ -43,7 +43,7 @@ export class OutreachService {
         }).first()
       : null;
 
-    const candidateProfile = await this.candidateService.getFullProfile(jd.userId);
+    const candidateProfile = await this.candidateService.getProfile(jd.userId);
 
     return { jd, analysis, strategy, resume, candidateProfile };
   }
