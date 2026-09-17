@@ -6,10 +6,14 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "check": "biome check --write .",
-    "test": "turbo test"
+    "test": "turbo test",
+    "test:e2e": "pnpm --filter api test:e2e",
+    "contract:emit": "pnpm --filter api contract:emit",
+    "seed": "pnpm --filter api seed"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.13",
