@@ -14,8 +14,6 @@
     var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-heading:
     var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-bengali: var(--font-bengali), var(--font-inter), -apple-system, sans-serif;
-  --font-script: var(--font-script), "Great Vibes", cursive;
   --font-galada: var(--font-galada), "Galada", cursive;
   --font-berkshire: var(--font-berkshire), "Berkshire Swash", cursive;
   --color-sidebar-ring: var(--sidebar-ring);
