@@ -136,6 +136,48 @@ export function useUpdateResumeLatex(id: string) {
   });
 }
 
+export function useJobOutreach(id: string) {
+  return useQuery({
+    queryKey: ['jobs', id, 'outreach'],
+    queryFn: () =>
+      fetcher<{
+        coverLetter: any | null;
+        coverLetterLatex: string | null;
+        recruiterEmail: any | null;
+      }>(`${API_URL}/job-descriptions/${id}/outreach`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useGenerateCoverLetter(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      fetcher<{ coverLetter: any; coverLetterLatex: string }>(
+        `${API_URL}/job-descriptions/${id}/outreach/cover-letter`,
+        { method: 'POST' },
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'outreach'] });
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+    },
+  });
+}
+
+export function useGenerateRecruiterEmail(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      fetcher<{ recruiterEmail: any }>(`${API_URL}/job-descriptions/${id}/outreach/email`, {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'outreach'] });
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+    },
+  });
+}
+
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({

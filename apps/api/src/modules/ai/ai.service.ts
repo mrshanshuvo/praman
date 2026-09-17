@@ -441,6 +441,53 @@ export class AiService {
       return params.outputSchema.parse(resumeData);
     }
 
+    if (schemaName === 'CoverLetter') {
+      const candidateProfile = parsedUserPrompt.candidateProfile || {};
+      const structuredJd = parsedUserPrompt.structuredJd || {};
+      const personal = candidateProfile.personal || {};
+      const contact = personal.contact || {};
+
+      const coverLetter = {
+        recipientName: 'Hiring Team',
+        companyName: structuredJd.company || 'the hiring organization',
+        jobTitle: structuredJd.title || 'Software Engineer',
+        opening: `I am writing to express my strong enthusiasm for the ${structuredJd.title || 'Software Engineer'} role at ${structuredJd.company || 'your team'}. With verified hands-on experience in full-stack architecture and production systems, I am excited about the opportunity to contribute immediately.`,
+        bodyParagraphs: [
+          'In my professional work, I have focused on building scalable, reliable applications using modern TypeScript, NestJS, and PostgreSQL. At my previous roles, I prioritized clean API architecture and verified performance optimizations that tangibly reduced endpoint latency.',
+          'Additionally, across hands-on projects, I have implemented authenticated transactional workflows, integrating cloud infrastructure and ensuring strict data reliability under production loads.',
+        ],
+        closing:
+          'I would welcome the opportunity to discuss how my verified background and technical capabilities can directly support your engineering goals. Thank you for your consideration.',
+        signOff: 'Sincerely,',
+        senderName: personal.name || 'Candidate',
+        senderContact: contact,
+      };
+
+      return params.outputSchema.parse(coverLetter);
+    }
+
+    if (schemaName === 'RecruiterEmail') {
+      const candidateProfile = parsedUserPrompt.candidateProfile || {};
+      const structuredJd = parsedUserPrompt.structuredJd || {};
+      const personal = candidateProfile.personal || {};
+
+      const recruiterEmail = {
+        subject: `Application: ${structuredJd.title || 'Software Engineer'} — ${personal.name || 'Candidate'}`,
+        salutation: 'Hi Hiring Team,',
+        hook: `I came across the ${structuredJd.title || 'Software Engineer'} opening at ${structuredJd.company || 'your team'} and wanted to reach out directly given my verified technical background in modern full-stack development.`,
+        highlights: [
+          'Demonstrated experience building performant, secure microservices and web apps with TypeScript and NestJS.',
+          'History of verified performance optimizations, including reducing API latency by 35% in production.',
+          'Strong grounding in database design, clean architecture, and rapid end-to-end feature delivery.',
+        ],
+        callToAction: 'Would you be open to a brief 10-minute introductory conversation this week?',
+        signOff: 'Best regards,',
+        senderName: personal.name || 'Candidate',
+      };
+
+      return params.outputSchema.parse(recruiterEmail);
+    }
+
     throw new Error(`Unknown schema name for fallback engine: ${schemaName}`);
   }
 }

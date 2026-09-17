@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, FileCode, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, FileCode, Mail, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -16,6 +16,7 @@ import {
   useRunStage,
 } from '@/hooks/usePramanApi';
 import { LatexViewer } from './_components/LatexViewer';
+import { OutreachTab } from './_components/OutreachTab';
 import { ResumeAuditHeader } from './_components/ResumeAuditHeader';
 import { ResumeViewer } from './_components/ResumeViewer';
 
@@ -112,6 +113,10 @@ export default function ResumeAuditPage() {
                 <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
                 <span>LaTeX Code (.tex)</span>
               </TabsTrigger>
+              <TabsTrigger value="outreach" className="text-xs px-4 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-brand-pink" />
+                <span>Cover Letter & Outreach</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="preview">
@@ -142,6 +147,10 @@ export default function ResumeAuditPage() {
                   LaTeX source not yet generated for this resume.
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="outreach">
+              <OutreachTab jobId={id} candidateName={resume.personal?.name} />
             </TabsContent>
           </Tabs>
         </div>

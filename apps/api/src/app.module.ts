@@ -8,6 +8,7 @@ import { CandidateModule } from './modules/candidate/candidate.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { JobDescriptionModule } from './modules/job-description/job-description.module.js';
 import { MatchModule } from './modules/match/match.module.js';
+import { OutreachModule } from './modules/outreach/outreach.module.js';
 import { PipelineModule } from './modules/pipeline/pipeline.module.js';
 import { ResumeModule } from './modules/resume/resume.module.js';
 import { StrategyModule } from './modules/strategy/strategy.module.js';
@@ -24,6 +25,7 @@ import { ValidationModule } from './modules/validation/validation.module.js';
     MatchModule,
     StrategyModule,
     ResumeModule,
+    OutreachModule,
     JobDescriptionModule,
     PipelineModule,
   ],

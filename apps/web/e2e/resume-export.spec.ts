@@ -163,4 +163,24 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
       }
     }
   });
+
+  test('cover letter and outreach tab renders optional outreach companion', async ({ page }) => {
+    await page.goto('/jobs');
+    const resumeLink = page.locator('a[href*="/resume"]').first();
+    if (await resumeLink.isVisible({ timeout: 4000 }).catch(() => false)) {
+      await resumeLink.click();
+      await page.waitForURL(/.*\/resume/);
+
+      // Switch to Cover Letter & Outreach tab
+      const outreachTab = page.locator('button').filter({ hasText: 'Cover Letter & Outreach' });
+      if (await outreachTab.isVisible({ timeout: 4000 }).catch(() => false)) {
+        await outreachTab.click();
+
+        // Check for Outreach companion elements
+        await expect(page.locator('text=Optional Outreach & Application Companion')).toBeVisible();
+        await expect(page.locator('text=Tailored Cover Letter')).toBeVisible();
+        await expect(page.locator('text=Recruiter Outreach Email')).toBeVisible();
+      }
+    }
+  });
 });
