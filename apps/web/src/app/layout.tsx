@@ -1,14 +1,6 @@
 import type { Metadata } from 'next';
-import {
-  Berkshire_Swash,
-  Galada,
-  Great_Vibes,
-  Hind_Siliguri,
-  Inter,
-  JetBrains_Mono,
-} from 'next/font/google';
+import { Berkshire_Swash, Galada, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
@@ -21,20 +13,6 @@ const inter = Inter({
 
 const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const hindSiliguri = Hind_Siliguri({
-  variable: '--font-bengali',
-  weight: ['400', '500', '600', '700'],
-  subsets: ['bengali'],
-  display: 'swap',
-});
-
-const greatVibes = Great_Vibes({
-  variable: '--font-script',
-  weight: '400',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -90,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} ${hindSiliguri.variable} ${greatVibes.variable} ${galada.variable} ${berkshireSwash.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${galada.variable} ${berkshireSwash.variable} h-full antialiased`}
     >
       <body
         suppressHydrationWarning
@@ -98,10 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <QueryProvider>
-            <AuthProvider>
-              <Navbar />
-              <main className="flex-1">{children}</main>
-            </AuthProvider>
+            <AuthProvider>{children}</AuthProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
