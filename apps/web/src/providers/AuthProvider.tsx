@@ -5,6 +5,19 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const TOKEN_KEY = 'praman_auth_token';
 
+function setAuthCookie(authToken: string) {
+  if (typeof document === 'undefined') return;
+  const isSecure = window.location.protocol === 'https:';
+  // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+  document.cookie = `${TOKEN_KEY}=${encodeURIComponent(authToken)}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`;
+}
+
+function removeAuthCookie() {
+  if (typeof document === 'undefined') return;
+  // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+  document.cookie = `${TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+}
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -30,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
+    removeAuthCookie();
     setToken(null);
     setUser(null);
   }, []);
@@ -38,11 +52,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
     if (!storedToken) {
+      removeAuthCookie();
       setIsLoading(false);
       return;
     }
 
     setToken(storedToken);
+    setAuthCookie(storedToken);
 
     fetch(`${API_URL}/auth/me`, {
       headers: {
@@ -83,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const authUser = data.user;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
+    setAuthCookie(accessToken);
     setToken(accessToken);
     setUser(authUser);
   };
@@ -104,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const authUser = data.user;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
+    setAuthCookie(accessToken);
     setToken(accessToken);
     setUser(authUser);
   };

@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             variant: 'ghost',
             size: 'sm',
             className:
-              'gap-1.5 text-xs text-muted-foreground hover:text-foreground bg-card/60 backdrop-blur-md border border-border/60 rounded-lg shadow-sm',
+              'gap-1.5 text-xs dark:text-brand-cyan hover:text-foreground bg-card/60 backdrop-blur-md border border-border/60 rounded-lg shadow-sm',
           })}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
