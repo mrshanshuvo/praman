@@ -28,7 +28,9 @@ export const EnvSchema = z.object({
 
   // Auth & Security
   JWT_SECRET: z.string().default('praman-dev-secret-super-secure-key-change-in-prod'),
-  JWT_EXPIRES_IN: z.string().default('7d'),
+  JWT_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_SECRET: z.string().default('praman-refresh-secret-super-secure-key-change-in-prod'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 });
 
 export type EnvConfig = z.infer<typeof EnvSchema>;
@@ -73,7 +75,10 @@ export const databaseConfig = registerAs('database', () => ({
 
 export const authConfig = registerAs('auth', () => ({
   jwtSecret: process.env.JWT_SECRET || 'praman-dev-secret-super-secure-key-change-in-prod',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '15m',
+  jwtRefreshSecret:
+    process.env.JWT_REFRESH_SECRET || 'praman-refresh-secret-super-secure-key-change-in-prod',
+  jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
 }));
 
 export const configLoaders = [appConfig, aiConfig, r2Config, databaseConfig, authConfig];

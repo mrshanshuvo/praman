@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const TOKEN_KEY = 'praman_auth_token';
+const REFRESH_TOKEN_KEY = 'praman_refresh_token';
 
 async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {});
@@ -17,15 +18,53 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
     }
   }
 
-  const res = await fetch(url, {
+  let res = await fetch(url, {
     ...options,
     headers,
   });
 
-  if (!res.ok) {
-    if (res.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem(TOKEN_KEY);
+  // If 401 Unauthorized, attempt a single silent refresh
+  if (res.status === 401 && typeof window !== 'undefined' && !url.includes('/auth/')) {
+    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    try {
+      const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
+      });
+
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+        const newAccessToken = data.accessToken;
+        const newRefreshToken = data.refreshToken;
+
+        localStorage.setItem(TOKEN_KEY, newAccessToken);
+        const isSecure = window.location.protocol === 'https:';
+        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+        document.cookie = `${TOKEN_KEY}=${encodeURIComponent(newAccessToken)}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`;
+        if (newRefreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+        }
+
+        // Retry original request with newly issued access token
+        headers.set('Authorization', `Bearer ${newAccessToken}`);
+        res = await fetch(url, {
+          ...options,
+          headers,
+        });
+      } else {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+        document.cookie = `${TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+      }
+    } catch {
+      // Network error during refresh
     }
+  }
+
+  if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
     const message = Array.isArray(errorBody.message)
       ? errorBody.message.join(', ')

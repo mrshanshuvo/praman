@@ -5,6 +5,7 @@ model User {
   email           String            @unique
   name            String?
   passwordHash    String?
+  refreshTokenHash String?
   createdAt       TimestamptzString @default(now())
   updatedAt       temporal.updatedAtString()
   profile         CandidateProfile?

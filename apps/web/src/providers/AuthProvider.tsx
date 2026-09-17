@@ -4,6 +4,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const TOKEN_KEY = 'praman_auth_token';
+const REFRESH_TOKEN_KEY = 'praman_refresh_token';
 
 function setAuthCookie(authToken: string) {
   if (typeof document === 'undefined') return;
@@ -31,7 +32,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
-  logout: () => void;
+  refreshSession: () => Promise<string | null>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,10 +60,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     removeAuthCookie();
     setToken(null);
     setUser(null);
   }, [token]);
+
+  const refreshSession = useCallback(async (): Promise<string | null> => {
+    const storedRefreshToken =
+      typeof window !== 'undefined' ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
+
+    try {
+      const res = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to refresh token');
+      }
+
+      const data = await res.json();
+      const newAccessToken = data.accessToken;
+      const newRefreshToken = data.refreshToken;
+      const authUser = data.user;
+
+      localStorage.setItem(TOKEN_KEY, newAccessToken);
+      setAuthCookie(newAccessToken);
+      if (newRefreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+      }
+      setToken(newAccessToken);
+      setUser(authUser);
+      return newAccessToken;
+    } catch {
+      await logout();
+      return null;
+    }
+  }, [logout]);
 
   // Hydrate user session on initial page load
   useEffect(() => {
@@ -89,18 +127,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((userData) => {
         setUser(userData);
       })
-      .catch(() => {
-        logout();
+      .catch(async () => {
+        // Attempt silent refresh before logging out
+        await refreshSession();
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [logout]);
+  }, [refreshSession]);
 
   const login = async (email: string, password: string) => {
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
 
@@ -111,9 +151,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = await res.json();
     const accessToken = data.accessToken;
+    const refreshToken = data.refreshToken;
     const authUser = data.user;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
+    if (refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    }
     setAuthCookie(accessToken);
     setToken(accessToken);
     setUser(authUser);
@@ -123,6 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email, password, name }),
     });
 
@@ -133,9 +178,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = await res.json();
     const accessToken = data.accessToken;
+    const refreshToken = data.refreshToken;
     const authUser = data.user;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
+    if (refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    }
     setAuthCookie(accessToken);
     setToken(accessToken);
     setUser(authUser);
@@ -150,6 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
+        refreshSession,
         logout,
       }}
     >

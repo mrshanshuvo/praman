@@ -201,4 +201,27 @@ Nice to have: Docker, Prisma ORM.
     expect(res.body).toHaveProperty('strategy');
     expect(res.body).toHaveProperty('resume');
   }, 15000);
+
+  it('Step 9: POST /auth/refresh rotates token pair and permits authenticated requests', async () => {
+    const loginRes = await request(httpServer).post('/auth/login').send({
+      email: 'mrshanshuvo@gmail.com',
+      password: 'Password123!',
+    });
+    const refreshToken = loginRes.body.refreshToken;
+    expect(refreshToken).toBeDefined();
+
+    const refreshRes = await request(httpServer)
+      .post('/auth/refresh')
+      .send({ refreshToken })
+      .expect(200);
+
+    expect(refreshRes.body).toHaveProperty('accessToken');
+    expect(refreshRes.body).toHaveProperty('refreshToken');
+    const newAccessToken = refreshRes.body.accessToken;
+
+    await request(httpServer)
+      .get('/candidate-profile')
+      .set('Authorization', `Bearer ${newAccessToken}`)
+      .expect(200);
+  });
 });
