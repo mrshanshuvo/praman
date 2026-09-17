@@ -1,11 +1,14 @@
 'use client';
 
 import type { ResumeStatus } from '@praman/schemas';
-import { ExternalLink, Play, RefreshCw } from 'lucide-react';
+import { ExternalLink, FileJson, FileText, Play, RefreshCw, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { JsonCard } from '@/components/JsonCard';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
+import { useCandidateProfile } from '@/hooks/usePramanApi';
+import { ResumeViewer } from '../resume/_components/ResumeViewer';
 import { StageEmpty } from './StageEmpty';
 
 interface Stage4ResumeProps {
@@ -31,9 +34,11 @@ export function Stage4Resume({
   isDisabled,
   onRun,
 }: Stage4ResumeProps) {
+  const { data: candidateProfile } = useCandidateProfile();
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-foreground">
             Stage 4: Generated Resume & Audit
@@ -43,17 +48,18 @@ export function Stage4Resume({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {resumeRecord && (
             <Link
               href={`/jobs/${jobId}/resume`}
               className={buttonVariants({
                 variant: 'outline',
                 size: 'sm',
-                className: 'border-border bg-muted/60 hover:bg-muted text-foreground gap-1',
+                className:
+                  'border-border bg-muted/60 hover:bg-muted text-foreground gap-1 flex-1 sm:flex-initial',
               })}
             >
-              <span>Full Audit View</span>
+              <span>Full Audit Page</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
           )}
@@ -62,7 +68,7 @@ export function Stage4Resume({
             size="sm"
             onClick={onRun}
             disabled={isDisabled || !hasStrategy}
-            className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20"
+            className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20 flex-1 sm:flex-initial"
           >
             {isRunning ? (
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -85,10 +91,38 @@ export function Stage4Resume({
           onCta={hasStrategy ? onRun : undefined}
         />
       ) : (
-        <div className="space-y-6">
-          <ValidationReportPanel report={validationReport} status={resumeStatus} />
-          <JsonCard title="Final Resume JSON" subtitle="Schema: ResumeSchema" data={resumeJson} />
-        </div>
+        <Tabs defaultValue="structured" className="w-full space-y-4">
+          <TabsList className="bg-muted/60 p-1 border border-border">
+            <TabsTrigger value="structured" className="text-xs flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-brand-cyan" />
+              <span>Interactive Audit View</span>
+            </TabsTrigger>
+            <TabsTrigger value="report" className="text-xs flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-brand-pink" />
+              <span>Validation Rules</span>
+            </TabsTrigger>
+            <TabsTrigger value="json" className="text-xs flex items-center gap-1.5">
+              <FileJson className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>Raw JSON</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="structured">
+            <ResumeViewer
+              resume={resumeJson}
+              validationReport={validationReport}
+              candidateProfile={candidateProfile}
+            />
+          </TabsContent>
+
+          <TabsContent value="report">
+            <ValidationReportPanel report={validationReport} status={resumeStatus} />
+          </TabsContent>
+
+          <TabsContent value="json">
+            <JsonCard title="Final Resume JSON" subtitle="Schema: ResumeSchema" data={resumeJson} />
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );

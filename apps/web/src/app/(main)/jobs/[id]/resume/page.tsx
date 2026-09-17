@@ -1,16 +1,20 @@
 'use client';
 
-import { ArrowLeft, Check, Copy, Download, FileCode, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, FileCode, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
-import { useJobResume, useJobResumeLatex } from '@/hooks/usePramanApi';
+import {
+  useCandidateProfile,
+  useJobResume,
+  useJobResumeLatex,
+  useRunStage,
+} from '@/hooks/usePramanApi';
 import { LatexViewer } from './_components/LatexViewer';
+import { ResumeAuditHeader } from './_components/ResumeAuditHeader';
 import { ResumeViewer } from './_components/ResumeViewer';
 
 export default function ResumeAuditPage() {
@@ -26,73 +30,31 @@ export default function ResumeAuditPage() {
   } = useJobResume(id);
 
   const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(id);
+  const { data: candidateProfile } = useCandidateProfile();
+  const runStageMutation = useRunStage(id);
 
-  const [copied, setCopied] = useState(false);
   const error = fetchError ? (fetchError as Error).message : null;
-
   const resume = resumeData?.resumeJson;
   const report = resumeData?.validationReport;
   const status = resumeData?.status;
   const downloadUrl = resumeData?.downloadUrl;
   const latex = latexData?.latex;
 
-  const handleCopyJson = () => {
-    if (!resume) return;
-    navigator.clipboard.writeText(JSON.stringify(resume, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleRegenerate = async () => {
+    try {
+      await runStageMutation.mutateAsync('resume');
+    } catch (err: any) {
+      console.error('Failed to regenerate resume:', err);
+    }
   };
 
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Top Bar Skeleton */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-9 w-9 rounded-lg bg-muted" />
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-7 w-64 bg-muted" />
-                <Skeleton className="h-5 w-20 rounded-full bg-muted" />
-              </div>
-              <Skeleton className="h-3.5 w-80 bg-muted/60" />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-24 rounded bg-muted" />
-            <Skeleton className="h-9 w-28 rounded bg-muted" />
-          </div>
-        </div>
-
-        {/* 2-Column Grid Skeleton */}
+        <Skeleton className="h-20 w-full rounded-2xl bg-card border border-border" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-7 space-y-4">
-            <div className="p-8 rounded-2xl border border-border bg-card/60 space-y-6">
-              <div className="space-y-2 border-b border-border pb-4">
-                <Skeleton className="h-8 w-48 bg-muted" />
-                <Skeleton className="h-4 w-72 bg-muted/60" />
-              </div>
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-32 bg-muted" />
-                <Skeleton className="h-16 w-full bg-muted/40" />
-              </div>
-              <div className="space-y-3 pt-2">
-                <Skeleton className="h-5 w-40 bg-muted" />
-                <Skeleton className="h-24 w-full bg-muted/40" />
-              </div>
-            </div>
-          </div>
-          <div className="lg:col-span-5 space-y-4">
-            <div className="p-6 rounded-2xl border border-border bg-card/60 space-y-4">
-              <Skeleton className="h-5 w-44 bg-muted" />
-              <Skeleton className="h-20 w-full rounded-xl bg-muted/50" />
-              <div className="space-y-2 pt-2">
-                <Skeleton className="h-10 w-full rounded-lg bg-muted/30" />
-                <Skeleton className="h-10 w-full rounded-lg bg-muted/30" />
-                <Skeleton className="h-10 w-full rounded-lg bg-muted/30" />
-              </div>
-            </div>
-          </div>
+          <Skeleton className="lg:col-span-7 h-150 rounded-2xl bg-card border border-border" />
+          <Skeleton className="lg:col-span-5 h-150 rounded-2xl bg-card border border-border" />
         </div>
       </div>
     );
@@ -100,11 +62,9 @@ export default function ResumeAuditPage() {
 
   if (error || !resume) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-lg font-bold text-foreground mb-2">
-          Resume Not Found or Not Generated
-        </h2>
-        <p className="text-xs text-muted-foreground mb-6">
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-4">
+        <h2 className="text-xl font-bold text-foreground">Resume Not Found or Not Generated</h2>
+        <p className="text-xs text-muted-foreground">
           {error || 'Stage 4 has not been run for this job description yet.'}
         </p>
         <Link
@@ -112,7 +72,7 @@ export default function ResumeAuditPage() {
           className={buttonVariants({
             size: 'sm',
             className:
-              'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20',
+              'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20 gap-1.5',
           })}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -124,97 +84,23 @@ export default function ResumeAuditPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/jobs/${id}`}
-            className={buttonVariants({
-              variant: 'outline',
-              size: 'icon',
-              className:
-                'border-border bg-card text-muted-foreground hover:text-foreground h-9 w-9',
-            })}
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                Resume & Evidence Audit
-              </h1>
-              <Badge
-                variant="outline"
-                className={`text-xs font-mono font-bold px-2.5 py-0.5 uppercase ${
-                  status === 'VALIDATED'
-                    ? 'bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan'
-                    : 'bg-brand-pink/10 border-brand-pink/30 text-brand-pink'
-                }`}
-              >
-                {status}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-              Audited against confirmed candidate profile records with zero hallucinations.
-            </p>
-          </div>
-        </div>
+      <ResumeAuditHeader
+        id={id}
+        status={status}
+        downloadUrl={downloadUrl}
+        resumeJson={resume}
+        isFetching={isFetching}
+        isRegenerating={runStageMutation.isPending}
+        onRefresh={() => refetch()}
+        onRegenerate={handleRegenerate}
+      />
 
-        <div className="flex items-center gap-2">
-          {downloadUrl && (
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonVariants({
-                size: 'sm',
-                className:
-                  'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-sm gap-1.5',
-              })}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download .tex</span>
-            </a>
-          )}
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="text-foreground border-border bg-card hover:bg-muted"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCopyJson}
-            className="text-foreground border-border bg-card hover:bg-muted"
-          >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-brand-cyan" />
-                <span className="text-brand-cyan">Copied JSON</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>Copy JSON</span>
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Main Grid: Left = Tabs (Formatted View / LaTeX Code), Right = Evidence Audit Report */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-4">
           <Tabs defaultValue="preview" className="w-full">
             <TabsList className="mb-3 bg-muted/60 p-1 border border-border">
               <TabsTrigger value="preview" className="text-xs px-4">
-                Structured Resume
+                Structured Resume & Evidence
               </TabsTrigger>
               <TabsTrigger value="latex" className="text-xs px-4 flex items-center gap-1.5">
                 <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
@@ -223,7 +109,11 @@ export default function ResumeAuditPage() {
             </TabsList>
 
             <TabsContent value="preview">
-              <ResumeViewer resume={resume} />
+              <ResumeViewer
+                resume={resume}
+                validationReport={report}
+                candidateProfile={candidateProfile}
+              />
             </TabsContent>
 
             <TabsContent value="latex">
