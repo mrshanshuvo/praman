@@ -147,6 +147,50 @@ export class ValidationService {
       }
     }
 
+    // 2.5 Summary Ground Truth & Metric Checks (§0 P0 Fix)
+    const candidateFullSourceText = [
+      candidateProfile?.personal?.summary || '',
+      ...(candidateProfile?.experiences || []).flatMap((e: any) => [
+        e.company || '',
+        e.title || '',
+        ...(e.responsibilities || []),
+        ...(e.achievements || []),
+      ]),
+      ...(candidateProfile?.projects || []).flatMap((p: any) => [
+        p.name || '',
+        p.description || '',
+        ...(p.outcomes || []),
+      ]),
+      ...(candidateProfile?.educations || []).flatMap((ed: any) => [
+        ed.institution || '',
+        ed.degree || '',
+      ]),
+      ...(candidateProfile?.certifications || []).map((c: any) => c.name || ''),
+    ].join(' ');
+
+    if (data.summary) {
+      // Check for unconfirmed metrics or numbers in summary
+      this.checkNumbersInBullet(data.summary, candidateFullSourceText, 'Summary', numberFlags);
+
+      // Check for unlearned skills claimed in summary
+      for (const sk of candidateProfile?.skills || []) {
+        if (sk.level === 'NOT_LEARNED') {
+          const escaped = sk.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const skillRegex = new RegExp(`\\b${escaped}\\b`, 'i');
+          if (skillRegex.test(data.summary)) {
+            violations.push(
+              `Forbidden skill claim in summary: candidate explicitly marked "${sk.name}" as NOT_LEARNED`,
+            );
+          }
+        }
+      }
+    }
+
+    // Check numbers in summaryClaims if present
+    for (const claim of (data as any).summaryClaims || []) {
+      this.checkNumbersInBullet(claim, candidateFullSourceText, 'Summary Claim', numberFlags);
+    }
+
     // 3. Skill Truth-Preservation Checks
     for (const skill of data.skills || []) {
       const normalized = skill.toLowerCase().trim();
@@ -218,17 +262,44 @@ export class ValidationService {
     location: string,
     outFlags: NumberFlag[],
   ) {
-    // Match numbers, percentages, currency, e.g. 50k, 12,000, 42%, $120k, 99.8%
+    // Match numbers, percentages, rankings, currency, e.g. 50k, 12,000, 42%, $120k, 99.8%, #1
     const numberRegex =
-      /(?:\$\s*\d+(?:,\d+)*(?:\.\d+)?(?:k|m|b)?|\b\d+(?:,\d+)*(?:\.\d+)?%|\b\d+(?:,\d+)*(?:\.\d+)?(?:k|m|b)?\b)/gi;
+      /(?:\$\s*\d+(?:,\d+)*(?:\.\d+)?(?:k|m|b)?|\b\d+(?:,\d+)*(?:\.\d+)?%|#\d+|\b\d+(?:,\d+)*(?:\.\d+)?(?:k|m|b)?\b)/gi;
     const bulletMatches = bullet.match(numberRegex) || [];
+
+    // Extract all source numbers as normalized tokens to avoid false substring matches (e.g. "50" in "250000")
+    const sourceNumbers = new Set<string>();
+    const sourceMatches = sourceText.match(numberRegex) || [];
+    for (const s of sourceMatches) {
+      const cleanS = s.toLowerCase().replace(/[,]/g, '');
+      sourceNumbers.add(cleanS);
+      if (cleanS.endsWith('k')) {
+        sourceNumbers.add(`${cleanS.slice(0, -1)}000`);
+      } else if (cleanS.endsWith('000')) {
+        sourceNumbers.add(`${cleanS.slice(0, -3)}k`);
+      }
+      if (cleanS.endsWith('m')) {
+        sourceNumbers.add(`${cleanS.slice(0, -1)}000000`);
+      } else if (cleanS.endsWith('000000')) {
+        sourceNumbers.add(`${cleanS.slice(0, -6)}m`);
+      }
+    }
 
     const unconfirmedNumbers: string[] = [];
     for (const num of bulletMatches) {
       const cleanNum = num.toLowerCase().replace(/[,]/g, '');
-      const cleanSource = sourceText.toLowerCase().replace(/[,]/g, '');
 
-      if (!cleanSource.includes(cleanNum)) {
+      let matched = sourceNumbers.has(cleanNum);
+
+      // Check shorthand expansion
+      if (!matched && cleanNum.endsWith('k')) {
+        matched = sourceNumbers.has(`${cleanNum.slice(0, -1)}000`);
+      }
+      if (!matched && cleanNum.endsWith('m')) {
+        matched = sourceNumbers.has(`${cleanNum.slice(0, -1)}000000`);
+      }
+
+      if (!matched) {
         unconfirmedNumbers.push(num);
       }
     }

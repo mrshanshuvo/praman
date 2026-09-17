@@ -1,18 +1,15 @@
-import "dotenv/config";
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module.js";
+import 'dotenv/config';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configuredOrigins = (process.env.FRONTEND_URL ?? "")
-    .split(",")
-    .map((url) => url.trim().replace(/\/+$/, ""))
+  const configuredOrigins = (process.env.FRONTEND_URL ?? '')
+    .split(',')
+    .map((url) => url.trim().replace(/\/+$/, ''))
     .filter(Boolean);
 
-  const allowedOrigins = new Set([
-    "http://localhost:3000",
-    ...configuredOrigins,
-  ]);
+  const allowedOrigins = new Set(['http://localhost:3000', ...configuredOrigins]);
 
   app.enableCors({
     origin: (
@@ -26,7 +23,7 @@ async function bootstrap() {
 
       try {
         const parsed = new URL(origin);
-        if (allowedOrigins.has(origin) || parsed.hostname.endsWith(".vercel.app")) {
+        if (allowedOrigins.has(origin) || parsed.hostname.endsWith('.vercel.app')) {
           return callback(null, true);
         }
       } catch {
@@ -40,8 +37,7 @@ async function bootstrap() {
     credentials: true,
   });
   const port = process.env.PORT ?? 5000;
-  await app.listen(port, "0.0.0.0");
+  await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://0.0.0.0:${port}`);
 }
 await bootstrap();
-

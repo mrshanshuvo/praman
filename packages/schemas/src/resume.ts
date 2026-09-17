@@ -44,6 +44,7 @@ export type ResumeCertificationItem = z.infer<typeof ResumeCertificationItemSche
 export const ResumeSchema = z.object({
   personal: ResumePersonalSchema,
   summary: z.string().min(1, 'Professional summary is required'),
+  summaryClaims: z.array(z.string()).optional().default([]),
   experience: z.array(ResumeExperienceItemSchema).default([]),
   projects: z.array(ResumeProjectItemSchema).default([]),
   skills: z.array(z.string()).default([]),

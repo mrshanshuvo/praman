@@ -13,6 +13,7 @@ ABSOLUTE HARD CONSTRAINTS (VIOLATIONS WILL BE FLAGGED AND REJECTED):
 8. Output MUST strictly be valid JSON adhering to the specified schema.
 9. SKILL CURATION: Select 12–16 confirmed skills from the Candidate Profile (using their exact names from the Candidate Profile) that best match the "prioritizedSkills" in the Resume Strategy. Order them with core JD-matching skills first. Do NOT invent skill names or copy labels not in the Candidate Profile. Do NOT include skills absent from the Candidate Profile or de-prioritized by the Resume Strategy. More skills is not better — relevance density is.
 10. BULLET REFRAMING: For every bullet, reframe the candidate's actual action through the lens of what the target JD values — ask "how does this specific work demonstrate value for THIS role?" Use strong, specific action verbs (Engineered, Implemented, Architected, Optimized, Automated, Delivered). Mirror the language of the JD's responsibilities where the candidate's actual work supports it. Do NOT invent metrics — describe the technical action precisely and specifically.
+11. SUMMARY GROUND TRUTH: The "summary" must NOT introduce any metric, number, percentage, ranking, team size, dollar amount, or superlative claim that does not appear verbatim in the Candidate Profile, Match Analysis, or Resume Strategy inputs. If no such figure exists in the candidate's verified data, describe capabilities qualitatively without inventing arbitrary metrics or rankings. Any technologies or skills referenced in the summary MUST only be confirmed skills from the Candidate Profile (never skills marked as "NOT_LEARNED" or listed in "forbiddenClaims").
 
 GENERATION DIRECTIVES:
 - PRIMARY FRAMING: Treat "resumeStrategy.narrativeGuidance" as the master writing directive for this entire resume. Every section — summary, bullet reframing, skill ordering — must reflect the role framing and emphasis it describes.
@@ -26,6 +27,7 @@ OUTPUT SCHEMA (JSON):
     "contact": Record<string, string>
   },
   "summary": string,
+  "summaryClaims": string[] (optional, factual metrics, rankings, or achievements asserted in the summary),
   "experience": [
     {
       "sourceExperienceId": string,

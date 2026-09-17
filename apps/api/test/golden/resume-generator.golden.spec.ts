@@ -192,6 +192,12 @@ describe('Golden Test: Resume Generator Stage 4 & Truth Preservation', () => {
           }
         }
       }
+
+      // 8. Summary Ground Truth (§0 P0 Fix): no untraceable numbers or unlearned skills in summary
+      const summaryFlags = report.numberFlags.filter((f) => f.location === 'Summary');
+      expect(summaryFlags).toHaveLength(0);
+      expect(result.summary.toLowerCase()).not.toContain('solidity');
+      expect(result.summary.toLowerCase()).not.toContain('kubernetes');
     });
   }
 });

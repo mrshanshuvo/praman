@@ -203,4 +203,71 @@ describe('ValidationService (Anti-Hallucination & Truth Enforcement)', () => {
     expect(report.numberFlags).toHaveLength(1);
     expect(report.numberFlags[0].flaggedNumbers).toContain('99%');
   });
+
+  it('FLAGS unbacked metrics and numbers in summary', () => {
+    const inflatedSummaryResume = {
+      personal: { name: 'Shahid Hasan Shovu', contact: {} },
+      summary: 'Ranked in top 1% globally with $500k in ARR and managed 50 engineers.',
+      experience: [],
+      projects: [],
+      skills: ['TypeScript'],
+      education: [],
+      certifications: [],
+    };
+
+    const report = service.validateResume(inflatedSummaryResume, candidateProfileFixture);
+
+    const summaryFlag = report.numberFlags.find((f) => f.location === 'Summary');
+    expect(summaryFlag).toBeDefined();
+    expect(summaryFlag?.flaggedNumbers).toContain('1%');
+    expect(summaryFlag?.flaggedNumbers).toContain('$500k');
+    expect(summaryFlag?.flaggedNumbers).toContain('50');
+  });
+
+  it('ACCEPTS verified metrics in summary that exist in candidate profile', () => {
+    const profileWithMetrics = {
+      ...candidateProfileFixture,
+      personal: {
+        ...candidateProfileFixture.personal,
+        summary: 'Competitive programmer ranked in top 4% on BeeCrowd with 40% latency reduction.',
+      },
+    };
+
+    const verifiedSummaryResume = {
+      personal: { name: 'Shahid Hasan Shovu', contact: {} },
+      summary:
+        'Competitive programmer ranked in top 4% on BeeCrowd with verified 40% latency reduction.',
+      experience: [],
+      projects: [],
+      skills: ['TypeScript'],
+      education: [],
+      certifications: [],
+    };
+
+    const report = service.validateResume(verifiedSummaryResume, profileWithMetrics);
+
+    const summaryFlags = report.numberFlags.filter((f) => f.location === 'Summary');
+    expect(summaryFlags).toHaveLength(0);
+  });
+
+  it('REJECTS a resume when summary claims a skill marked as NOT_LEARNED', () => {
+    const forbiddenSummaryResume = {
+      personal: { name: 'Shahid Hasan Shovu', contact: {} },
+      summary: 'Expert Solidity developer building decentralized applications.',
+      experience: [],
+      projects: [],
+      skills: ['TypeScript'],
+      education: [],
+      certifications: [],
+    };
+
+    const report = service.validateResume(forbiddenSummaryResume, candidateProfileFixture);
+
+    expect(report.status).toBe('REJECTED');
+    expect(
+      report.violations.some(
+        (v) => v.includes('Forbidden skill claim in summary') && v.includes('Solidity'),
+      ),
+    ).toBe(true);
+  });
 });
