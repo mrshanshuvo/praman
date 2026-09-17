@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: praman-api
+    runtime: node
+    plan: free
+    buildCommand: npm install -g pnpm@12.4.2 && pnpm install --frozen-lockfile && pnpm turbo run build --filter=api...
+    startCommand: pnpm --filter api exec prisma db migrate && pnpm --filter api run start:prod
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_BASE_URL
+        sync: false
+      - key: AI_MODEL
+        value: groq/compound-mini

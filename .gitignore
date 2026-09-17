@@ -13,3 +13,5 @@ coverage/
 .cursor/
 .devin/
 .system_generated/
+apps/*/pnpm-lock.yaml
+packages/*/pnpm-lock.yaml
