@@ -6,7 +6,7 @@ export function AuthBackground() {
       {/* Dark Mode: Futuristic neon network constellation */}
       <div className="relative w-full h-full hidden dark:block">
         <Image
-          src="/auth/auth-bg-dark.jpg"
+          src="/auth/pexels-nikolaydemirev-35330876.jpg"
           alt="Auth Backdrop"
           fill
           priority
