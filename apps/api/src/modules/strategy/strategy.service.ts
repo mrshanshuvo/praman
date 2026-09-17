@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { type ResumeStrategy, ResumeStrategySchema } from '@praman/schemas';
-import { AiService } from '../ai/ai.service.js';
 import { PrismaService } from '../../core/database/prisma.service.js';
+import { AiService } from '../ai/ai.service.js';
 import { RESUME_STRATEGY_SYSTEM_PROMPT_V1 } from '../ai/prompts/resume-strategy.v1.js';
 
 @Injectable()

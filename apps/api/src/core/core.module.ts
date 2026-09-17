@@ -1,6 +1,6 @@
+import * as path from 'node:path';
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import * as path from 'node:path';
 import { configLoaders, validateEnv } from './config/env.config.js';
 import { PrismaModule } from './database/prisma.module.js';
 import { StorageModule } from './storage/storage.module.js';

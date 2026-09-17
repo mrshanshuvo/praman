@@ -1,5 +1,5 @@
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
-import { createDatabaseClient, db, type DatabaseClient } from './db.js';
+import { createDatabaseClient, type DatabaseClient, db } from './db.js';
 
 export type { DatabaseClient };
 

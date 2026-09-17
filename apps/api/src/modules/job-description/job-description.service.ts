@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { type StructuredJd, StructuredJdSchema } from '@praman/schemas';
-import { AiService } from '../ai/ai.service.js';
-import { CandidateService } from '../candidate/candidate.service.js';
 import { PrismaService } from '../../core/database/prisma.service.js';
+import { AiService } from '../ai/ai.service.js';
 import { JD_ANALYZER_SYSTEM_PROMPT_V1 } from '../ai/prompts/jd-analyzer.v1.js';
+import { CandidateService } from '../candidate/candidate.service.js';
 
 @Injectable()
 export class JobDescriptionService {
