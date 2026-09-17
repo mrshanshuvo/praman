@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     buildCommand: npm install -g pnpm@12.4.2 && pnpm install --frozen-lockfile && pnpm turbo run build --filter=api...
-    startCommand: pnpm --filter api exec prisma db migrate && pnpm --filter api run start:prod
+    startCommand: pnpm --filter api run start:prod
     envVars:
       - key: NODE_VERSION
         value: 20
