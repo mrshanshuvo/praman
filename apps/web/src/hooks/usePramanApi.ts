@@ -48,7 +48,6 @@ export function useJobResumeLatex(id: string) {
   });
 }
 
-
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({

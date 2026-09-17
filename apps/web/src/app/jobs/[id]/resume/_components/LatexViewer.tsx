@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-
 interface LatexViewerProps {
   latex: string;
   downloadUrl?: string | null;
@@ -89,19 +88,19 @@ export function LatexViewer({ latex, downloadUrl, candidateName = 'resume' }: La
               className={buttonVariants({
                 variant: 'outline',
                 size: 'sm',
-                className: 'h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1.5',
+                className:
+                  'h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1.5',
               })}
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>R2 Link</span>
             </a>
           )}
-
         </div>
       </div>
 
       {/* Syntax/Code Box */}
-      <div className="p-6 bg-slate-950/90 text-slate-100 font-mono text-xs overflow-x-auto max-h-[600px] leading-relaxed select-text">
+      <div className="p-6 bg-slate-950/90 text-slate-100 font-mono text-xs overflow-x-auto max-h-150 leading-relaxed select-text">
         <pre className="font-mono">
           <code>{latex}</code>
         </pre>

@@ -25,10 +25,7 @@ export default function ResumeAuditPage() {
     refetch,
   } = useJobResume(id);
 
-  const {
-    data: latexData,
-    isLoading: latexLoading,
-  } = useJobResumeLatex(id);
+  const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(id);
 
   const [copied, setCopied] = useState(false);
   const error = fetchError ? (fetchError as Error).message : null;
@@ -262,4 +259,3 @@ export default function ResumeAuditPage() {
     </div>
   );
 }
-
