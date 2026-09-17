@@ -9,6 +9,7 @@ describe('Pipeline E2E Integration Test', () => {
   let httpServer: any;
   let candidateProfile: any;
   let jobDescriptionId: string;
+  let authToken: string;
 
   beforeAll(async () => {
     // Ensure deterministic offline AI engine for tests
@@ -22,6 +23,26 @@ describe('Pipeline E2E Integration Test', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
     httpServer = app.getHttpServer();
+
+    // Authenticate as the seeded candidate user to obtain Bearer token for pipeline testing
+    const loginRes = await request(httpServer).post('/auth/login').send({
+      email: 'mrshanshuvo@gmail.com',
+      password: 'Password123!',
+    });
+
+    if (loginRes.status === 200) {
+      authToken = loginRes.body.accessToken;
+    } else {
+      // Fallback: register new user
+      const authRes = await request(httpServer)
+        .post('/auth/register')
+        .send({
+          email: `e2e-${Date.now()}@praman.dev`,
+          password: 'Password123!',
+          name: 'E2E Test User',
+        });
+      authToken = authRes.body.accessToken;
+    }
   });
 
   afterAll(async () => {
@@ -30,8 +51,15 @@ describe('Pipeline E2E Integration Test', () => {
     }
   });
 
+  it('Step 0: Verify unauthenticated requests are rejected with 401', async () => {
+    await request(httpServer).get('/candidate-profile').expect(401);
+  });
+
   it('Step 1: GET /candidate-profile retrieves seeded candidate records', async () => {
-    const res = await request(httpServer).get('/candidate-profile').expect(200);
+    const res = await request(httpServer)
+      .get('/candidate-profile')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
 
     candidateProfile = res.body;
     expect(candidateProfile).toBeDefined();
@@ -53,6 +81,7 @@ Nice to have: Docker, Prisma ORM.
 
     const res = await request(httpServer)
       .post('/job-descriptions')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({ rawText: jdText })
       .expect(201);
 
@@ -67,6 +96,7 @@ Nice to have: Docker, Prisma ORM.
   it('Step 3: POST /job-descriptions/:id/match runs Stage 2 Match Analysis', async () => {
     const res = await request(httpServer)
       .post(`/job-descriptions/${jobDescriptionId}/match`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(201);
 
     expect(res.body).toHaveProperty('result');
@@ -79,6 +109,7 @@ Nice to have: Docker, Prisma ORM.
   it('Step 4: POST /job-descriptions/:id/strategy runs Stage 3 Strategy formulation', async () => {
     const res = await request(httpServer)
       .post(`/job-descriptions/${jobDescriptionId}/strategy`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(201);
 
     expect(res.body).toHaveProperty('result');
@@ -91,6 +122,7 @@ Nice to have: Docker, Prisma ORM.
   it('Step 5: POST /job-descriptions/:id/resume runs Stage 4 Generation + Evidence Validation', async () => {
     const res = await request(httpServer)
       .post(`/job-descriptions/${jobDescriptionId}/resume`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(201);
 
     expect(res.body).toHaveProperty('status');
@@ -137,6 +169,7 @@ Nice to have: Docker, Prisma ORM.
   it('Step 6: GET /job-descriptions/:id/resume retrieves the latest validated resume', async () => {
     const res = await request(httpServer)
       .get(`/job-descriptions/${jobDescriptionId}/resume`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
     expect(res.body).toBeDefined();
@@ -147,6 +180,7 @@ Nice to have: Docker, Prisma ORM.
   it('Step 7: POST /job-descriptions/:id/run-pipeline executes orchestrated pipeline in one call', async () => {
     const res = await request(httpServer)
       .post(`/job-descriptions/${jobDescriptionId}/run-pipeline`)
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(201);
 
     expect(res.body).toHaveProperty('jobDescriptionId', jobDescriptionId);
@@ -157,7 +191,10 @@ Nice to have: Docker, Prisma ORM.
   }, 15000);
 
   it('Step 8: POST /pipelines/:id executes via new dedicated PipelineController', async () => {
-    const res = await request(httpServer).post(`/pipelines/${jobDescriptionId}`).expect(201);
+    const res = await request(httpServer)
+      .post(`/pipelines/${jobDescriptionId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(201);
 
     expect(res.body).toHaveProperty('jobDescriptionId', jobDescriptionId);
     expect(res.body).toHaveProperty('match');

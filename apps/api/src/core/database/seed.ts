@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { db } from './db.js';
 
 export async function seed() {
@@ -6,6 +7,7 @@ export async function seed() {
 
   const userEmail = 'mrshanshuvo@gmail.com';
   const userName = 'Shahid Hasan Shovu';
+  const defaultPasswordHash = bcrypt.hashSync('Password123!', 10);
 
   // Check if user already exists
   let user = await db.orm.public.User.where({ email: userEmail }).first();
@@ -19,14 +21,24 @@ export async function seed() {
       user = await db.orm.public.User.where({ id: oldUser.id }).update({
         email: userEmail,
         name: userName,
+        passwordHash: defaultPasswordHash,
       });
       console.log(`Updated user ${oldUser.id} to ${userEmail}`);
     } else {
       user = await db.orm.public.User.create({
         email: userEmail,
         name: userName,
+        passwordHash: defaultPasswordHash,
       });
       console.log(`Created user with ID: ${user.id}`);
+    }
+  } else if (!user.passwordHash) {
+    const updated = await db.orm.public.User.where({ id: user.id }).update({
+      passwordHash: defaultPasswordHash,
+    });
+    if (updated) {
+      user = updated;
+      console.log(`Updated existing user ${user.id} with default passwordHash`);
     }
   }
 

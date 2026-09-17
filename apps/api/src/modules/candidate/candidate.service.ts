@@ -41,10 +41,15 @@ export class CandidateService {
     return user;
   }
 
-  async getProfile() {
-    const user = await this.getDefaultUser();
+  async getProfile(targetUserId?: string) {
+    let userId = targetUserId;
+    if (!userId) {
+      const user = await this.getDefaultUser();
+      userId = user.id;
+    }
+
     let profile = await this.prisma.client.orm.public.CandidateProfile.where({
-      userId: user.id,
+      userId,
     })
       .include('experiences')
       .include('projects')
@@ -54,11 +59,15 @@ export class CandidateService {
       .first();
 
     if (!profile) {
+      const userRecord = await this.prisma.client.orm.public.User.where({
+        id: userId,
+      }).first();
+
       const newProfile = await this.prisma.client.orm.public.CandidateProfile.create({
-        userId: user.id,
+        userId,
         personal: {
-          name: user.name ?? 'Candidate',
-          contact: { email: user.email },
+          name: userRecord?.name ?? 'Candidate',
+          contact: { email: userRecord?.email ?? '' },
           links: {},
         },
       });

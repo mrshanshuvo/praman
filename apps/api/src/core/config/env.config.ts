@@ -25,6 +25,10 @@ export const EnvSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().default('praman-resumes'),
+
+  // Auth & Security
+  JWT_SECRET: z.string().default('praman-dev-secret-super-secure-key-change-in-prod'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
 });
 
 export type EnvConfig = z.infer<typeof EnvSchema>;
@@ -67,9 +71,15 @@ export const databaseConfig = registerAs('database', () => ({
   url: process.env.DATABASE_URL!,
 }));
 
-export const configLoaders = [appConfig, aiConfig, r2Config, databaseConfig];
+export const authConfig = registerAs('auth', () => ({
+  jwtSecret: process.env.JWT_SECRET || 'praman-dev-secret-super-secure-key-change-in-prod',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+}));
+
+export const configLoaders = [appConfig, aiConfig, r2Config, databaseConfig, authConfig];
 
 export type AppConfig = ReturnType<typeof appConfig>;
 export type AiConfig = ReturnType<typeof aiConfig>;
 export type R2Config = ReturnType<typeof r2Config>;
 export type DatabaseConfig = ReturnType<typeof databaseConfig>;
+export type AuthConfig = ReturnType<typeof authConfig>;

@@ -13,8 +13,12 @@ export class JobDescriptionService {
     private readonly candidateService: CandidateService,
   ) {}
 
-  async createAndAnalyze(rawText: string) {
-    const user = await this.candidateService.getDefaultUser();
+  async createAndAnalyze(rawText: string, targetUserId?: string) {
+    let userId = targetUserId;
+    if (!userId) {
+      const user = await this.candidateService.getDefaultUser();
+      userId = user.id;
+    }
 
     // Run Stage 1: JD Analyzer
     const structured = await this.aiService.runStructuredCall<StructuredJd>({
@@ -26,7 +30,7 @@ export class JobDescriptionService {
 
     // Save to Database
     const jd = await this.prisma.client.orm.public.JobDescription.create({
-      userId: user.id,
+      userId,
       rawText,
       structured,
     });
@@ -34,10 +38,14 @@ export class JobDescriptionService {
     return jd;
   }
 
-  async getAllJds() {
-    const user = await this.candidateService.getDefaultUser();
+  async getAllJds(targetUserId?: string) {
+    let userId = targetUserId;
+    if (!userId) {
+      const user = await this.candidateService.getDefaultUser();
+      userId = user.id;
+    }
     const jds = await this.prisma.client.orm.public.JobDescription.where({
-      userId: user.id,
+      userId,
     })
       .include('analysis')
       .all();
