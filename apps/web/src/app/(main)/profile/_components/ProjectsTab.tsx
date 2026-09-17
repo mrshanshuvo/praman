@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink, Plus, Trash2 } from 'lucide-react';
+import { Edit2, ExternalLink, Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 interface ProjectsTabProps {
   projects: any[];
   onAdd: (payload: any) => Promise<void>;
+  onUpdate?: (id: string, payload: any) => Promise<void>;
   onDelete: (id: string, name: string) => Promise<void>;
 }
 
@@ -24,9 +25,29 @@ const EMPTY_PROJECT = {
   link: '',
 };
 
-export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
+export function ProjectsTab({ projects, onAdd, onUpdate, onDelete }: ProjectsTabProps) {
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_PROJECT);
+
+  const handleStartAdd = () => {
+    setEditingId(null);
+    setForm(EMPTY_PROJECT);
+    setShowForm(true);
+  };
+
+  const handleStartEdit = (proj: any) => {
+    setEditingId(proj.id);
+    setForm({
+      name: proj.name || '',
+      description: proj.description || '',
+      role: proj.role || '',
+      link: proj.link || '',
+      technologies: (proj.technologies || []).join(', '),
+      outcomes: (proj.outcomes || []).join('\n'),
+    });
+    setShowForm(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +66,14 @@ export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
         .map((s) => s.trim())
         .filter(Boolean),
     };
-    await onAdd(payload);
+
+    if (editingId && onUpdate) {
+      await onUpdate(editingId, payload);
+    } else {
+      await onAdd(payload);
+    }
     setShowForm(false);
+    setEditingId(null);
     setForm(EMPTY_PROJECT);
   };
 
@@ -61,7 +88,7 @@ export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
         </div>
         <Button
           size="sm"
-          onClick={() => setShowForm(true)}
+          onClick={handleStartAdd}
           className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
         >
           <Plus className="w-4 h-4" />
@@ -72,7 +99,7 @@ export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
       {showForm && (
         <Card className="p-5 border-brand-pink/40 dark:border-brand-cyan/40 bg-card gap-4">
           <h4 className="text-sm font-semibold text-brand-pink dark:text-brand-cyan">
-            New Project Anchor
+            {editingId ? 'Edit Project Anchor' : 'New Project Anchor'}
           </h4>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -162,7 +189,7 @@ export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
                 size="sm"
                 className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
               >
-                Save Project
+                {editingId ? 'Update Project' : 'Save Project'}
               </Button>
             </div>
           </form>
@@ -194,7 +221,7 @@ export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
                   <p className="text-sm text-muted-foreground mt-0.5">Role: {proj.role}</p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Badge
                   variant="outline"
                   className="text-xs font-mono text-muted-foreground bg-muted/60 border-border px-2 py-0.5"
@@ -205,8 +232,19 @@ export function ProjectsTab({ projects, onAdd, onDelete }: ProjectsTabProps) {
                   type="button"
                   variant="ghost"
                   size="icon-xs"
+                  onClick={() => handleStartEdit(proj)}
+                  className="text-muted-foreground hover:text-brand-cyan hover:bg-brand-cyan/10 transition"
+                  title="Edit project"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   onClick={() => onDelete(proj.id, proj.name)}
                   className="text-muted-foreground hover:text-brand-pink hover:bg-brand-pink/10 transition"
+                  title="Delete project"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>

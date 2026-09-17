@@ -1,7 +1,7 @@
 'use client';
 
 import type { SkillLevel } from '@praman/schemas';
-import { Plus, Trash2 } from 'lucide-react';
+import { Edit2, Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { SkillLevelBadge } from '@/components/SkillLevelBadge';
@@ -19,6 +19,10 @@ import {
 interface SkillsTabProps {
   skills: any[];
   onAdd: (payload: { name: string; level: SkillLevel; evidence: string }) => Promise<void>;
+  onUpdate?: (
+    id: string,
+    payload: { name: string; level: SkillLevel; evidence: string },
+  ) => Promise<void>;
   onDelete: (id: string, name: string) => Promise<void>;
 }
 
@@ -29,15 +33,38 @@ const EMPTY_SKILL = {
   evidence: '',
 };
 
-export function SkillsTab({ skills, onAdd, onDelete }: SkillsTabProps) {
+export function SkillsTab({ skills, onAdd, onUpdate, onDelete }: SkillsTabProps) {
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_SKILL);
+
+  const handleStartAdd = () => {
+    setEditingId(null);
+    setForm(EMPTY_SKILL);
+    setShowForm(true);
+  };
+
+  const handleStartEdit = (sk: any) => {
+    setEditingId(sk.id);
+    setForm({
+      name: sk.name || '',
+      level: sk.level || 'EXPERIENCED',
+      evidence: sk.evidence || '',
+    });
+    setShowForm(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) return;
-    await onAdd(form);
+
+    if (editingId && onUpdate) {
+      await onUpdate(editingId, form);
+    } else {
+      await onAdd(form);
+    }
     setShowForm(false);
+    setEditingId(null);
     setForm(EMPTY_SKILL);
   };
 
@@ -52,7 +79,7 @@ export function SkillsTab({ skills, onAdd, onDelete }: SkillsTabProps) {
         </div>
         <Button
           size="sm"
-          onClick={() => setShowForm(true)}
+          onClick={handleStartAdd}
           className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
         >
           <Plus className="w-4 h-4" />
@@ -62,7 +89,9 @@ export function SkillsTab({ skills, onAdd, onDelete }: SkillsTabProps) {
 
       {showForm && (
         <Card className="p-4 border-brand-pink/40 dark:border-brand-cyan/40 bg-card/90 gap-3">
-          <h4 className="text-sm font-semibold text-brand-pink dark:text-brand-cyan">Add Skill</h4>
+          <h4 className="text-sm font-semibold text-brand-pink dark:text-brand-cyan">
+            {editingId ? 'Edit Skill Record' : 'New Skill Record'}
+          </h4>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
@@ -125,7 +154,7 @@ export function SkillsTab({ skills, onAdd, onDelete }: SkillsTabProps) {
                 size="sm"
                 className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
               >
-                Save Skill
+                {editingId ? 'Update Skill' : 'Save Skill'}
               </Button>
             </div>
           </form>
@@ -156,15 +185,28 @@ export function SkillsTab({ skills, onAdd, onDelete }: SkillsTabProps) {
                       </p>
                     )}
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={() => onDelete(sk.id, sk.name)}
-                    className="text-muted-foreground hover:text-brand-pink hover:bg-brand-pink/10 p-1 opacity-0 group-hover:opacity-100 transition shrink-0"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => handleStartEdit(sk)}
+                      className="text-muted-foreground hover:text-brand-cyan hover:bg-brand-cyan/10 p-1"
+                      title="Edit skill"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onDelete(sk.id, sk.name)}
+                      className="text-muted-foreground hover:text-brand-pink hover:bg-brand-pink/10 p-1"
+                      title="Delete skill"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </Card>
               ))}
             </div>

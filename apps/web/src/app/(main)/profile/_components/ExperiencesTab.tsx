@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, Trash2 } from 'lucide-react';
+import { Edit2, Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 interface ExperiencesTabProps {
   experiences: any[];
   onAdd: (payload: any) => Promise<void>;
+  onUpdate?: (id: string, payload: any) => Promise<void>;
   onDelete: (id: string, company: string) => Promise<void>;
 }
 
@@ -26,9 +27,31 @@ const EMPTY_EXP = {
   achievements: '',
 };
 
-export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabProps) {
+export function ExperiencesTab({ experiences, onAdd, onUpdate, onDelete }: ExperiencesTabProps) {
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_EXP);
+
+  const handleStartAdd = () => {
+    setEditingId(null);
+    setForm(EMPTY_EXP);
+    setShowForm(true);
+  };
+
+  const handleStartEdit = (exp: any) => {
+    setEditingId(exp.id);
+    setForm({
+      company: exp.company || '',
+      title: exp.title || '',
+      startDate: exp.startDate || '',
+      endDate: exp.endDate || '',
+      isCurrent: Boolean(exp.isCurrent),
+      responsibilities: (exp.responsibilities || []).join('\n'),
+      technologies: (exp.technologies || []).join(', '),
+      achievements: (exp.achievements || []).join('\n'),
+    });
+    setShowForm(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +75,14 @@ export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabP
         .map((s) => s.trim())
         .filter(Boolean),
     };
-    await onAdd(payload);
+
+    if (editingId && onUpdate) {
+      await onUpdate(editingId, payload);
+    } else {
+      await onAdd(payload);
+    }
     setShowForm(false);
+    setEditingId(null);
     setForm(EMPTY_EXP);
   };
 
@@ -68,7 +97,7 @@ export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabP
         </div>
         <Button
           size="sm"
-          onClick={() => setShowForm(true)}
+          onClick={handleStartAdd}
           className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
         >
           <Plus className="w-4 h-4" />
@@ -79,7 +108,7 @@ export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabP
       {showForm && (
         <Card className="p-5 border-brand-pink/40 dark:border-brand-cyan/40 bg-card/90 gap-4">
           <h4 className="text-sm font-semibold text-brand-pink dark:text-brand-cyan">
-            New Experience Record
+            {editingId ? 'Edit Experience Record' : 'New Experience Record'}
           </h4>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -180,7 +209,7 @@ export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabP
                 size="sm"
                 className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
               >
-                Save Experience
+                {editingId ? 'Update Experience' : 'Save Experience'}
               </Button>
             </div>
           </form>
@@ -213,7 +242,7 @@ export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabP
                   {exp.startDate} — {exp.isCurrent ? 'Present' : exp.endDate || 'N/A'}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Badge
                   variant="outline"
                   className="text-xs font-mono text-muted-foreground bg-muted/60 border-border px-2 py-0.5"
@@ -224,8 +253,19 @@ export function ExperiencesTab({ experiences, onAdd, onDelete }: ExperiencesTabP
                   type="button"
                   variant="ghost"
                   size="icon-xs"
+                  onClick={() => handleStartEdit(exp)}
+                  className="text-muted-foreground hover:text-brand-cyan hover:bg-brand-cyan/10 transition"
+                  title="Edit experience"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   onClick={() => onDelete(exp.id, exp.company)}
                   className="text-muted-foreground hover:text-brand-pink hover:bg-brand-pink/10 transition"
+                  title="Delete experience"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
