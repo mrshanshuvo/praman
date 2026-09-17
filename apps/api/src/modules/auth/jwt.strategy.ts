@@ -20,7 +20,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const auth = configService.get<AuthConfig>('auth');
     const secret = auth?.jwtSecret || 'praman-dev-secret-super-secure-key-change-in-prod';
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        ExtractJwt.fromUrlQueryParameter('token'),
+      ]),
       ignoreExpiration: false,
       secretOrKey: secret,
     });

@@ -224,4 +224,19 @@ Nice to have: Docker, Prisma ORM.
       .set('Authorization', `Bearer ${newAccessToken}`)
       .expect(200);
   });
+
+  it('Step 10: GET /pipelines/:id/stream streams real-time SSE progression events', async () => {
+    const res = await request(httpServer)
+      .get(`/pipelines/${jobDescriptionId}/stream`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
+
+    expect(res.headers['content-type']).toContain('text/event-stream');
+    expect(res.text).toContain('data:');
+    expect(res.text).toContain('"stage":"match"');
+    expect(res.text).toContain('"stage":"strategy"');
+    expect(res.text).toContain('"stage":"resume"');
+    expect(res.text).toContain('"stage":"pipeline"');
+    expect(res.text).toContain('"status":"complete"');
+  }, 20000);
 });
