@@ -50,9 +50,9 @@ describe('PipelineService', () => {
     expect(mockResumeService.generateAndValidate).toHaveBeenCalledWith('jd-123');
 
     expect(result.jobDescriptionId).toBe('jd-123');
-    expect(result.match.id).toBe('match-1');
-    expect(result.strategy.id).toBe('strategy-1');
-    expect(result.resume.id).toBe('resume-1');
+    expect(result.match?.id).toBe('match-1');
+    expect(result.strategy?.id).toBe('strategy-1');
+    expect(result.resume?.id).toBe('resume-1');
   });
 
   it('streamFullPipeline should emit progression events across all stages to completion', async () => {
