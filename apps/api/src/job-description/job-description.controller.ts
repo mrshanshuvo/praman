@@ -53,7 +53,14 @@ export class JobDescriptionController {
     return this.resumeService.getLatestResume(id);
   }
 
+  @Get(':id/resume/latex')
+  async getResumeLatex(@Param('id') id: string) {
+    const latex = await this.resumeService.getLatexSource(id);
+    return { latex };
+  }
+
   // Convenience orchestrator endpoint (§4)
+
   @Post(':id/run-pipeline')
   async runFullPipeline(@Param('id') id: string) {
     const match = await this.matchService.runMatch(id);

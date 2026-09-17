@@ -4,7 +4,9 @@ import { AiService } from '../ai/ai.service.js';
 import { CandidateService } from '../candidate/candidate.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RESUME_GENERATOR_SYSTEM_PROMPT_V1 } from '../prompts/resume-generator.v1.js';
+import { StorageService } from '../storage/storage.service.js';
 import { ValidationService } from '../validation/validation.service.js';
+import { LatexService } from './latex.service.js';
 
 @Injectable()
 export class ResumeService {
@@ -15,6 +17,8 @@ export class ResumeService {
     private readonly aiService: AiService,
     private readonly candidateService: CandidateService,
     private readonly validationService: ValidationService,
+    private readonly latexService: LatexService,
+    private readonly storageService: StorageService,
   ) {}
 
   async generateAndValidate(jobDescriptionId: string) {
@@ -114,7 +118,29 @@ export class ResumeService {
       });
     }
 
-    return resumeRecord;
+    // Generate dynamic LaTeX code and upload to Cloudflare R2
+    let texKey: string | null = null;
+    let downloadUrl: string | null = null;
+    if (resumeRecord) {
+      try {
+        const texContent = await this.latexService.generateLatex(resumeJson, profile);
+        const userId = jd.userId || 'default-user';
+        texKey = `resumes/${userId}/${(resumeRecord as any).id}/resume.tex`;
+
+        await this.storageService.uploadFile(texKey, texContent, 'application/x-tex');
+        downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600); // 1-hour presigned URL
+      } catch (storageErr: any) {
+        this.logger.error(`LaTeX generation/upload failed: ${storageErr.message}`);
+      }
+    }
+
+
+
+    return {
+      ...resumeRecord,
+      texKey,
+      downloadUrl,
+    };
   }
 
   async getLatestResume(jobDescriptionId: string) {
@@ -140,6 +166,32 @@ export class ResumeService {
       resumeStrategyId: strategy.id,
     }).first();
 
-    return resume;
+    if (!resume) return null;
+
+    const userId = jd.userId || 'default-user';
+    const texKey = `resumes/${userId}/${resume.id}/resume.tex`;
+    let downloadUrl: string | null = null;
+    try {
+      downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600);
+    } catch {
+      // ignore
+    }
+
+    return {
+      ...resume,
+      texKey,
+      downloadUrl,
+    };
+  }
+
+  async getLatexSource(jobDescriptionId: string): Promise<string> {
+    const resumeRecord = await this.getLatestResume(jobDescriptionId);
+    if (!resumeRecord) {
+      throw new NotFoundException(`Resume not found for job description ${jobDescriptionId}`);
+    }
+    const profile = await this.candidateService.getProfile();
+    return await this.latexService.generateLatex(resumeRecord.resumeJson as ResumeData, profile);
   }
 }
+
+

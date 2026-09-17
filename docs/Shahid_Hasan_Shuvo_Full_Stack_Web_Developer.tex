@@ -1,0 +1,215 @@
+\documentclass[10pt, a4paper]{article}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+% Packages
+\usepackage{setspace}
+\setstretch{1.10}
+\usepackage[
+    ignoreheadfoot,
+    top=0.75cm, bottom=0.75cm,
+    left=1cm, right=1cm,
+]{geometry}
+\usepackage{titlesec, tabularx, array, xcolor, enumitem, amsmath}
+\definecolor{primaryColor}{RGB}{0, 79, 144}
+\usepackage[
+    pdftitle={Shahid Hasan Shovu's CV},
+    pdfauthor={Shahid Hasan Shovu},
+    colorlinks=true,
+    urlcolor=primaryColor
+]{hyperref}
+\usepackage{changepage, paracol, needspace, iftex}
+% Icons
+\usepackage{fontawesome5}
+\usepackage{graphicx}
+\newcommand{\beecrowdIcon}{\includegraphics[height=0.30cm]{Images/logo-beecrowd1.png}}
+
+% PDF engine setup
+\ifPDFTeX
+    \input{glyphtounicode}
+    \pdfgentounicode=1
+    \usepackage[utf8]{inputenc}
+    \usepackage{lmodern}
+\fi
+
+\pagestyle{empty}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0cm}
+\setlength{\topskip}{0pt}
+\renewcommand\labelitemi{$\circ$}
+
+% Formatting sections
+\titleformat{\section}{\needspace{4\baselineskip}\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule]
+
+
+\titlespacing{\section}{0pt}{0.20cm}{0.15cm}
+
+
+\newenvironment{highlights}{\begin{itemize}[topsep=0.1cm, parsep=0.1cm, partopsep=0pt, itemsep=0pt, leftmargin=10pt]}{\end{itemize}}
+\newenvironment{onecolentry}{\begin{adjustwidth}{0.2cm}{0.2cm}}{\end{adjustwidth}}
+\newenvironment{twocolentry}[1]{\onecolentry\def\secondColumn{#1}\setcolumnwidth{\fill, 4.5cm}\begin{paracol}{2}}{\switchcolumn\raggedleft \secondColumn\end{paracol}\endonecolentry}
+
+\begin{document}
+
+% ===========================
+% Header
+% ===========================
+\begin{center}
+    {\Huge \textbf{Shahid Hasan Shovu}} \\[3pt]
+    \textbf{Full-Stack Developer}\\[3pt]
+     Dhaka - 1216 \textbar\
+    \href{https://wa.me/8801929346733}{+8801929346733} \textbar\
+    \href{mailto:mrshanshuvo@gmail.com}{mrshanshuvo@gmail.com} \\[2pt]
+    
+    \href{https://www.linkedin.com/in/shahidhasanshovu/}{LinkedIn} \textbar\
+    \href{https://github.com/mrshanshuvo}{GitHub} \textbar\
+    \href{https://shahidhasanshuvo.vercel.app/}{Portfolio} \textbar\
+    \href{https://judge.beecrowd.com/en/profile/917228}{beecrowd}
+\end{center}
+
+
+% ===========================
+% Professional Summary
+% ===========================
+\section{Professional Summary}
+\begin{onecolentry}
+Full-Stack Developer specializing in Next.js, TypeScript, Node.js, and NestJS, with experience building production-ready web applications and RESTful APIs. Experienced in authentication, role-based access control, database design, cloud deployment. Strong problem-solving background with competitive programming experience and a top 4\% global ranking on BeeCrowd.
+\end{onecolentry}
+
+
+
+% ===========================
+% Skills
+% ===========================
+\section{Skills}
+\begin{onecolentry}
+\textbf{Frontend:} React.js, Next.js, TypeScript, JavaScript, Tailwind CSS, Shadcn/UI, Redux, Zustand \\
+\textbf{Backend:} Node.js, Express.js, NestJS, REST APIs, JWT, RBAC, Socket.IO \\
+\textbf{Database:} PostgreSQL, MongoDB, Prisma, Mongoose, NeonDB \\
+\textbf{DevOps \& Tools:} Docker, Git, GitHub Actions, Linux, Vercel, Firebase, Postman, Swagger/OpenAPI
+\end{onecolentry}
+
+
+% ===========================
+% Experience
+% ===========================
+\section{Experience}
+
+\begin{onecolentry}
+\textbf{Jr. Full Stack Developer} \hfill \textit{Softvence Agency · Aug 2026 – Present}
+\begin{highlights}
+\item Developing production applications using Next.js, TypeScript, Node.js, NestJS, and RESTful APIs with auth and RBAC.
+\item Building AI-powered features and integrations while working with PostgreSQL, Docker, and deployment workflows.
+\end{highlights}
+\end{onecolentry}
+
+\begin{onecolentry}
+\textbf{Frontend Developer} \hfill \textit{Softvence Agency · Jan 2026 – Jul 2026}
+\begin{highlights}
+\item Developed production applications using Next.js, TypeScript, and React.js, focused on performance, SEO, and responsive UI.
+\item Built reusable components, managed state with Redux and Zustand, and contributed to AI-powered features and integrations.
+\end{highlights}
+\end{onecolentry}
+
+\begin{onecolentry}
+\textbf{Frontend Developer Intern} \hfill \textit{Zensoft Lab · Sep 2025 – Dec 2025}
+\begin{highlights}
+\item Developed web application features using React.js, focusing on reusable components and maintainable UI architecture.
+\item Collaborated with the development team to deliver user-focused features and improve application usability and performance.
+\end{highlights}
+\end{onecolentry}
+
+% ===========================
+% Projects
+% ===========================
+\section{Projects}
+
+\begin{onecolentry}
+\textbf{CareCamp - \href{https://mcms-web-client.vercel.app/}{Live}
+\quad \href{https://github.com/mrshanshuvo/MCMS-web-client}{Client}
+\;|\; \href{https://github.com/mrshanshuvo/MCMS-backend}{Server}} \hfill \textit{MERN, Node.js, React, MongoDB, JWT, Stripe}
+\begin{highlights}
+\item Engineered a full-stack medical management platform with RESTful APIs, JWT authentication, and cloud-hosted MongoDB.
+\item Integrated Stripe payments and Firebase Authentication, with responsive dashboards for users, bookings, and transactions.
+
+\end{highlights}
+\end{onecolentry}
+
+\begin{onecolentry}
+\textbf{Gram2City - \href{https://gram2city-web-client.vercel.app/}{Live}
+\quad \href{https://github.com/mrshanshuvo/gram2city-web-client}{Client}
+\;|\; \href{https://github.com/mrshanshuvo/gram2city-server}{Server}} \hfill \textit{Next.js, TypeScript, Node.js, Express.js, MongoDB, JWT}
+\begin{highlights}
+\item Built a parcel delivery platform with Next.js, TypeScript, Node.js, Express.js, and MongoDB.
+\item Implemented real-time delivery tracking, live chat, REST APIs, JWT authentication, and role-based access control.
+\end{highlights}
+\end{onecolentry}
+
+\begin{onecolentry}
+\textbf{WhereIsIt – \href{https://wit-web-client.vercel.app/}{Live}
+\quad \href{https://github.com/mrshanshuvo/WIT-web-client}{Client}
+\;|\; \href{https://github.com/mrshanshuvo/WIT-backend-server}{Server}} \hfill \textit{Next.js, TypeScript, Firebase, Node.js, Express.js, MongoDB}
+\begin{highlights}
+\item Built a community platform for reporting and discovering lost and found items using Next.js and TypeScript.
+\item Implemented Firebase authentication, image uploads, search functionality, and recovery confirmation workflows.
+\end{highlights}
+\end{onecolentry}
+% ===========================
+% Publications
+% ===========================
+\section{Publications}
+
+\begin{onecolentry}
+\textbf{Multimodal Lie Detection Using Speech and Video with Deep Neural Networks}: First-author research using MFCC and ResNet-18 features, achieving 82\% accuracy on DOLOS.
+\hfill \textit{IEEE ICCIT 2025}
+\end{onecolentry}
+
+
+% ===========================
+% Training & Courses
+% ===========================
+\section{Training \& Courses}
+
+\begin{onecolentry}
+\textbf{Next Level Web Development} — Programming Hero (Ongoing); Next.js, Node.js, PostgreSQL, System Design, AI
+\end{onecolentry}
+
+\begin{onecolentry}
+\textbf{Web Development Bootcamp} — Programming Hero (6 months); React, Node.js, Express, MongoDB; 45+ projects
+\end{onecolentry}
+
+\begin{onecolentry}
+\textbf{EDGE Program} — BCC, ICT Division; Python \& Django
+\end{onecolentry}
+
+% ===========================
+% Achievements
+% ===========================
+\section{Achievements}
+
+\begin{onecolentry}
+VC's \& Dean's List Scholarship (2022--2025) \textbar\ ICPC \& IDPC Competitor \textbar\ Top 4\% globally on BeeCrowd (321.11 points)
+\end{onecolentry}
+
+% ===========================
+% Education
+% ===========================
+\section{Education}
+
+\begin{onecolentry}
+\textbf{B.Sc. in Computer Science \& Engineering} — Green University of Bangladesh \hfill \textit{Jan 2026, CGPA: 3.76/4.00}
+\end{onecolentry}
+
+% ===========================
+% Languages
+% ===========================
+\section{Languages}
+
+\begin{onecolentry}
+Bangla (Native) \textbar\ English (Fluent) \textbar\ Hindi/Urdu (Conversational)
+\end{onecolentry}
+% \vfill
+% \hfill {\small\textit{Last Updated: \today}}
+
+\end{document}
