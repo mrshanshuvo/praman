@@ -28,8 +28,8 @@ export type ResumeProjectItem = z.infer<typeof ResumeProjectItemSchema>;
 
 export const ResumeEducationItemSchema = z.object({
   sourceEducationId: z.string().describe('Must strictly match an existing candidate Education ID'),
-  institution: z.string().optional(),
-  degree: z.string().optional(),
+  institution: z.string().nullable().optional(),
+  degree: z.string().nullable().optional(),
 });
 export type ResumeEducationItem = z.infer<typeof ResumeEducationItemSchema>;
 
@@ -37,7 +37,7 @@ export const ResumeCertificationItemSchema = z.object({
   sourceCertificationId: z
     .string()
     .describe('Must strictly match an existing candidate Certification ID'),
-  name: z.string().optional(),
+  name: z.string().nullable().optional(),
 });
 export type ResumeCertificationItem = z.infer<typeof ResumeCertificationItemSchema>;
 

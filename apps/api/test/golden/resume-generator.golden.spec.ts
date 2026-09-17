@@ -166,6 +166,32 @@ describe('Golden Test: Resume Generator Stage 4 & Truth Preservation', () => {
       expect(report.violations).toHaveLength(0);
       expect(report.sourceIdChecks.every((c) => c.exists)).toBe(true);
       expect(report.skillChecks.every((s) => s.isAllowed)).toBe(true);
+
+      // 6. Skills Curation: must not exceed 16, must only come from prioritizedSkills
+      const allowedSkills = new Set(
+        fixture.resumeStrategy.prioritizedSkills.map((s) => s.toLowerCase()),
+      );
+      expect(result.skills.length).toBeLessThanOrEqual(16);
+      for (const skill of result.skills) {
+        expect(allowedSkills.has(skill.toLowerCase())).toBe(true);
+      }
+
+      // 7. Bullet Quality: no bullets should start with passive phrases
+      const passivePhrases = [
+        'worked with',
+        'helped',
+        'assisted',
+        'was responsible for',
+        'participated in',
+      ];
+      for (const exp of result.experience) {
+        for (const bullet of exp.bullets) {
+          const lower = bullet.toLowerCase();
+          for (const phrase of passivePhrases) {
+            expect(lower.startsWith(phrase), `Passive bullet found: "${bullet}"`).toBe(false);
+          }
+        }
+      }
     });
   }
 });

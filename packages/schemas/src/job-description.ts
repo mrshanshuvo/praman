@@ -4,6 +4,7 @@ export const StructuredJdSchema = z.object({
   jobTitle: z.string().describe('The primary title of the job opening'),
   seniority: z
     .string()
+    .nullable()
     .optional()
     .describe('Level of seniority requested (e.g. Junior, Mid, Senior, Lead, Staff)'),
   requiredSkills: z
@@ -16,6 +17,7 @@ export const StructuredJdSchema = z.object({
     .describe('Nice-to-have or preferred technical/functional skills'),
   yearsOfExperience: z
     .string()
+    .nullable()
     .optional()
     .describe('Expected years of experience or range if specified'),
   responsibilities: z
@@ -24,13 +26,15 @@ export const StructuredJdSchema = z.object({
     .describe('Key day-to-day responsibilities and tasks'),
   educationRequirements: z
     .array(z.string())
+    .nullable()
     .optional()
     .describe('Degrees or education criteria if stated'),
   locationOrWorkMode: z
     .string()
+    .nullable()
     .optional()
     .describe('Remote, Hybrid, On-site, or specific city/country'),
-  salary: z.string().optional().describe('Compensation range or notes if listed'),
+  salary: z.string().nullable().optional().describe('Compensation range or notes if listed'),
   mustHave: z
     .array(z.string())
     .default([])
@@ -38,6 +42,7 @@ export const StructuredJdSchema = z.object({
   niceToHave: z.array(z.string()).default([]).describe('Bonus qualifications or differentiators'),
   otherNotes: z
     .array(z.string())
+    .nullable()
     .optional()
     .describe('Cultural or operational notes, perks, or constraints'),
 });
