@@ -1,12 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import type { EnvConfig } from '../config/env.validation.js';
+import type { EnvConfig } from '../config/env.config.js';
 
 @Injectable()
 export class StorageService {
@@ -31,15 +27,20 @@ export class StorageService {
       });
       this.logger.log(`Cloudflare R2 Storage initialized for bucket: ${this.bucketName}`);
     } else {
-      this.logger.warn('Cloudflare R2 credentials missing in environment. Storage operations will be mocked.');
+      this.logger.warn(
+        'Cloudflare R2 credentials missing in environment. Storage operations will be mocked.',
+      );
     }
   }
-
 
   /**
    * Uploads a file (text or buffer) to Cloudflare R2
    */
-  async uploadFile(key: string, content: string | Buffer, contentType = 'text/plain'): Promise<string> {
+  async uploadFile(
+    key: string,
+    content: string | Buffer,
+    contentType = 'text/plain',
+  ): Promise<string> {
     if (!this.s3Client) {
       this.logger.warn(`StorageService mocked upload for key: ${key}`);
       return `mock://r2/${this.bucketName}/${key}`;
@@ -107,4 +108,3 @@ export class StorageService {
     }
   }
 }
-

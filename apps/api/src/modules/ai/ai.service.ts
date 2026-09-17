@@ -1,7 +1,7 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { z } from 'zod';
-import type { EnvConfig } from '../../core/config/env.validation.js';
+import type { EnvConfig } from '../../core/config/env.config.js';
 
 export interface StructuredCallParams<T> {
   systemPrompt: string;
@@ -26,9 +26,9 @@ export class AiService {
     const envKey = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
     this.apiKey = isTest
       ? envKey
-      : (this.configService?.get('OPENAI_API_KEY', { infer: true }) ||
-         this.configService?.get('AI_API_KEY', { infer: true }) ||
-         envKey);
+      : this.configService?.get('OPENAI_API_KEY', { infer: true }) ||
+        this.configService?.get('AI_API_KEY', { infer: true }) ||
+        envKey;
 
     const rawBaseUrl =
       this.configService?.get('OPENAI_BASE_URL', { infer: true }) ||
@@ -48,8 +48,7 @@ export class AiService {
   }
 
   private resolveModels(): string[] {
-    const rawList =
-      this.configService?.get('AI_MODELS', { infer: true }) || process.env.AI_MODELS;
+    const rawList = this.configService?.get('AI_MODELS', { infer: true }) || process.env.AI_MODELS;
     if (rawList?.trim()) {
       const parsed = rawList
         .split(',')
@@ -57,14 +56,12 @@ export class AiService {
         .filter(Boolean);
       if (parsed.length > 0) return parsed;
     }
-    const single =
-      this.configService?.get('AI_MODEL', { infer: true }) || process.env.AI_MODEL;
+    const single = this.configService?.get('AI_MODEL', { infer: true }) || process.env.AI_MODEL;
     if (single?.trim()) {
       return [single.trim()];
     }
     return ['groq/compound-mini', 'openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'qwen/qwen3.8-27b'];
   }
-
 
   async runStructuredCall<T>(params: StructuredCallParams<T>): Promise<T> {
     const { schemaName = 'output' } = params;

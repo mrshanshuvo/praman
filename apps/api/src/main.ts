@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
-import type { EnvConfig } from './core/config/env.validation.js';
+import type { EnvConfig } from './core/config/env.config.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

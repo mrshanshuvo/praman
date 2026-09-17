@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as path from 'node:path';
-import { validateEnv } from './config/env.validation.js';
+import { configLoaders, validateEnv } from './config/env.config.js';
 import { PrismaModule } from './database/prisma.module.js';
 import { StorageModule } from './storage/storage.module.js';
 
@@ -10,11 +10,9 @@ import { StorageModule } from './storage/storage.module.js';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [
-        path.resolve(process.cwd(), '.env'),
-        path.resolve(process.cwd(), '../../.env'),
-      ],
+      envFilePath: [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')],
       validate: validateEnv,
+      load: configLoaders,
     }),
     PrismaModule,
     StorageModule,

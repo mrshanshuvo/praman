@@ -88,55 +88,51 @@ Nice to have: Docker, Prisma ORM.
     expect(typeof strategy.narrativeGuidance).toBe('string');
   });
 
-  it(
-    'Step 5: POST /job-descriptions/:id/resume runs Stage 4 Generation + Evidence Validation',
-    async () => {
-      const res = await request(httpServer)
-        .post(`/job-descriptions/${jobDescriptionId}/resume`)
-        .expect(201);
+  it('Step 5: POST /job-descriptions/:id/resume runs Stage 4 Generation + Evidence Validation', async () => {
+    const res = await request(httpServer)
+      .post(`/job-descriptions/${jobDescriptionId}/resume`)
+      .expect(201);
 
-      expect(res.body).toHaveProperty('status');
-      expect(res.body).toHaveProperty('resumeJson');
-      expect(res.body).toHaveProperty('validationReport');
+    expect(res.body).toHaveProperty('status');
+    expect(res.body).toHaveProperty('resumeJson');
+    expect(res.body).toHaveProperty('validationReport');
 
-      const { status, resumeJson, validationReport } = res.body;
+    const { status, resumeJson, validationReport } = res.body;
 
-      // Must be VALIDATED
-      expect(status).toBe('VALIDATED');
-      expect(validationReport.status).toBe('VALIDATED');
-      expect(validationReport.schemaValid).toBe(true);
-      expect(validationReport.violations).toHaveLength(0);
+    // Must be VALIDATED
+    expect(status).toBe('VALIDATED');
+    expect(validationReport.status).toBe('VALIDATED');
+    expect(validationReport.schemaValid).toBe(true);
+    expect(validationReport.violations).toHaveLength(0);
 
-      // Absolute Traceability Verification against real Candidate Profile
-      const realExpIds = new Set(candidateProfile.experiences.map((e: any) => e.id));
-      const realProjIds = new Set(candidateProfile.projects.map((p: any) => p.id));
-      const realEduIds = new Set(candidateProfile.educations.map((e: any) => e.id));
-      const realCertIds = new Set(candidateProfile.certifications.map((c: any) => c.id));
+    // Absolute Traceability Verification against real Candidate Profile
+    const realExpIds = new Set(candidateProfile.experiences.map((e: any) => e.id));
+    const realProjIds = new Set(candidateProfile.projects.map((p: any) => p.id));
+    const realEduIds = new Set(candidateProfile.educations.map((e: any) => e.id));
+    const realCertIds = new Set(candidateProfile.certifications.map((c: any) => c.id));
 
-      for (const exp of resumeJson.experience || []) {
-        expect(realExpIds.has(exp.sourceExperienceId)).toBe(true);
-      }
-      for (const proj of resumeJson.projects || []) {
-        expect(realProjIds.has(proj.sourceProjectId)).toBe(true);
-      }
-      for (const edu of resumeJson.education || []) {
-        expect(realEduIds.has(edu.sourceEducationId)).toBe(true);
-      }
-      for (const cert of resumeJson.certifications || []) {
-        expect(realCertIds.has(cert.sourceCertificationId)).toBe(true);
-      }
+    for (const exp of resumeJson.experience || []) {
+      expect(realExpIds.has(exp.sourceExperienceId)).toBe(true);
+    }
+    for (const proj of resumeJson.projects || []) {
+      expect(realProjIds.has(proj.sourceProjectId)).toBe(true);
+    }
+    for (const edu of resumeJson.education || []) {
+      expect(realEduIds.has(edu.sourceEducationId)).toBe(true);
+    }
+    for (const cert of resumeJson.certifications || []) {
+      expect(realCertIds.has(cert.sourceCertificationId)).toBe(true);
+    }
 
-      // Skills verification: No disallowed skills
-      const candidateSkillMap = new Map(
-        (candidateProfile.skills || []).map((s: any) => [s.name.toLowerCase(), s.level]),
-      );
-      for (const skill of resumeJson.skills || []) {
-        const level = candidateSkillMap.get(skill.toLowerCase());
-        expect(['EXPERIENCED', 'WORKING_KNOWLEDGE']).toContain(level);
-      }
-    },
-    15000,
-  );
+    // Skills verification: No disallowed skills
+    const candidateSkillMap = new Map(
+      (candidateProfile.skills || []).map((s: any) => [s.name.toLowerCase(), s.level]),
+    );
+    for (const skill of resumeJson.skills || []) {
+      const level = candidateSkillMap.get(skill.toLowerCase());
+      expect(['EXPERIENCED', 'WORKING_KNOWLEDGE']).toContain(level);
+    }
+  }, 15000);
 
   it('Step 6: GET /job-descriptions/:id/resume retrieves the latest validated resume', async () => {
     const res = await request(httpServer)
@@ -148,26 +144,20 @@ Nice to have: Docker, Prisma ORM.
     expect(res.body.resumeJson).toBeDefined();
   });
 
-  it(
-    'Step 7: POST /job-descriptions/:id/run-pipeline executes orchestrated pipeline in one call',
-    async () => {
-      const res = await request(httpServer)
-        .post(`/job-descriptions/${jobDescriptionId}/run-pipeline`)
-        .expect(201);
+  it('Step 7: POST /job-descriptions/:id/run-pipeline executes orchestrated pipeline in one call', async () => {
+    const res = await request(httpServer)
+      .post(`/job-descriptions/${jobDescriptionId}/run-pipeline`)
+      .expect(201);
 
-      expect(res.body).toHaveProperty('jobDescriptionId', jobDescriptionId);
-      expect(res.body).toHaveProperty('match');
-      expect(res.body).toHaveProperty('strategy');
-      expect(res.body).toHaveProperty('resume');
-      expect(res.body.resume.status).toBe('VALIDATED');
-    },
-    15000,
-  );
+    expect(res.body).toHaveProperty('jobDescriptionId', jobDescriptionId);
+    expect(res.body).toHaveProperty('match');
+    expect(res.body).toHaveProperty('strategy');
+    expect(res.body).toHaveProperty('resume');
+    expect(res.body.resume.status).toBe('VALIDATED');
+  }, 15000);
 
   it('Step 8: POST /pipelines/:id executes via new dedicated PipelineController', async () => {
-    const res = await request(httpServer)
-      .post(`/pipelines/${jobDescriptionId}`)
-      .expect(201);
+    const res = await request(httpServer).post(`/pipelines/${jobDescriptionId}`).expect(201);
 
     expect(res.body).toHaveProperty('jobDescriptionId', jobDescriptionId);
     expect(res.body).toHaveProperty('match');

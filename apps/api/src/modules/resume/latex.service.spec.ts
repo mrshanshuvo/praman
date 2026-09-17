@@ -128,7 +128,8 @@ describe('LatexService', () => {
 
   describe('escapeLatex', () => {
     it('should escape all LaTeX reserved characters correctly', () => {
-      const raw = 'Worked with C++ & Python (100% test coverage) for $500k ARR #1 priority {auth_token}';
+      const raw =
+        'Worked with C++ & Python (100% test coverage) for $500k ARR #1 priority {auth_token}';
       const escaped = service.escapeLatex(raw);
 
       expect(escaped).toContain('\\&');
@@ -226,10 +227,12 @@ describe('LatexService', () => {
       const tex = await service.generateLatex(mockResumeData, mockCandidateProfile);
 
       // Verify R2 mock was consulted
-      expect(mockStorageService.getFileString).toHaveBeenCalledWith('templates/modern-developer.tex');
+      expect(mockStorageService.getFileString).toHaveBeenCalledWith(
+        'templates/modern-developer.tex',
+      );
 
       // Verify Document Header & Metadata
-      expect(tex).toContain('pdftitle={Shahid Hasan Shuvo\'s CV}');
+      expect(tex).toContain("pdftitle={Shahid Hasan Shuvo's CV}");
       expect(tex).toContain('pdfauthor={Shahid Hasan Shuvo}');
       expect(tex).toContain('\\textbf{Shahid Hasan Shuvo}');
       expect(tex).toContain('\\textbf{Full-Stack Developer}');
@@ -244,18 +247,25 @@ describe('LatexService', () => {
       expect(tex).toContain('TypeScript, React.js, PostgreSQL, Docker');
 
       // Verify Experience & Highlights
-      expect(tex).toContain('\\textbf{Jr. Full Stack Developer} \\hfill \\textit{Softvence Agency · Aug 2026 – Present}');
+      expect(tex).toContain(
+        '\\textbf{Jr. Full Stack Developer} \\hfill \\textit{Softvence Agency · Aug 2026 – Present}',
+      );
       expect(tex).toContain('\\item Built real-time features using Socket.IO \\& NestJS.');
       expect(tex).toContain('\\item Refactored API reducing latency by 35\\%.');
 
       // Verify Projects & Live Link
-      expect(tex).toContain('\\textbf{CareCamp - \\href{https://mcms-web-client.vercel.app/}{Live}} \\hfill \\textit{React, Node.js, MongoDB}');
+      expect(tex).toContain(
+        '\\textbf{CareCamp - \\href{https://mcms-web-client.vercel.app/}{Live}} \\hfill \\textit{React, Node.js, MongoDB}',
+      );
       expect(tex).toContain('\\item Integrated Stripe payments and Firebase Authentication.');
 
       // Verify Education & Certifications
-      expect(tex).toContain('\\textbf{B.Sc. in Computer Science \\& Engineering} — Green University of Bangladesh \\hfill \\textit{Jan 2026}');
-      expect(tex).toContain('\\textbf{Next Level Web Development} — Programming Hero \\hfill \\textit{2026}');
+      expect(tex).toContain(
+        '\\textbf{B.Sc. in Computer Science \\& Engineering} — Green University of Bangladesh \\hfill \\textit{Jan 2026}',
+      );
+      expect(tex).toContain(
+        '\\textbf{Next Level Web Development} — Programming Hero \\hfill \\textit{2026}',
+      );
     });
-
   });
 });

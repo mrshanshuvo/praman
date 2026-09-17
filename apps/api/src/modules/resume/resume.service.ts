@@ -134,8 +134,6 @@ export class ResumeService {
       }
     }
 
-
-
     return {
       ...resumeRecord,
       texKey,
@@ -193,5 +191,3 @@ export class ResumeService {
     return await this.latexService.generateLatex(resumeRecord.resumeJson as ResumeData, profile);
   }
 }
-
-
