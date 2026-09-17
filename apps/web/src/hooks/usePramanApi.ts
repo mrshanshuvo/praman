@@ -4,12 +4,35 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, options);
-  if (!res.ok) {
-    const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.message || `Request failed with status ${res.status}`);
+const TOKEN_KEY = 'praman_auth_token';
+
+async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const headers = new Headers(options.headers || {});
+
+  // Automatically inject Bearer token if available
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token && !headers.has('Authorization')) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
   }
+
+  const res = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  if (!res.ok) {
+    if (res.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+    const errorBody = await res.json().catch(() => ({}));
+    const message = Array.isArray(errorBody.message)
+      ? errorBody.message.join(', ')
+      : errorBody.message || `Request failed with status ${res.status}`;
+    throw new Error(message);
+  }
+
   return res.json();
 }
 
@@ -17,10 +40,11 @@ async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
 // Job Descriptions Queries & Mutations
 // ==========================================
 
-export function useJobs() {
+export function useJobs(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['jobs'],
     queryFn: () => fetcher<any[]>(`${API_URL}/job-descriptions`),
+    enabled: options?.enabled ?? true,
   });
 }
 
@@ -95,10 +119,11 @@ export function useRunFullPipeline(id: string) {
 // Candidate Profile Queries & Mutations
 // ==========================================
 
-export function useCandidateProfile() {
+export function useCandidateProfile(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['candidate-profile'],
     queryFn: () => fetcher<any>(`${API_URL}/candidate-profile`),
+    enabled: options?.enabled ?? true,
   });
 }
 

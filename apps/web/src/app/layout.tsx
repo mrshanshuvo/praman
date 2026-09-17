@@ -10,6 +10,7 @@ import {
 import './globals.css';
 import { Navbar } from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 
 const inter = Inter({
@@ -97,8 +98,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <QueryProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
+            <AuthProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+            </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
