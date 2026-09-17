@@ -39,4 +39,14 @@ export class AuthController {
   async getMe(@CurrentUser() user: AuthUser) {
     return this.authService.getMe(user.id);
   }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Log out current user and invalidate session' })
+  @ApiResponse({ status: 200, description: 'Successfully logged out' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async logout(@CurrentUser() user: AuthUser) {
+    return this.authService.logout(user.id);
+  }
 }

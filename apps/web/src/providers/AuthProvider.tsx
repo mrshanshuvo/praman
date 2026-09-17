@@ -41,12 +41,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const currentToken =
+      token || (typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null);
+    if (currentToken) {
+      try {
+        await fetch(`${API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
+          },
+        });
+      } catch {
+        // Silently proceed - credentials must always be purged locally even if offline
+      }
+    }
+
     localStorage.removeItem(TOKEN_KEY);
     removeAuthCookie();
     setToken(null);
     setUser(null);
-  }, []);
+  }, [token]);
 
   // Hydrate user session on initial page load
   useEffect(() => {

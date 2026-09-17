@@ -117,4 +117,12 @@ describe('AuthService', () => {
       }),
     ).rejects.toThrow(UnauthorizedException);
   });
+
+  it('should logout user and return confirmation message', async () => {
+    const result = await service.logout('u-login');
+    expect(result).toEqual({
+      message: 'Successfully logged out',
+      userId: 'u-login',
+    });
+  });
 });
