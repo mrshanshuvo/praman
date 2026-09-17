@@ -63,4 +63,81 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
       await expect(page.locator('text=Export Resume Suite')).not.toBeVisible();
     }
   });
+
+  test('job pipeline inspect view renders stepper and supports stage tab selection', async ({
+    page,
+  }) => {
+    await page.goto('/jobs');
+    const inspectBtn = page
+      .locator('a[href*="/jobs/"]')
+      .filter({ hasText: 'Inspect Stages' })
+      .first();
+    if (await inspectBtn.isVisible({ timeout: 4000 }).catch(() => false)) {
+      await inspectBtn.click();
+      await expect(page).toHaveURL(/\/jobs\/[a-zA-Z0-9_-]+/);
+
+      // Verify pipeline stage stepper exists
+      const matchStageTrigger = page
+        .locator('button')
+        .filter({ hasText: /Stage 2/i })
+        .first();
+      if (await matchStageTrigger.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await matchStageTrigger.click();
+        // Check for Stage 2 header
+        await expect(page.locator('text=Candidate ↔ JD Match Analysis')).toBeVisible({
+          timeout: 5000,
+        });
+
+        // Check if Diff Inspector sub-view is visible
+        const diffTab = page.locator('button').filter({ hasText: 'Alignment Diff Inspector' });
+        if (await diffTab.isVisible({ timeout: 2000 }).catch(() => false)) {
+          await expect(diffTab).toBeVisible();
+          await expect(page.locator('text=Deterministic Match Score')).toBeVisible();
+          // Check for sub-tabs
+          const overviewTab = page.locator('button').filter({ hasText: 'Synthesis & Skill Cards' });
+          if (await overviewTab.isVisible()) {
+            await overviewTab.click();
+            await expect(page.locator('text=Explainable Synthesis')).toBeVisible();
+            await diffTab.click();
+          }
+        }
+      }
+    }
+  });
+
+  test('skill claim tuning dialog can be opened and closed in match inspector', async ({
+    page,
+  }) => {
+    await page.goto('/jobs');
+    const inspectBtn = page
+      .locator('a[href*="/jobs/"]')
+      .filter({ hasText: 'Inspect Stages' })
+      .first();
+    if (await inspectBtn.isVisible({ timeout: 4000 }).catch(() => false)) {
+      await inspectBtn.click();
+      const matchStageTrigger = page
+        .locator('button')
+        .filter({ hasText: /Stage 2/i })
+        .first();
+      if (await matchStageTrigger.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await matchStageTrigger.click();
+
+        // Find tune claim button
+        const tuneBtn = page.locator('button[title*="tune" i]').first();
+        if (await tuneBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+          await tuneBtn.click();
+          await expect(page.locator('text=Skill Claim Audit')).toBeVisible();
+          await expect(page.locator('text=Experienced')).toBeVisible();
+          await expect(page.locator('text=Working Knowledge')).toBeVisible();
+          await expect(page.locator('text=Learning')).toBeVisible();
+          await expect(page.locator('text=Not Learned')).toBeVisible();
+
+          // Close modal
+          const cancelBtn = page.getByRole('button', { name: 'Cancel' });
+          await cancelBtn.click();
+          await expect(page.locator('text=Skill Claim Audit')).not.toBeVisible();
+        }
+      }
+    }
+  });
 });

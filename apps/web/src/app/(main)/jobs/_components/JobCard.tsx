@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import Link from 'next/link';
+import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,6 +21,7 @@ interface JobCardProps {
 export function JobCard({ jd }: JobCardProps) {
   const structured = jd.structured || {};
   const analysis = jd.analysis;
+  const matchData = analysis?.result || analysis;
   const strategy = analysis?.strategy;
   const resume = strategy?.resume;
 
@@ -90,12 +92,15 @@ export function JobCard({ jd }: JobCardProps) {
             </Badge>
 
             {hasAnalysis ? (
-              <Badge
-                variant="outline"
-                className="gap-1.5 bg-brand-cyan/10 text-brand-cyan border-brand-cyan/40 text-xs font-medium px-2.5 py-0.5"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5 text-brand-cyan" /> Stage 2: Matched
-              </Badge>
+              <div className="flex items-center gap-1.5">
+                <Badge
+                  variant="outline"
+                  className="gap-1.5 bg-brand-cyan/10 text-brand-cyan border-brand-cyan/40 text-xs font-medium px-2.5 py-0.5"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-brand-cyan" /> Stage 2: Matched
+                </Badge>
+                <MatchScoreBadge analysis={matchData} variant="compact" />
+              </div>
             ) : (
               <Badge
                 variant="outline"

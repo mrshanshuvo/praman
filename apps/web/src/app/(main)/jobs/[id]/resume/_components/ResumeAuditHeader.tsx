@@ -3,6 +3,7 @@
 import { ArrowLeft, Check, Copy, Download, Play, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ExportSuiteModal } from './ExportSuiteModal';
@@ -13,6 +14,7 @@ interface ResumeAuditHeaderProps {
   downloadUrl?: string | null;
   resumeJson?: any;
   latexCode?: string;
+  matchAnalysis?: any;
   isFetching: boolean;
   isRegenerating: boolean;
   onRefresh: () => void;
@@ -25,6 +27,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   downloadUrl,
   resumeJson,
   latexCode = '',
+  matchAnalysis,
   isFetching,
   isRegenerating,
   onRefresh,
@@ -56,7 +59,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               Resume & Evidence Audit
             </h1>
@@ -70,6 +73,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
             >
               {status || 'DRAFT'}
             </Badge>
+            {matchAnalysis && <MatchScoreBadge analysis={matchAnalysis} variant="pill" />}
           </div>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
             Audited against confirmed candidate profile records with zero hallucinations.

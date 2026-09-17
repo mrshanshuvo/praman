@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
 import {
   useCandidateProfile,
+  useJob,
   useJobResume,
   useJobResumeLatex,
   useRunStage,
@@ -21,6 +22,7 @@ export default function ResumeAuditPage() {
   const params = useParams();
   const id = params.id as string;
 
+  const { data: jd } = useJob(id);
   const {
     data: resumeData,
     isLoading: loading,
@@ -89,6 +91,7 @@ export default function ResumeAuditPage() {
         downloadUrl={downloadUrl}
         resumeJson={resume}
         latexCode={latex}
+        matchAnalysis={jd?.analysis?.result || jd?.analysis}
         isFetching={isFetching}
         isRegenerating={runStageMutation.isPending}
         onRefresh={() => refetch()}

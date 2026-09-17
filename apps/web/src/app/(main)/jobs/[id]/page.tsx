@@ -123,6 +123,7 @@ export default function JobDetailPage() {
         {activeTab === 'match' && (
           <Stage2Match
             analysis={analysis}
+            structured={structured}
             isRunning={isStreaming || runStageMutation.isPending}
             isDisabled={isAnyStageRunning}
             onRun={() => runStage('match')}
