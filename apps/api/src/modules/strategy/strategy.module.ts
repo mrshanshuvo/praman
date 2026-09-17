@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AiModule } from '../ai/ai.module.js';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { StrategyController } from './strategy.controller.js';
 import { StrategyService } from './strategy.service.js';
 
 @Module({
-  imports: [PrismaModule, AiModule],
+  imports: [AiModule],
+  controllers: [StrategyController],
   providers: [StrategyService],
   exports: [StrategyService],
 })

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { AiService } from '../src/ai/ai.service.js';
+import { AiService } from '../src/modules/ai/ai.service.js';
 
 describe('AiService - Dynamic Model Fallback Cascade', () => {
   const originalEnv = process.env;

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ValidationService } from '../src/validation/validation.service.js';
+import { ValidationService } from '../src/modules/validation/validation.service.js';
 
 describe('ValidationService (Anti-Hallucination & Truth Enforcement)', () => {
   let service: ValidationService;

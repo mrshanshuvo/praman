@@ -2,9 +2,9 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { type ResumeData, ResumeSchema, type ResumeStatus } from '@praman/schemas';
 import { AiService } from '../ai/ai.service.js';
 import { CandidateService } from '../candidate/candidate.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { RESUME_GENERATOR_SYSTEM_PROMPT_V1 } from '../prompts/resume-generator.v1.js';
-import { StorageService } from '../storage/storage.service.js';
+import { PrismaService } from '../../core/database/prisma.service.js';
+import { RESUME_GENERATOR_SYSTEM_PROMPT_V1 } from '../ai/prompts/resume-generator.v1.js';
+import { StorageService } from '../../core/storage/storage.service.js';
 import { ValidationService } from '../validation/validation.service.js';
 import { LatexService } from './latex.service.js';
 

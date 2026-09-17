@@ -1,7 +1,7 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { z } from 'zod';
-import type { EnvConfig } from '../config/env.validation.js';
+import type { EnvConfig } from '../../core/config/env.validation.js';
 
 export interface StructuredCallParams<T> {
   systemPrompt: string;
@@ -22,11 +22,13 @@ export class AiService {
   private activeModelIndex = 0;
 
   constructor(@Optional() private readonly configService?: ConfigService<EnvConfig, true>) {
-    this.apiKey =
-      this.configService?.get('OPENAI_API_KEY', { infer: true }) ||
-      this.configService?.get('AI_API_KEY', { infer: true }) ||
-      process.env.OPENAI_API_KEY ||
-      process.env.AI_API_KEY;
+    const isTest = process.env.NODE_ENV === 'test';
+    const envKey = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
+    this.apiKey = isTest
+      ? envKey
+      : (this.configService?.get('OPENAI_API_KEY', { infer: true }) ||
+         this.configService?.get('AI_API_KEY', { infer: true }) ||
+         envKey);
 
     const rawBaseUrl =
       this.configService?.get('OPENAI_BASE_URL', { infer: true }) ||

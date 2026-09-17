@@ -7,7 +7,7 @@ import type {
   CreateProjectDto,
   CreateSkillDto,
 } from '@praman/schemas';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../../core/database/prisma.service.js';
 
 @Injectable()
 export class CandidateService {

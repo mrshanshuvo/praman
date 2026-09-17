@@ -1,7 +1,7 @@
 import { type StructuredJd, StructuredJdSchema } from '@praman/schemas';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AiService } from '../../src/ai/ai.service.js';
-import { JD_ANALYZER_SYSTEM_PROMPT_V1 } from '../../src/prompts/jd-analyzer.v1.js';
+import { AiService } from '../../src/modules/ai/ai.service.js';
+import { JD_ANALYZER_SYSTEM_PROMPT_V1 } from '../../src/modules/ai/prompts/jd-analyzer.v1.js';
 
 describe('Golden Test: JD Analyzer Stage 1', () => {
   let aiService: AiService;

@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreateJobDescriptionDtoSchema } from '@praman/schemas';
 import { MatchService } from '../match/match.service.js';
+import { PipelineService } from '../pipeline/pipeline.service.js';
 import { ResumeService } from '../resume/resume.service.js';
 import { StrategyService } from '../strategy/strategy.service.js';
 import { JobDescriptionService } from './job-description.service.js';
@@ -12,6 +13,7 @@ export class JobDescriptionController {
     private readonly matchService: MatchService,
     private readonly strategyService: StrategyService,
     private readonly resumeService: ResumeService,
+    private readonly pipelineService: PipelineService,
   ) {}
 
   @Post()
@@ -59,19 +61,9 @@ export class JobDescriptionController {
     return { latex };
   }
 
-  // Convenience orchestrator endpoint (§4)
-
+  // Orchestrator delegate (§4)
   @Post(':id/run-pipeline')
   async runFullPipeline(@Param('id') id: string) {
-    const match = await this.matchService.runMatch(id);
-    const strategy = await this.strategyService.runStrategy(id);
-    const resume = await this.resumeService.generateAndValidate(id);
-
-    return {
-      jobDescriptionId: id,
-      match,
-      strategy,
-      resume,
-    };
+    return this.pipelineService.runFullPipeline(id);
   }
 }

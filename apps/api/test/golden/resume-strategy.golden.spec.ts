@@ -1,7 +1,7 @@
 import { type ResumeStrategy, ResumeStrategySchema } from '@praman/schemas';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AiService } from '../../src/ai/ai.service.js';
-import { RESUME_STRATEGY_SYSTEM_PROMPT_V1 } from '../../src/prompts/resume-strategy.v1.js';
+import { AiService } from '../../src/modules/ai/ai.service.js';
+import { RESUME_STRATEGY_SYSTEM_PROMPT_V1 } from '../../src/modules/ai/prompts/resume-strategy.v1.js';
 
 describe('Golden Test: Resume Strategy Stage 3', () => {
   let aiService: AiService;

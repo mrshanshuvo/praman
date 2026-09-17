@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { type MatchAnalysis, MatchAnalysisSchema } from '@praman/schemas';
 import { AiService } from '../ai/ai.service.js';
 import { CandidateService } from '../candidate/candidate.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { CANDIDATE_MATCHER_SYSTEM_PROMPT_V1 } from '../prompts/candidate-matcher.v1.js';
+import { PrismaService } from '../../core/database/prisma.service.js';
+import { CANDIDATE_MATCHER_SYSTEM_PROMPT_V1 } from '../ai/prompts/candidate-matcher.v1.js';
 
 @Injectable()
 export class MatchService {

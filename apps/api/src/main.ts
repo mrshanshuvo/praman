@@ -1,16 +1,19 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import type { EnvConfig } from './config/env.validation.js';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
+import type { EnvConfig } from './core/config/env.validation.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
   const configService = app.get(ConfigService<EnvConfig, true>);
 
   const frontendUrl = configService.get('FRONTEND_URL', { infer: true }) || '';
   const configuredOrigins = frontendUrl
     .split(',')
-    .map((url) => url.trim().replace(/\/+$/, ''))
+    .map((url: string) => url.trim().replace(/\/+$/, ''))
     .filter(Boolean);
 
   const allowedOrigins = new Set(['http://localhost:3000', ...configuredOrigins]);
@@ -46,4 +49,3 @@ async function bootstrap() {
   console.log(`Application is running on: http://0.0.0.0:${port}`);
 }
 await bootstrap();
-

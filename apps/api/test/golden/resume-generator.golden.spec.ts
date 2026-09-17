@@ -1,8 +1,8 @@
 import { type ResumeData, ResumeSchema } from '@praman/schemas';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AiService } from '../../src/ai/ai.service.js';
-import { RESUME_GENERATOR_SYSTEM_PROMPT_V1 } from '../../src/prompts/resume-generator.v1.js';
-import { ValidationService } from '../../src/validation/validation.service.js';
+import { AiService } from '../../src/modules/ai/ai.service.js';
+import { RESUME_GENERATOR_SYSTEM_PROMPT_V1 } from '../../src/modules/ai/prompts/resume-generator.v1.js';
+import { ValidationService } from '../../src/modules/validation/validation.service.js';
 
 describe('Golden Test: Resume Generator Stage 4 & Truth Preservation', () => {
   let aiService: AiService;

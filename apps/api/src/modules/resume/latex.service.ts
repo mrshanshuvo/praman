@@ -1,6 +1,6 @@
 import { Injectable, Logger, Optional } from "@nestjs/common";
 import type { ResumeData } from "@praman/schemas";
-import { StorageService } from "../storage/storage.service.js";
+import { StorageService } from "../../core/storage/storage.service.js";
 
 @Injectable()
 export class LatexService {

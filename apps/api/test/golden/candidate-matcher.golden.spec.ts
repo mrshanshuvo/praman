@@ -1,7 +1,7 @@
 import { type MatchAnalysis, MatchAnalysisSchema } from '@praman/schemas';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AiService } from '../../src/ai/ai.service.js';
-import { CANDIDATE_MATCHER_SYSTEM_PROMPT_V1 } from '../../src/prompts/candidate-matcher.v1.js';
+import { AiService } from '../../src/modules/ai/ai.service.js';
+import { CANDIDATE_MATCHER_SYSTEM_PROMPT_V1 } from '../../src/modules/ai/prompts/candidate-matcher.v1.js';
 
 describe('Golden Test: Candidate Matcher Stage 2', () => {
   let aiService: AiService;
