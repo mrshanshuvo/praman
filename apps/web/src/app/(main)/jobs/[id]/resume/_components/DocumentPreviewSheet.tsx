@@ -81,7 +81,10 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
           className="transition-transform duration-200 ease-out"
         >
-          <Card className="w-198.5 min-h-280.75 bg-white text-slate-900 font-sans p-12 shadow-2xl rounded-none border border-slate-200 select-text print:shadow-none print:border-none print:m-0 print:p-8">
+          <Card
+            id="resume-printable-document"
+            className="w-198.5 min-h-280.75 bg-white text-slate-900 font-sans p-12 shadow-2xl rounded-none border border-slate-200 select-text print:shadow-none print:border-none print:m-0 print:p-8"
+          >
             {/* Document Header */}
             <div className="text-center border-b border-slate-300 pb-4 mb-5">
               <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 uppercase">

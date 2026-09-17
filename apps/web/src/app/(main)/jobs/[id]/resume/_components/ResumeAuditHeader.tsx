@@ -5,12 +5,14 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { ExportSuiteModal } from './ExportSuiteModal';
 
 interface ResumeAuditHeaderProps {
   id: string;
   status?: string;
   downloadUrl?: string | null;
   resumeJson?: any;
+  latexCode?: string;
   isFetching: boolean;
   isRegenerating: boolean;
   onRefresh: () => void;
@@ -22,12 +24,14 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   status,
   downloadUrl,
   resumeJson,
+  latexCode = '',
   isFetching,
   isRegenerating,
   onRefresh,
   onRegenerate,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   const handleCopyJson = () => {
     if (!resumeJson) return;
@@ -74,27 +78,21 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-        {downloadUrl && (
-          <a
-            href={downloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonVariants({
-              size: 'sm',
-              className:
-                'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-sm gap-1.5',
-            })}
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download .tex</span>
-          </a>
-        )}
+        {/* Prominent Export Resume Button */}
+        <Button
+          size="sm"
+          onClick={() => setIsExportOpen(true)}
+          className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs gap-1.5 cursor-pointer"
+        >
+          <Download className="w-3.5 h-3.5" />
+          <span>Export Resume</span>
+        </Button>
 
         <Button
           size="sm"
           onClick={onRegenerate}
           disabled={isRegenerating}
-          className="bg-card hover:bg-muted text-foreground border border-border gap-1.5"
+          className="bg-card hover:bg-muted text-foreground border border-border gap-1.5 cursor-pointer"
         >
           {isRegenerating ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand-cyan" />
@@ -109,7 +107,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
           size="sm"
           onClick={onRefresh}
           disabled={isFetching || isRegenerating}
-          className="text-foreground border-border bg-card hover:bg-muted"
+          className="text-foreground border-border bg-card hover:bg-muted cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
@@ -119,7 +117,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
           variant="outline"
           size="sm"
           onClick={handleCopyJson}
-          className="text-foreground border-border bg-card hover:bg-muted"
+          className="text-foreground border-border bg-card hover:bg-muted cursor-pointer"
         >
           {copied ? (
             <>
@@ -134,6 +132,16 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
           )}
         </Button>
       </div>
+
+      {/* Unified Multi-Format Export Suite Modal */}
+      <ExportSuiteModal
+        isOpen={isExportOpen}
+        onOpenChange={setIsExportOpen}
+        resumeData={resumeJson}
+        latexCode={latexCode}
+        downloadUrl={downloadUrl}
+        candidateName={resumeJson?.personal?.name}
+      />
     </div>
   );
 };

@@ -28,7 +28,6 @@ export default function ResumeAuditPage() {
     error: fetchError,
     refetch,
   } = useJobResume(id);
-
   const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(id);
   const { data: candidateProfile } = useCandidateProfile();
   const runStageMutation = useRunStage(id);
@@ -72,7 +71,7 @@ export default function ResumeAuditPage() {
           className={buttonVariants({
             size: 'sm',
             className:
-              'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20 gap-1.5',
+              'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium gap-1.5 shadow-sm',
           })}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -89,6 +88,7 @@ export default function ResumeAuditPage() {
         status={status}
         downloadUrl={downloadUrl}
         resumeJson={resume}
+        latexCode={latex}
         isFetching={isFetching}
         isRegenerating={runStageMutation.isPending}
         onRefresh={() => refetch()}
