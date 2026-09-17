@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { AuthBackground } from '@/components/AuthBackground';
 import { useAuth } from '@/providers/AuthProvider';
 import { LoginForm } from './_components';
 
@@ -16,13 +15,5 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  return (
-    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 overflow-hidden">
-      <AuthBackground />
-
-      <div className="w-full max-w-md relative z-10">
-        <LoginForm />
-      </div>
-    </div>
-  );
+  return <LoginForm />;
 }
