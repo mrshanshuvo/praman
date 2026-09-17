@@ -4,6 +4,7 @@ import { AlertCircle, ArrowRight, KeyRound, Loader2, Lock, Mail, Sparkles } from
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { BrandLogo } from '@/components/BrandLogo';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -52,6 +53,9 @@ export function LoginForm() {
   return (
     <Card className="border-border bg-card/80 backdrop-blur-xl shadow-2xl">
       <CardHeader className="text-center pb-4">
+        <div className="flex justify-center mb-3">
+          <BrandLogo size="md" />
+        </div>
         <div className="flex justify-center mb-2">
           <Badge
             variant="outline"
@@ -62,7 +66,7 @@ export function LoginForm() {
           </Badge>
         </div>
         <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-          Sign in to <span className="text-brand-cyan font-berkshire">praman</span>
+          Welcome back
         </CardTitle>
         <CardDescription className="text-muted-foreground text-sm">
           Access your verified candidate profile and run AI resume pipelines.
