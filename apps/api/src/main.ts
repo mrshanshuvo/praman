@@ -1,6 +1,13 @@
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+import * as path from 'node:path';
+
+// Ensure root and local environment variables are loaded
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

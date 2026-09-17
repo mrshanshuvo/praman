@@ -5,6 +5,8 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as dotenv from 'dotenv';
+import * as path from 'node:path';
 
 @Injectable()
 export class StorageService {
@@ -13,10 +15,14 @@ export class StorageService {
   private readonly bucketName: string;
 
   constructor() {
+    dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+    dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
+
     const accountId = process.env.R2_ACCOUNT_ID;
     const accessKeyId = process.env.R2_ACCESS_KEY_ID;
     const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
     this.bucketName = process.env.R2_BUCKET_NAME || 'praman-resumes';
+
 
     if (accountId && accessKeyId && secretAccessKey) {
       this.s3Client = new S3Client({
