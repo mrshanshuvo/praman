@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import * as dotenv from 'dotenv';
-import * as path from 'node:path';
+import type { EnvConfig } from '../config/env.validation.js';
 
 @Injectable()
 export class StorageService {
@@ -14,15 +14,11 @@ export class StorageService {
   private readonly s3Client: S3Client | null = null;
   private readonly bucketName: string;
 
-  constructor() {
-    dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-    dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
-
-    const accountId = process.env.R2_ACCOUNT_ID;
-    const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-    this.bucketName = process.env.R2_BUCKET_NAME || 'praman-resumes';
-
+  constructor(private readonly configService: ConfigService<EnvConfig, true>) {
+    const accountId = this.configService.get('R2_ACCOUNT_ID', { infer: true });
+    const accessKeyId = this.configService.get('R2_ACCESS_KEY_ID', { infer: true });
+    const secretAccessKey = this.configService.get('R2_SECRET_ACCESS_KEY', { infer: true });
+    this.bucketName = this.configService.get('R2_BUCKET_NAME', { infer: true }) || 'praman-resumes';
 
     if (accountId && accessKeyId && secretAccessKey) {
       this.s3Client = new S3Client({
@@ -38,6 +34,7 @@ export class StorageService {
       this.logger.warn('Cloudflare R2 credentials missing in environment. Storage operations will be mocked.');
     }
   }
+
 
   /**
    * Uploads a file (text or buffer) to Cloudflare R2

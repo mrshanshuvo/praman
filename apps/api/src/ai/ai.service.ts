@@ -1,5 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { z } from 'zod';
+import type { EnvConfig } from '../config/env.validation.js';
 
 export interface StructuredCallParams<T> {
   systemPrompt: string;
@@ -14,13 +16,26 @@ export interface StructuredCallParams<T> {
 export class AiService {
   private readonly logger = new Logger(AiService.name);
 
-  private readonly apiKey = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
-  private readonly baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(
-    /\/+$/,
-    '',
-  );
-  private readonly models: string[] = this.resolveModels();
+  private readonly apiKey: string | undefined;
+  private readonly baseUrl: string;
+  private readonly models: string[];
   private activeModelIndex = 0;
+
+  constructor(@Optional() private readonly configService?: ConfigService<EnvConfig, true>) {
+    this.apiKey =
+      this.configService?.get('OPENAI_API_KEY', { infer: true }) ||
+      this.configService?.get('AI_API_KEY', { infer: true }) ||
+      process.env.OPENAI_API_KEY ||
+      process.env.AI_API_KEY;
+
+    const rawBaseUrl =
+      this.configService?.get('OPENAI_BASE_URL', { infer: true }) ||
+      process.env.OPENAI_BASE_URL ||
+      'https://api.openai.com/v1';
+    this.baseUrl = rawBaseUrl.replace(/\/+$/, '');
+
+    this.models = this.resolveModels();
+  }
 
   get currentModel(): string {
     return this.models[this.activeModelIndex] || 'groq/compound-mini';
@@ -31,7 +46,8 @@ export class AiService {
   }
 
   private resolveModels(): string[] {
-    const rawList = process.env.AI_MODELS;
+    const rawList =
+      this.configService?.get('AI_MODELS', { infer: true }) || process.env.AI_MODELS;
     if (rawList?.trim()) {
       const parsed = rawList
         .split(',')
@@ -39,12 +55,14 @@ export class AiService {
         .filter(Boolean);
       if (parsed.length > 0) return parsed;
     }
-    const single = process.env.AI_MODEL;
+    const single =
+      this.configService?.get('AI_MODEL', { infer: true }) || process.env.AI_MODEL;
     if (single?.trim()) {
       return [single.trim()];
     }
     return ['groq/compound-mini', 'openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'qwen/qwen3.8-27b'];
   }
+
 
   async runStructuredCall<T>(params: StructuredCallParams<T>): Promise<T> {
     const { schemaName = 'output' } = params;
