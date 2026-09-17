@@ -15,3 +15,5 @@ coverage/
 .system_generated/
 apps/*/pnpm-lock.yaml
 packages/*/pnpm-lock.yaml
+test-results/
+playwright-report/
