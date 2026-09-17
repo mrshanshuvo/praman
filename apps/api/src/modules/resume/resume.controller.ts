@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ResumeService } from './resume.service.js';
 
 @Controller('resumes')
@@ -19,5 +19,13 @@ export class ResumeController {
   async getResumeLatex(@Param('jobDescriptionId') jobDescriptionId: string) {
     const latex = await this.resumeService.getLatexSource(jobDescriptionId);
     return { latex };
+  }
+
+  @Put(':jobDescriptionId/latex')
+  async updateLatex(
+    @Param('jobDescriptionId') jobDescriptionId: string,
+    @Body('latex') latex: string,
+  ) {
+    return this.resumeService.updateLatexSource(jobDescriptionId, latex);
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateJobDescriptionDtoSchema } from '@praman/schemas';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
@@ -81,6 +81,13 @@ export class JobDescriptionController {
   async getResumeLatex(@Param('id') id: string) {
     const latex = await this.resumeService.getLatexSource(id);
     return { latex };
+  }
+
+  @Put(':id/resume/latex')
+  @ApiOperation({ summary: 'Update and persist custom edited LaTeX source to Cloudflare R2' })
+  @ApiResponse({ status: 200, description: 'LaTeX source updated and synced to R2' })
+  async updateResumeLatex(@Param('id') id: string, @Body('latex') latex: string) {
+    return this.resumeService.updateLatexSource(id, latex);
   }
 
   // Orchestrator delegate (§4)

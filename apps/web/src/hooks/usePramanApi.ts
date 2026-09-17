@@ -111,6 +111,25 @@ export function useJobResumeLatex(id: string) {
   });
 }
 
+export function useUpdateResumeLatex(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (latex: string) =>
+      fetcher<{ success: boolean; downloadUrl: string }>(
+        `${API_URL}/job-descriptions/${id}/resume/latex`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latex }),
+        },
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume', 'latex'] });
+      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+    },
+  });
+}
+
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({

@@ -183,11 +183,55 @@ export class ResumeService {
   }
 
   async getLatexSource(jobDescriptionId: string): Promise<string> {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({
+      id: jobDescriptionId,
+    }).first();
+    if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+
     const resumeRecord = await this.getLatestResume(jobDescriptionId);
     if (!resumeRecord) {
       throw new NotFoundException(`Resume not found for job description ${jobDescriptionId}`);
     }
+
+    const userId = jd.userId || 'default-user';
+    const texKey = `resumes/${userId}/${resumeRecord.id}/resume.tex`;
+
+    // Check if customized LaTeX exists in Cloudflare R2
+    try {
+      const storedTex = await this.storageService.getFileString(texKey);
+      if (storedTex) {
+        return storedTex;
+      }
+    } catch {
+      // fallback to dynamic generator
+    }
+
     const profile = await this.candidateService.getProfile();
     return await this.latexService.generateLatex(resumeRecord.resumeJson as ResumeData, profile);
+  }
+
+  async updateLatexSource(jobDescriptionId: string, latex: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({
+      id: jobDescriptionId,
+    }).first();
+    if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+
+    const resumeRecord = await this.getLatestResume(jobDescriptionId);
+    if (!resumeRecord) {
+      throw new NotFoundException(`Resume not found for job description ${jobDescriptionId}`);
+    }
+
+    const userId = jd.userId || 'default-user';
+    const texKey = `resumes/${userId}/${resumeRecord.id}/resume.tex`;
+
+    await this.storageService.uploadFile(texKey, latex, 'application/x-tex');
+    const downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600);
+
+    return {
+      success: true,
+      texKey,
+      downloadUrl,
+      updatedAt: new Date().toISOString(),
+    };
   }
 }

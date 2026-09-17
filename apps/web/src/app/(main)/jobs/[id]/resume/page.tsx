@@ -123,9 +123,11 @@ export default function ResumeAuditPage() {
                 </div>
               ) : latex ? (
                 <LatexViewer
+                  jobId={id}
                   latex={latex}
                   downloadUrl={downloadUrl}
                   candidateName={resume.personal?.name}
+                  resumeData={resume}
                 />
               ) : (
                 <div className="p-8 text-center text-xs text-muted-foreground">
