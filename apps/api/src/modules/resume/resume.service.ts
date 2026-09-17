@@ -182,7 +182,7 @@ export class ResumeService {
     };
   }
 
-  async getLatexSource(jobDescriptionId: string): Promise<string> {
+  async getLatexSource(jobDescriptionId: string, templateId?: string) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
@@ -194,9 +194,10 @@ export class ResumeService {
     }
 
     const userId = jd.userId || 'default-user';
-    const texKey = `resumes/${userId}/${resumeRecord.id}/resume.tex`;
+    const targetTemplate = templateId || 'modern-developer';
+    const texKey = `resumes/${userId}/${resumeRecord.id}/${targetTemplate}.tex`;
 
-    // Check if customized LaTeX exists in Cloudflare R2
+    // Check if customized LaTeX exists in Cloudflare R2 for this template
     try {
       const storedTex = await this.storageService.getFileString(texKey);
       if (storedTex) {
@@ -207,10 +208,14 @@ export class ResumeService {
     }
 
     const profile = await this.candidateService.getProfile();
-    return await this.latexService.generateLatex(resumeRecord.resumeJson as ResumeData, profile);
+    return await this.latexService.generateLatex(
+      resumeRecord.resumeJson as ResumeData,
+      profile,
+      targetTemplate,
+    );
   }
 
-  async updateLatexSource(jobDescriptionId: string, latex: string) {
+  async updateLatexSource(jobDescriptionId: string, latex: string, templateId?: string) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
@@ -222,7 +227,8 @@ export class ResumeService {
     }
 
     const userId = jd.userId || 'default-user';
-    const texKey = `resumes/${userId}/${resumeRecord.id}/resume.tex`;
+    const targetTemplate = templateId || 'modern-developer';
+    const texKey = `resumes/${userId}/${resumeRecord.id}/${targetTemplate}.tex`;
 
     await this.storageService.uploadFile(texKey, latex, 'application/x-tex');
     const downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600);

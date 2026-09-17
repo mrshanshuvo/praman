@@ -103,10 +103,13 @@ export function useJobResume(id: string) {
   });
 }
 
-export function useJobResumeLatex(id: string) {
+export function useJobResumeLatex(id: string, templateId?: string) {
   return useQuery({
-    queryKey: ['jobs', id, 'resume', 'latex'],
-    queryFn: () => fetcher<{ latex: string }>(`${API_URL}/job-descriptions/${id}/resume/latex`),
+    queryKey: ['jobs', id, 'resume', 'latex', templateId || 'modern-developer'],
+    queryFn: () =>
+      fetcher<{ latex: string; templateId?: string }>(
+        `${API_URL}/job-descriptions/${id}/resume/latex${templateId ? `?template=${encodeURIComponent(templateId)}` : ''}`,
+      ),
     enabled: Boolean(id),
   });
 }
@@ -114,15 +117,18 @@ export function useJobResumeLatex(id: string) {
 export function useUpdateResumeLatex(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (latex: string) =>
-      fetcher<{ success: boolean; downloadUrl: string }>(
-        `${API_URL}/job-descriptions/${id}/resume/latex`,
+    mutationFn: (payload: string | { latex: string; templateId?: string }) => {
+      const latex = typeof payload === 'string' ? payload : payload.latex;
+      const templateId = typeof payload === 'string' ? undefined : payload.templateId;
+      return fetcher<{ success: boolean; downloadUrl: string }>(
+        `${API_URL}/job-descriptions/${id}/resume/latex${templateId ? `?template=${encodeURIComponent(templateId)}` : ''}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ latex }),
         },
-      ),
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume', 'latex'] });
       queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });

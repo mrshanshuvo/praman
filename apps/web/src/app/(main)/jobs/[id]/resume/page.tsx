@@ -3,6 +3,7 @@
 import { ArrowLeft, FileCode, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,6 +23,7 @@ export default function ResumeAuditPage() {
   const params = useParams();
   const id = params.id as string;
 
+  const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
   const { data: jd } = useJob(id);
   const {
     data: resumeData,
@@ -30,7 +32,7 @@ export default function ResumeAuditPage() {
     error: fetchError,
     refetch,
   } = useJobResume(id);
-  const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(id);
+  const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(id, selectedTemplate);
   const { data: candidateProfile } = useCandidateProfile();
   const runStageMutation = useRunStage(id);
 
@@ -128,6 +130,8 @@ export default function ResumeAuditPage() {
                 <LatexViewer
                   jobId={id}
                   latex={latex}
+                  selectedTemplate={selectedTemplate}
+                  onSelectTemplate={setSelectedTemplate}
                   downloadUrl={downloadUrl}
                   candidateName={resume.personal?.name}
                   resumeData={resume}

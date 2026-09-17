@@ -2,6 +2,41 @@ import { Injectable, Logger, Optional } from '@nestjs/common';
 import type { ResumeData } from '@praman/schemas';
 import { StorageService } from '../../core/storage/storage.service.js';
 
+export interface ResumeTemplateMeta {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  tags: string[];
+}
+
+export const RESUME_TEMPLATES: ResumeTemplateMeta[] = [
+  {
+    id: 'modern-developer',
+    name: 'Modern Developer',
+    category: 'Engineering & Tech',
+    description:
+      'Clean Helvetica sans-serif with blue accents, ideal for software engineers and full-stack devs.',
+    tags: ['Sans-serif', 'Tech Accent', 'Balanced'],
+  },
+  {
+    id: 'classic-academic',
+    name: 'Classic Academic',
+    category: 'Research & Formal',
+    description:
+      'Traditional serif typography with small-caps section titles, suited for academic, research, and advisory roles.',
+    tags: ['Serif', 'Small Caps', 'Formal'],
+  },
+  {
+    id: 'compact-executive',
+    name: 'Compact Executive',
+    category: 'Leadership & Senior',
+    description:
+      'High-density 1-page layout with ultra-crisp geometry, optimized for executive and senior profiles.',
+    tags: ['High Density', '1-Page', 'Condensed'],
+  },
+];
+
 @Injectable()
 export class LatexService {
   private readonly logger = new Logger(LatexService.name);
@@ -85,6 +120,123 @@ export class LatexService {
 {{/if}}
 {{#if HAS_CERTIFICATIONS}}
 \\section{Certifications}
+{{CERTIFICATION_ENTRIES}}
+{{/if}}
+\\end{document}`;
+      this.templateCache.set(templateId, fallback);
+      return fallback;
+    }
+
+    // Built-in resilient fallback for 'classic-academic'
+    if (templateId === 'classic-academic') {
+      const fallback = `\\documentclass[11pt, a4paper]{article}
+\\usepackage{setspace}
+\\setstretch{1.15}
+\\usepackage[ignoreheadfoot, top=1.0cm, bottom=1.0cm, left=1.2cm, right=1.2cm]{geometry}
+\\usepackage{titlesec, tabularx, array, xcolor, enumitem, amsmath}
+\\definecolor{primaryColor}{RGB}{25, 40, 75}
+\\usepackage[pdftitle={%%FULL_NAME%%'s Curriculum Vitae}, pdfauthor={%%FULL_NAME%%}, colorlinks=true, urlcolor=primaryColor]{hyperref}
+\\usepackage{changepage, paracol, needspace}
+\\pagestyle{empty}
+\\setcounter{secnumdepth}{0}
+\\setlength{\\parindent}{0pt}
+\\titleformat{\\section}{\\needspace{4\\baselineskip}\\scshape\\large\\color{primaryColor}}{}{0pt}{}[\\vspace{2pt}\\titlerule]
+\\titlespacing{\\section}{0pt}{0.25cm}{0.18cm}
+\\newenvironment{highlights}{\\begin{itemize}[topsep=0.1cm, parsep=0.08cm, partopsep=0pt, itemsep=0pt, leftmargin=12pt]}{\\end{itemize}}
+\\newenvironment{onecolentry}{\\begin{adjustwidth}{0.15cm}{0.15cm}}{\\end{adjustwidth}}
+\\begin{document}
+\\begin{center}
+    {\\LARGE \\scshape %%FULL_NAME%%} \\\\[4pt]
+    {{TITLE_LINE}}
+    {\\small {{CONTACT_LINE}}} \\\\[2pt]
+    {\\footnotesize {{LINKS_LINE}}}
+\\end{center}
+\\vspace{-4pt}
+{{#if SUMMARY}}
+\\section{Scholarly \\& Professional Summary}
+\\begin{onecolentry}
+{{SUMMARY}}
+\\end{onecolentry}
+{{/if}}
+{{#if SKILLS}}
+\\section{Core Competencies \\& Technical Areas}
+\\begin{onecolentry}
+{{SKILLS}}
+\\end{onecolentry}
+{{/if}}
+{{#if HAS_EXPERIENCE}}
+\\section{Professional \\& Research Experience}
+{{EXPERIENCE_ENTRIES}}
+{{/if}}
+{{#if HAS_PROJECTS}}
+\\section{Notable Projects \\& Research}
+{{PROJECT_ENTRIES}}
+{{/if}}
+{{#if HAS_EDUCATION}}
+\\section{Education}
+{{EDUCATION_ENTRIES}}
+{{/if}}
+{{#if HAS_CERTIFICATIONS}}
+\\section{Certifications \\& Honors}
+{{CERTIFICATION_ENTRIES}}
+{{/if}}
+\\end{document}`;
+      this.templateCache.set(templateId, fallback);
+      return fallback;
+    }
+
+    // Built-in resilient fallback for 'compact-executive'
+    if (templateId === 'compact-executive') {
+      const fallback = `\\documentclass[9.5pt, a4paper]{article}
+\\usepackage{helvet}
+\\renewcommand{\\familydefault}{\\sfdefault}
+\\usepackage{setspace}
+\\setstretch{1.02}
+\\usepackage[ignoreheadfoot, top=0.55cm, bottom=0.55cm, left=0.75cm, right=0.75cm]{geometry}
+\\usepackage{titlesec, tabularx, array, xcolor, enumitem, amsmath}
+\\definecolor{primaryColor}{RGB}{15, 30, 50}
+\\usepackage[pdftitle={%%FULL_NAME%%'s Executive Brief}, pdfauthor={%%FULL_NAME%%}, colorlinks=true, urlcolor=primaryColor]{hyperref}
+\\usepackage{changepage, needspace}
+\\pagestyle{empty}
+\\setcounter{secnumdepth}{0}
+\\setlength{\\parindent}{0pt}
+\\titleformat{\\section}{\\needspace{3\\baselineskip}\\bfseries\\normalsize\\color{primaryColor}}{}{0pt}{}[\\vspace{0.5pt}\\titlerule]
+\\titlespacing{\\section}{0pt}{0.14cm}{0.10cm}
+\\newenvironment{highlights}{\\begin{itemize}[topsep=0.04cm, parsep=0.04cm, partopsep=0pt, itemsep=0pt, leftmargin=8pt]}{\\end{itemize}}
+\\newenvironment{onecolentry}{\\begin{adjustwidth}{0.1cm}{0.1cm}}{\\end{adjustwidth}}
+\\begin{document}
+\\begin{center}
+    {\\huge \\textbf{%%FULL_NAME%%}} \\\\[2pt]
+    {{TITLE_LINE}}
+    {\\footnotesize {{CONTACT_LINE}} \\textbar\\ {{LINKS_LINE}}}
+\\end{center}
+\\vspace{-4pt}
+{{#if SUMMARY}}
+\\section{Executive Summary}
+\\begin{onecolentry}
+{\\small {{SUMMARY}}}
+\\end{onecolentry}
+{{/if}}
+{{#if SKILLS}}
+\\section{Key Competencies}
+\\begin{onecolentry}
+{\\small {{SKILLS}}}
+\\end{onecolentry}
+{{/if}}
+{{#if HAS_EXPERIENCE}}
+\\section{Leadership \\& Professional Experience}
+{{EXPERIENCE_ENTRIES}}
+{{/if}}
+{{#if HAS_PROJECTS}}
+\\section{Strategic Initiatives \\& Projects}
+{{PROJECT_ENTRIES}}
+{{/if}}
+{{#if HAS_EDUCATION}}
+\\section{Education}
+{{EDUCATION_ENTRIES}}
+{{/if}}
+{{#if HAS_CERTIFICATIONS}}
+\\section{Credentials}
 {{CERTIFICATION_ENTRIES}}
 {{/if}}
 \\end{document}`;

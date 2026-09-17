@@ -121,7 +121,12 @@ describe('LatexService', () => {
 
   beforeEach(() => {
     mockStorageService = {
-      getFileString: vi.fn().mockResolvedValue(fullProductionTemplate),
+      getFileString: vi.fn().mockImplementation((key: string) => {
+        if (key === 'templates/modern-developer.tex') {
+          return Promise.resolve(fullProductionTemplate);
+        }
+        return Promise.resolve(null);
+      }),
     };
     service = new LatexService(mockStorageService);
   });
@@ -144,86 +149,86 @@ describe('LatexService', () => {
   });
 
   describe('generateLatex', () => {
+    const mockResumeData: any = {
+      personal: {
+        name: 'Shahid Hasan Shuvo',
+        contact: {
+          location: 'Dhaka - 1216',
+          phone: '+8801929346733',
+          email: 'mrshanshuvo@gmail.com',
+          linkedin: 'https://linkedin.com/in/shahidhasanshovu',
+          github: 'https://github.com/mrshanshuvo',
+        },
+      },
+      summary: 'Full-Stack Developer with expertise in Next.js & NestJS.',
+      skills: ['TypeScript', 'React.js', 'PostgreSQL', 'Docker'],
+      experience: [
+        {
+          sourceExperienceId: 'exp-1',
+          company: 'Softvence Agency',
+          title: 'Jr. Full Stack Developer',
+          bullets: [
+            'Built real-time features using Socket.IO & NestJS.',
+            'Refactored API reducing latency by 35%.',
+          ],
+        },
+      ],
+      projects: [
+        {
+          sourceProjectId: 'proj-1',
+          name: 'CareCamp',
+          bullets: ['Integrated Stripe payments and Firebase Authentication.'],
+        },
+      ],
+      education: [
+        {
+          sourceEducationId: 'edu-1',
+          institution: 'Green University of Bangladesh',
+          degree: 'B.Sc. in Computer Science & Engineering',
+        },
+      ],
+      certifications: [
+        {
+          sourceCertificationId: 'cert-1',
+          name: 'Next Level Web Development',
+        },
+      ],
+    };
+
+    const mockCandidateProfile: any = {
+      profile: {
+        desiredTitle: 'Full-Stack Developer',
+      },
+      experiences: [
+        {
+          id: 'exp-1',
+          startDate: 'Aug 2026',
+          isCurrent: true,
+        },
+      ],
+      projects: [
+        {
+          id: 'proj-1',
+          link: 'https://mcms-web-client.vercel.app/',
+          technologies: ['React', 'Node.js', 'MongoDB'],
+        },
+      ],
+      educations: [
+        {
+          id: 'edu-1',
+          endDate: 'Jan 2026',
+        },
+      ],
+      certifications: [
+        {
+          id: 'cert-1',
+          issuer: 'Programming Hero',
+          date: '2026',
+        },
+      ],
+    };
+
     it('should generate valid full-fidelity LaTeX structure from ResumeData and candidate profile', async () => {
-      const mockResumeData: any = {
-        personal: {
-          name: 'Shahid Hasan Shuvo',
-          contact: {
-            location: 'Dhaka - 1216',
-            phone: '+8801929346733',
-            email: 'mrshanshuvo@gmail.com',
-            linkedin: 'https://linkedin.com/in/shahidhasanshovu',
-            github: 'https://github.com/mrshanshuvo',
-          },
-        },
-        summary: 'Full-Stack Developer with expertise in Next.js & NestJS.',
-        skills: ['TypeScript', 'React.js', 'PostgreSQL', 'Docker'],
-        experience: [
-          {
-            sourceExperienceId: 'exp-1',
-            company: 'Softvence Agency',
-            title: 'Jr. Full Stack Developer',
-            bullets: [
-              'Built real-time features using Socket.IO & NestJS.',
-              'Refactored API reducing latency by 35%.',
-            ],
-          },
-        ],
-        projects: [
-          {
-            sourceProjectId: 'proj-1',
-            name: 'CareCamp',
-            bullets: ['Integrated Stripe payments and Firebase Authentication.'],
-          },
-        ],
-        education: [
-          {
-            sourceEducationId: 'edu-1',
-            institution: 'Green University of Bangladesh',
-            degree: 'B.Sc. in Computer Science & Engineering',
-          },
-        ],
-        certifications: [
-          {
-            sourceCertificationId: 'cert-1',
-            name: 'Next Level Web Development',
-          },
-        ],
-      };
-
-      const mockCandidateProfile: any = {
-        profile: {
-          desiredTitle: 'Full-Stack Developer',
-        },
-        experiences: [
-          {
-            id: 'exp-1',
-            startDate: 'Aug 2026',
-            isCurrent: true,
-          },
-        ],
-        projects: [
-          {
-            id: 'proj-1',
-            link: 'https://mcms-web-client.vercel.app/',
-            technologies: ['React', 'Node.js', 'MongoDB'],
-          },
-        ],
-        educations: [
-          {
-            id: 'edu-1',
-            endDate: 'Jan 2026',
-          },
-        ],
-        certifications: [
-          {
-            id: 'cert-1',
-            issuer: 'Programming Hero',
-            date: '2026',
-          },
-        ],
-      };
-
       const tex = await service.generateLatex(mockResumeData, mockCandidateProfile);
 
       // Verify R2 mock was consulted
@@ -266,6 +271,30 @@ describe('LatexService', () => {
       expect(tex).toContain(
         '\\textbf{Next Level Web Development} — Programming Hero \\hfill \\textit{2026}',
       );
+    });
+
+    it('generates classic-academic template with serif small-caps structure', async () => {
+      const tex = await service.generateLatex(
+        mockResumeData,
+        mockCandidateProfile,
+        'classic-academic',
+      );
+      expect(tex).toContain('\\scshape');
+      expect(tex).toContain("Shahid Hasan Shuvo's Curriculum Vitae");
+      expect(tex).toContain('\\section{Scholarly \\& Professional Summary}');
+      expect(tex).toContain('\\section{Core Competencies \\& Technical Areas}');
+    });
+
+    it('generates compact-executive template with high-density layout', async () => {
+      const tex = await service.generateLatex(
+        mockResumeData,
+        mockCandidateProfile,
+        'compact-executive',
+      );
+      expect(tex).toContain("Shahid Hasan Shuvo's Executive Brief");
+      expect(tex).toContain('\\section{Executive Summary}');
+      expect(tex).toContain('\\section{Key Competencies}');
+      expect(tex).toContain('\\section{Leadership \\& Professional Experience}');
     });
   });
 });

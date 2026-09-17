@@ -1,4 +1,13 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateJobDescriptionDtoSchema } from '@praman/schemas';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
@@ -78,16 +87,20 @@ export class JobDescriptionController {
   @Get(':id/resume/latex')
   @ApiOperation({ summary: 'Get compiled LaTeX source for latest resume' })
   @ApiResponse({ status: 200, description: 'LaTeX string wrapped in object' })
-  async getResumeLatex(@Param('id') id: string) {
-    const latex = await this.resumeService.getLatexSource(id);
-    return { latex };
+  async getResumeLatex(@Param('id') id: string, @Query('template') templateId?: string) {
+    const latex = await this.resumeService.getLatexSource(id, templateId);
+    return { latex, templateId: templateId || 'modern-developer' };
   }
 
   @Put(':id/resume/latex')
   @ApiOperation({ summary: 'Update and persist custom edited LaTeX source to Cloudflare R2' })
   @ApiResponse({ status: 200, description: 'LaTeX source updated and synced to R2' })
-  async updateResumeLatex(@Param('id') id: string, @Body('latex') latex: string) {
-    return this.resumeService.updateLatexSource(id, latex);
+  async updateResumeLatex(
+    @Param('id') id: string,
+    @Body('latex') latex: string,
+    @Query('template') templateId?: string,
+  ) {
+    return this.resumeService.updateLatexSource(id, latex, templateId);
   }
 
   // Orchestrator delegate (§4)

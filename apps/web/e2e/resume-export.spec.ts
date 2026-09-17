@@ -140,4 +140,26 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
       }
     }
   });
+
+  test('template switcher displays templates and switches template selection', async ({ page }) => {
+    await page.goto('/jobs');
+    const resumeLink = page.locator('a[href*="/resume"]').first();
+    if (await resumeLink.isVisible({ timeout: 4000 }).catch(() => false)) {
+      await resumeLink.click();
+      await page.waitForURL(/.*\/resume/);
+
+      // Verify LaTeX Style bar is visible
+      const styleBar = page.locator('text=LaTeX Style:');
+      if (await styleBar.isVisible({ timeout: 4000 }).catch(() => false)) {
+        await expect(page.getByRole('button', { name: /Modern Developer/i })).toBeVisible();
+        const academicBtn = page.getByRole('button', { name: /Classic Academic/i });
+        await expect(academicBtn).toBeVisible();
+        await expect(page.getByRole('button', { name: /Compact Executive/i })).toBeVisible();
+
+        // Switch to Classic Academic
+        await academicBtn.click();
+        await expect(page.locator('text=Traditional Computer Modern serif')).toBeVisible();
+      }
+    }
+  });
 });

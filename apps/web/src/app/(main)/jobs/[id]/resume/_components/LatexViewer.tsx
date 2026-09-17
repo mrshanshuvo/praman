@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Eye,
   FileCode,
+  Palette,
   RotateCcw,
   Save,
 } from 'lucide-react';
@@ -19,9 +20,35 @@ import { Card } from '@/components/ui/card';
 import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
 import { DocumentPreviewSheet } from './DocumentPreviewSheet';
 
+export const TEMPLATES = [
+  {
+    id: 'modern-developer',
+    name: 'Modern Developer',
+    badge: 'Tech & Engineering',
+    color: 'text-brand-cyan border-brand-cyan/30 bg-brand-cyan/10',
+    description: 'Clean Helvetica sans-serif, primary blue accents (#004F90), itemized highlights.',
+  },
+  {
+    id: 'classic-academic',
+    name: 'Classic Academic',
+    badge: 'Formal & Research',
+    color: 'text-amber-500 border-amber-500/30 bg-amber-500/10',
+    description: 'Traditional Computer Modern serif, small-caps section titles, academic rules.',
+  },
+  {
+    id: 'compact-executive',
+    name: 'Compact Executive',
+    badge: '1-Page Senior',
+    color: 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10',
+    description: 'Condensed high-density layout with 0.5cm margins and bold leadership styling.',
+  },
+];
+
 interface LatexViewerProps {
   jobId: string;
   latex: string;
+  selectedTemplate?: string;
+  onSelectTemplate?: (templateId: string) => void;
   downloadUrl?: string | null;
   candidateName?: string;
   resumeData?: any;
@@ -30,6 +57,8 @@ interface LatexViewerProps {
 export function LatexViewer({
   jobId,
   latex,
+  selectedTemplate = 'modern-developer',
+  onSelectTemplate,
   downloadUrl,
   candidateName = 'resume',
   resumeData,
@@ -58,7 +87,10 @@ export function LatexViewer({
 
   const handleSave = async () => {
     try {
-      await updateLatexMutation.mutateAsync(code);
+      await updateLatexMutation.mutateAsync({
+        latex: code,
+        templateId: selectedTemplate,
+      });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
@@ -270,6 +302,40 @@ export function LatexViewer({
             <span>Overleaf</span>
           </Button>
         </div>
+      </div>
+
+      {/* Template Selector Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 bg-muted/20 border-b border-border text-xs">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Palette className="w-3.5 h-3.5 text-brand-cyan" />
+          <span className="text-xs font-semibold text-foreground">LaTeX Style:</span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {TEMPLATES.map((tpl) => {
+              const isActive = (selectedTemplate || 'modern-developer') === tpl.id;
+              return (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => onSelectTemplate?.(tpl.id)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 border ${
+                    isActive
+                      ? 'bg-background font-bold text-foreground border-brand-cyan/50 shadow-xs ring-1 ring-brand-cyan/30'
+                      : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-brand-cyan' : 'bg-muted-foreground'}`}
+                  />
+                  <span>{tpl.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <span className="text-[11px] font-sans text-muted-foreground hidden md:inline">
+          {TEMPLATES.find((t) => t.id === (selectedTemplate || 'modern-developer'))?.description}
+        </span>
       </div>
 
       {/* Main Workspace: Code, Split, or Preview */}
