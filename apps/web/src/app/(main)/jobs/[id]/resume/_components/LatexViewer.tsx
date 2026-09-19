@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from 'cn';
 import {
   Check,
   Code2,
@@ -9,17 +10,16 @@ import {
   ExternalLink,
   Eye,
   FileCode,
-  FileDown,
   Palette,
-  RefreshCw,
   RotateCcw,
   Save,
+  WrapText,
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { downloadResumePdf, useUpdateResumeLatex } from '@/hooks/usePramanApi';
+import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
 import { DocumentPreviewSheet } from './DocumentPreviewSheet';
 
 export const TEMPLATES = [
@@ -69,15 +69,54 @@ export function LatexViewer({
   const [viewMode, setViewMode] = useState<'split' | 'code' | 'preview'>('code');
   const [copied, setCopied] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [wordWrap, setWordWrap] = useState(true);
+  const [lineHeights, setLineHeights] = useState<number[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
+  const mirrorRef = useRef<HTMLDivElement>(null);
+
+  const lines = code.split('\n');
 
   const updateLatexMutation = useUpdateResumeLatex(jobId);
 
   useEffect(() => {
     setCode(latex);
   }, [latex]);
+
+  useEffect(() => {
+    if (!wordWrap) {
+      setLineHeights([]);
+      return;
+    }
+
+    const updateHeights = () => {
+      if (!mirrorRef.current || !textareaRef.current) return;
+      if (textareaRef.current.clientWidth) {
+        mirrorRef.current.style.width = `${textareaRef.current.clientWidth}px`;
+      }
+      const children = mirrorRef.current.children;
+      const heights: number[] = [];
+      for (let i = 0; i < children.length; i++) {
+        heights.push((children[i] as HTMLElement).offsetHeight);
+      }
+      setLineHeights(heights);
+    };
+
+    updateHeights();
+
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const observer = new ResizeObserver(() => {
+      updateHeights();
+    });
+    observer.observe(textarea);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [code, wordWrap, viewMode]);
 
   const isDirty = code !== latex;
 
@@ -102,28 +141,6 @@ export function LatexViewer({
 
   const handleReset = () => {
     setCode(latex);
-  };
-
-  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
-
-  const handleDownloadPdf = async () => {
-    try {
-      setIsDownloadingPdf(true);
-      const safeCandidate = candidateName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '');
-      await downloadResumePdf(
-        jobId,
-        selectedTemplate,
-        undefined,
-        `${safeCandidate}_${selectedTemplate}.pdf`,
-      );
-    } catch (err: any) {
-      console.error('Failed to download PDF:', err);
-    } finally {
-      setIsDownloadingPdf(false);
-    }
   };
 
   const handleDownload = () => {
@@ -185,9 +202,6 @@ export function LatexViewer({
     }
   };
 
-  const lineCount = code.split('\n').length;
-  const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1);
-
   return (
     <Card className="p-0 border-border bg-card/90 overflow-hidden shadow-lg space-y-0 gap-0">
       {/* Top Toolbar */}
@@ -216,46 +230,72 @@ export function LatexViewer({
           )}
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 bg-background/80 p-1 rounded-lg border border-border">
-          <button
-            type="button"
-            onClick={() => setViewMode('code')}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-              viewMode === 'code'
-                ? 'bg-brand-pink/15 text-brand-pink dark:bg-brand-cyan/15 dark:text-brand-cyan font-semibold'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Code2 className="w-3.5 h-3.5" />
-            <span>Editor</span>
-          </button>
+        {/* View Mode & Word Wrap Toggles */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 bg-background/80 p-1 rounded-lg border border-border">
+            <button
+              type="button"
+              onClick={() => setViewMode('code')}
+              className={cn(
+                'px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer',
+                viewMode === 'code'
+                  ? 'bg-brand-pink/15 text-brand-pink dark:bg-brand-cyan/15 dark:text-brand-cyan font-semibold'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Code2 className="w-3.5 h-3.5" />
+              <span>Editor</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setViewMode('split')}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-              viewMode === 'split'
-                ? 'bg-brand-pink/15 text-brand-pink dark:bg-brand-cyan/15 dark:text-brand-cyan font-semibold'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Columns2 className="w-3.5 h-3.5" />
-            <span>Split View</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('split')}
+              className={cn(
+                'px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer',
+                viewMode === 'split'
+                  ? 'bg-brand-pink/15 text-brand-pink dark:bg-brand-cyan/15 dark:text-brand-cyan font-semibold'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Columns2 className="w-3.5 h-3.5" />
+              <span>Split View</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setViewMode('preview')}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-              viewMode === 'preview'
-                ? 'bg-brand-pink/15 text-brand-pink dark:bg-brand-cyan/15 dark:text-brand-cyan font-semibold'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Preview</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('preview')}
+              className={cn(
+                'px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer',
+                viewMode === 'preview'
+                  ? 'bg-brand-pink/15 text-brand-pink dark:bg-brand-cyan/15 dark:text-brand-cyan font-semibold'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Preview</span>
+            </button>
+          </div>
+
+          {(viewMode === 'code' || viewMode === 'split') && (
+            <button
+              type="button"
+              onClick={() => setWordWrap((w) => !w)}
+              className={cn(
+                'px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer h-7.5',
+                wordWrap
+                  ? 'bg-brand-cyan/15 border-brand-cyan/40 text-brand-cyan font-semibold'
+                  : 'bg-background/80 border-border text-muted-foreground hover:text-foreground',
+              )}
+              title={
+                wordWrap
+                  ? 'Word Wrap enabled (click to disable)'
+                  : 'Word Wrap disabled (click to enable)'
+              }
+            >
+              <WrapText className="w-3.5 h-3.5" />
+              <span>Wrap</span>
+            </button>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -304,21 +344,6 @@ export function LatexViewer({
                 <span>Copy Code</span>
               </>
             )}
-          </Button>
-
-          <Button
-            size="sm"
-            onClick={handleDownloadPdf}
-            disabled={isDownloadingPdf}
-            className="h-8 text-xs font-semibold bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark shadow-sm gap-1 cursor-pointer"
-            title="Download ATS-optimized PDF"
-          >
-            {isDownloadingPdf ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <FileDown className="w-3.5 h-3.5" />
-            )}
-            <span>{isDownloadingPdf ? 'Generating...' : 'Download PDF'}</span>
           </Button>
 
           <Button
@@ -389,14 +414,35 @@ export function LatexViewer({
         {/* Code Editor Pane */}
         {(viewMode === 'code' || viewMode === 'split') && (
           <div className="relative flex bg-slate-950 text-slate-100 font-mono text-xs overflow-hidden h-155">
+            {/* Hidden Mirror for Exact Word-Wrap Height Measurement */}
+            {wordWrap && (
+              <div
+                ref={mirrorRef}
+                aria-hidden="true"
+                className="absolute left-12 right-0 top-0 invisible pointer-events-none p-4 font-mono text-xs leading-relaxed box-border"
+              >
+                {lines.map((line, i) => (
+                  <div key={i} className="whitespace-pre-wrap wrap-break-word">
+                    {line || '\u00A0'}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Gutter / Line Numbers */}
             <div
               ref={lineNumbersRef}
               aria-hidden="true"
               className="w-12 py-4 pr-3 pl-2 bg-slate-900/90 text-slate-500 font-mono text-right select-none overflow-hidden shrink-0 border-r border-slate-800 leading-relaxed"
             >
-              {lineNumbers.map((num) => (
-                <div key={num}>{num}</div>
+              {lines.map((_, i) => (
+                <div
+                  key={i}
+                  style={wordWrap && lineHeights[i] ? { height: `${lineHeights[i]}px` } : undefined}
+                  className="flex items-start justify-end"
+                >
+                  {i + 1}
+                </div>
               ))}
             </div>
 
@@ -408,7 +454,12 @@ export function LatexViewer({
               onKeyDown={handleKeyDown}
               onScroll={handleScroll}
               spellCheck={false}
-              className="flex-1 p-4 bg-transparent text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none overflow-y-auto whitespace-pre tab-size-2"
+              className={cn(
+                'flex-1 p-4 bg-transparent text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none overflow-y-auto tab-size-2',
+                wordWrap
+                  ? 'whitespace-pre-wrap wrap-break-word overflow-x-hidden'
+                  : 'whitespace-pre overflow-x-auto',
+              )}
               placeholder="LaTeX source code..."
             />
           </div>
