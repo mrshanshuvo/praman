@@ -1,8 +1,8 @@
 'use client';
 
 import { AlertCircle } from 'lucide-react';
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { type PipelineStage, PipelineStepper } from '@/components/PipelineStepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -16,15 +16,56 @@ import { Stage2Match } from './_components/Stage2Match';
 import { Stage3Strategy } from './_components/Stage3Strategy';
 import { Stage4Resume } from './_components/Stage4Resume';
 
+const VALID_STAGES: PipelineStage[] = ['structured', 'match', 'strategy', 'resume'];
+
 export default function JobDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const id = params.id as string;
+
+  const stageFromUrl = searchParams.get('stage') as PipelineStage | null;
+  const initialStage = stageFromUrl && VALID_STAGES.includes(stageFromUrl) ? stageFromUrl : null;
 
   const { data: jd, isLoading: loading, isFetching, error: fetchError, refetch } = useJob(id);
   const runStageMutation = useRunStage(id);
 
-  const [activeTab, setActiveTab] = useState<PipelineStage>('structured');
+  const [activeTab, setActiveTabState] = useState<PipelineStage>(initialStage || 'structured');
+  const [hasAutoAdvanced, setHasAutoAdvanced] = useState<boolean>(Boolean(initialStage));
   const [manualActionError, setManualActionError] = useState<string | null>(null);
+
+  const setActiveTab = useCallback(
+    (stage: PipelineStage) => {
+      setActiveTabState(stage);
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('stage', stage);
+        window.history.replaceState(null, '', `${pathname}?${urlParams.toString()}`);
+      }
+    },
+    [pathname],
+  );
+
+  // Auto-advance to highest completed stage on first load if no URL stage was provided
+  useEffect(() => {
+    if (!hasAutoAdvanced && jd) {
+      let highestStage: PipelineStage = 'structured';
+      if (jd.analysis?.strategy?.resume?.resumeJson) {
+        highestStage = 'resume';
+      } else if (jd.analysis?.strategy?.result) {
+        highestStage = 'strategy';
+      } else if (jd.analysis?.result) {
+        highestStage = 'match';
+      }
+      setActiveTabState(highestStage);
+      setHasAutoAdvanced(true);
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('stage', highestStage);
+        window.history.replaceState(null, '', `${pathname}?${urlParams.toString()}`);
+      }
+    }
+  }, [jd, hasAutoAdvanced, pathname]);
 
   const {
     isStreaming,

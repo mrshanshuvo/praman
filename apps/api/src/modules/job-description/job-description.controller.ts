@@ -2,14 +2,16 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateJobDescriptionDtoSchema } from '@praman/schemas';
+import { CreateJobDescriptionDtoSchema, UpdateJobStatusDtoSchema } from '@praman/schemas';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { MatchService } from '../match/match.service.js';
 import { PipelineService } from '../pipeline/pipeline.service.js';
@@ -38,7 +40,7 @@ export class JobDescriptionController {
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.jdService.createAndAnalyze(parse.data.rawText, user?.id);
+    return this.jdService.createAndAnalyze(parse.data.rawText, user?.id, parse.data.force);
   }
 
   @Get()
@@ -56,39 +58,80 @@ export class JobDescriptionController {
     return this.jdService.getJdById(id);
   }
 
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a job description and all derived pipeline results' })
+  @ApiResponse({ status: 200, description: 'Job description and derived pipeline results deleted' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async deleteJd(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.jdService.deleteJd(id, user?.id);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update job description application status' })
+  @ApiResponse({ status: 200, description: 'Application status updated' })
+  @ApiResponse({ status: 400, description: 'Invalid status provided' })
+  @ApiResponse({ status: 404, description: 'Job description not found' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() body: unknown,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const parse = UpdateJobStatusDtoSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.jdService.updateStatus(id, parse.data.status, user?.id);
+  }
+
   @Post(':id/match')
   @ApiOperation({ summary: 'Run candidate ↔ JD match analysis' })
   @ApiResponse({ status: 201, description: 'Match analysis generated' })
-  async runMatch(@Param('id') id: string) {
-    return this.matchService.runMatch(id);
+  async runMatch(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.matchService.runMatch(id, user?.id);
   }
 
   @Post(':id/strategy')
   @ApiOperation({ summary: 'Generate strategic resume positioning recommendations' })
   @ApiResponse({ status: 201, description: 'Strategy generated' })
-  async runStrategy(@Param('id') id: string) {
-    return this.strategyService.runStrategy(id);
+  async runStrategy(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.strategyService.runStrategy(id, user?.id);
   }
 
   @Post(':id/resume')
   @ApiOperation({ summary: 'Generate and validate tailored resume JSON' })
   @ApiResponse({ status: 201, description: 'Resume generated and validated' })
-  async runResume(@Param('id') id: string) {
-    return this.resumeService.generateAndValidate(id);
+  async runResume(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.resumeService.generateAndValidate(id, user?.id);
   }
 
   @Get(':id/resume')
-  @ApiOperation({ summary: 'Get latest generated resume for this JD' })
-  @ApiResponse({ status: 200, description: 'Latest resume record' })
-  async getResume(@Param('id') id: string) {
-    return this.resumeService.getLatestResume(id);
+  @ApiOperation({ summary: 'Get latest or specific version of generated resume for this JD' })
+  @ApiResponse({ status: 200, description: 'Resume record' })
+  async getResume(
+    @Param('id') id: string,
+    @Query('version') versionOrId?: string,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.resumeService.getLatestResume(id, versionOrId, user?.id);
+  }
+
+  @Get(':id/resume/versions')
+  @ApiOperation({ summary: 'List all historical resume versions for this JD' })
+  @ApiResponse({ status: 200, description: 'List of resume versions' })
+  async getResumeVersions(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.resumeService.getResumeVersions(id, user?.id);
   }
 
   @Get(':id/resume/latex')
-  @ApiOperation({ summary: 'Get compiled LaTeX source for latest resume' })
+  @ApiOperation({ summary: 'Get compiled LaTeX source for resume' })
   @ApiResponse({ status: 200, description: 'LaTeX string wrapped in object' })
-  async getResumeLatex(@Param('id') id: string, @Query('template') templateId?: string) {
-    const latex = await this.resumeService.getLatexSource(id, templateId);
+  async getResumeLatex(
+    @Param('id') id: string,
+    @Query('template') templateId?: string,
+    @Query('version') versionOrId?: string,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const latex = await this.resumeService.getLatexSource(id, templateId, versionOrId, user?.id);
     return { latex, templateId: templateId || 'modern-developer' };
   }
 
@@ -99,8 +142,10 @@ export class JobDescriptionController {
     @Param('id') id: string,
     @Body('latex') latex: string,
     @Query('template') templateId?: string,
+    @Query('version') versionOrId?: string,
+    @CurrentUser() user?: AuthUser,
   ) {
-    return this.resumeService.updateLatexSource(id, latex, templateId);
+    return this.resumeService.updateLatexSource(id, latex, templateId, versionOrId, user?.id);
   }
 
   // Orchestrator delegate (§4)
@@ -110,7 +155,7 @@ export class JobDescriptionController {
       'Trigger full end-to-end tailoring pipeline (Match -> Strategy -> Resume -> Validation)',
   })
   @ApiResponse({ status: 201, description: 'Pipeline execution complete' })
-  async runFullPipeline(@Param('id') id: string) {
-    return this.pipelineService.runFullPipeline(id);
+  async runFullPipeline(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.pipelineService.runFullPipeline(id, user?.id);
   }
 }

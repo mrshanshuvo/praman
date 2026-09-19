@@ -9,11 +9,11 @@ import { Card } from '@/components/ui/card';
 interface JobDetailHeaderProps {
   id: string;
   structured?: {
-    jobTitle?: string;
-    seniority?: string;
-    locationOrWorkMode?: string;
-    yearsOfExperience?: string;
-  };
+    jobTitle?: string | null;
+    seniority?: string | null;
+    locationOrWorkMode?: string | null;
+    yearsOfExperience?: string | null;
+  } | null;
   isFetching: boolean;
   isStreaming: boolean;
   onRefresh: () => void;

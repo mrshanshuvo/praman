@@ -5,14 +5,40 @@ import {
   CheckCircle2,
   ChevronRight,
   FileText,
+  Loader2,
   PlusCircle,
   ShieldCheck,
+  Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useDeleteJob, useUpdateJobStatus } from '@/hooks/usePramanApi';
+
+const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  SAVED: {
+    label: 'Saved',
+    className: 'bg-slate-500/10 text-slate-600 border-slate-500/30 dark:text-slate-400',
+  },
+  APPLIED: {
+    label: 'Applied',
+    className: 'bg-blue-500/10 text-blue-600 border-blue-500/30 dark:text-blue-400',
+  },
+  INTERVIEWING: {
+    label: 'Interviewing',
+    className: 'bg-purple-500/10 text-purple-600 border-purple-500/30 dark:text-purple-400',
+  },
+  OFFER: {
+    label: 'Offer',
+    className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400',
+  },
+  REJECTED: {
+    label: 'Rejected',
+    className: 'bg-rose-500/10 text-rose-600 border-rose-500/30 dark:text-rose-400',
+  },
+};
 
 interface JobCardProps {
   jd: any;
@@ -30,6 +56,29 @@ export function JobCard({ jd }: JobCardProps) {
   const hasResume = !!resume;
   const isResumeValidated = resume?.status === 'VALIDATED';
 
+  const deleteJobMutation = useDeleteJob();
+  const updateStatusMutation = useUpdateJobStatus();
+
+  const currentStatus = jd.status || 'SAVED';
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      window.confirm(
+        `Are you sure you want to delete "${structured.jobTitle || 'this job'}" and all associated pipeline stages?`,
+      )
+    ) {
+      await deleteJobMutation.mutateAsync(jd.id);
+    }
+  };
+
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await updateStatusMutation.mutateAsync({ id: jd.id, status: e.target.value });
+  };
+
   return (
     <Card className="group border-border bg-card/80 hover:bg-card hover:border-brand-pink/50 dark:hover:border-brand-cyan/40 transition-all duration-200 backdrop-blur-md p-5 gap-0">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -38,6 +87,26 @@ export function JobCard({ jd }: JobCardProps) {
             <h3 className="text-lg font-semibold text-foreground group-hover:text-brand-pink dark:group-hover:text-brand-cyan transition truncate">
               {structured.jobTitle || 'Target Role'}
             </h3>
+
+            {/* Application Status Dropdown */}
+            <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+              <select
+                value={currentStatus}
+                onChange={handleStatusChange}
+                disabled={updateStatusMutation.isPending}
+                aria-label="Application Status"
+                className={`text-xs font-medium rounded-full px-2.5 py-0.5 border transition-colors cursor-pointer outline-none ${
+                  STATUS_CONFIG[currentStatus]?.className || STATUS_CONFIG.SAVED.className
+                }`}
+              >
+                <option value="SAVED" className="bg-card text-foreground">Saved</option>
+                <option value="APPLIED" className="bg-card text-foreground">Applied</option>
+                <option value="INTERVIEWING" className="bg-card text-foreground">Interviewing</option>
+                <option value="OFFER" className="bg-card text-foreground">Offer</option>
+                <option value="REJECTED" className="bg-card text-foreground">Rejected</option>
+              </select>
+            </div>
+
             {structured.seniority && (
               <Badge
                 variant="outline"
@@ -177,6 +246,21 @@ export function JobCard({ jd }: JobCardProps) {
               <span>Resume</span>
             </Link>
           )}
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            disabled={deleteJobMutation.isPending}
+            title="Delete Job"
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors"
+          >
+            {deleteJobMutation.isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="w-3.5 h-3.5" />
+            )}
+          </Button>
         </div>
       </div>
     </Card>
