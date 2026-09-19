@@ -1,8 +1,10 @@
 'use client';
-
+import { cn } from 'cn';
 import {
   AlertTriangle,
   Check,
+  Code2,
+  Columns2,
   Copy,
   Download,
   ExternalLink,
@@ -13,8 +15,10 @@ import {
   Mail,
   RefreshCw,
   Send,
+  Share2,
   ShieldCheck,
   Sparkles,
+  WrapText,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +42,10 @@ export function OutreachTab({ jobId, candidateName = 'Candidate' }: OutreachTabP
   const generateEmailMutation = useGenerateRecruiterEmail(jobId);
 
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
+  const [coverLetterViewMode, setCoverLetterViewMode] = useState<'letter' | 'split' | 'latex'>(
+    'letter',
+  );
+  const [coverLetterWrap, setCoverLetterWrap] = useState(true);
 
   const handleCopy = (text: string, sectionId: string) => {
     navigator.clipboard.writeText(text);
@@ -123,9 +131,14 @@ ${coverLetter.senderName}
         {/* ============================================================ */}
         {/* Card 1: Tailored Cover Letter                                */}
         {/* ============================================================ */}
-        <Card className="p-5 border-border bg-card/80 flex flex-col justify-between space-y-4">
+        <Card
+          className={cn(
+            'p-5 border-border bg-card/80 flex flex-col justify-between space-y-4 transition-all duration-200',
+            coverLetterViewMode === 'split' ? 'lg:col-span-2' : '',
+          )}
+        >
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-brand-cyan/10 border border-brand-cyan/30 flex items-center justify-center text-brand-cyan">
                   <FileText className="w-4 h-4" />
@@ -139,12 +152,74 @@ ${coverLetter.senderName}
               </div>
 
               {coverLetter && (
-                <Badge
-                  variant="outline"
-                  className="text-[10px] font-mono text-emerald-500 border-emerald-500/30 bg-emerald-500/10"
-                >
-                  Ready
-                </Badge>
+                <div className="flex items-center gap-2">
+                  {/* View Mode Segmented Controls */}
+                  <div className="flex items-center gap-1 bg-background/80 p-0.5 rounded-lg border border-border text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setCoverLetterViewMode('letter')}
+                      className={cn(
+                        'px-2 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer',
+                        coverLetterViewMode === 'letter'
+                          ? 'bg-brand-cyan/15 text-brand-cyan font-semibold'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      <FileText className="w-3 h-3" />
+                      <span>Letter</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCoverLetterViewMode('split')}
+                      className={cn(
+                        'px-2 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer',
+                        coverLetterViewMode === 'split'
+                          ? 'bg-brand-cyan/15 text-brand-cyan font-semibold'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      <Columns2 className="w-3 h-3" />
+                      <span>Split View</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCoverLetterViewMode('latex')}
+                      className={cn(
+                        'px-2 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer',
+                        coverLetterViewMode === 'latex'
+                          ? 'bg-brand-cyan/15 text-brand-cyan font-semibold'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      <Code2 className="w-3 h-3" />
+                      <span>LaTeX</span>
+                    </button>
+                  </div>
+
+                  {(coverLetterViewMode === 'split' || coverLetterViewMode === 'latex') && (
+                    <button
+                      type="button"
+                      onClick={() => setCoverLetterWrap((w) => !w)}
+                      className={cn(
+                        'px-2 py-0.5 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 cursor-pointer',
+                        coverLetterWrap
+                          ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan font-semibold'
+                          : 'bg-background border-border text-muted-foreground hover:text-foreground',
+                      )}
+                      title={coverLetterWrap ? 'Word Wrap on' : 'Word Wrap off'}
+                    >
+                      <WrapText className="w-3 h-3" />
+                      <span>Wrap</span>
+                    </button>
+                  )}
+
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-mono text-emerald-500 border-emerald-500/30 bg-emerald-500/10"
+                  >
+                    Ready
+                  </Badge>
+                </div>
               )}
             </div>
 
@@ -211,36 +286,97 @@ ${coverLetter.senderName}
                   </div>
                 )}
 
-                {/* Letter Content Preview */}
-                <div className="p-4 rounded-lg border border-border/80 bg-muted/20 space-y-3 text-xs text-foreground font-sans leading-relaxed max-h-96 overflow-y-auto">
-                  <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-[11px] space-y-0.5">
-                    <div>
-                      <strong className="text-foreground">To:</strong> {coverLetter.recipientName}
+                {/* Cover Letter Content Body: Formatted / Split / LaTeX */}
+                {coverLetterViewMode === 'split' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Left Pane: Letterhead Paper Sheet */}
+                    <div className="p-4 rounded-lg border border-border/80 bg-background/90 shadow-sm space-y-3 text-xs text-foreground font-sans leading-relaxed max-h-120 overflow-y-auto">
+                      <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-[11px] space-y-0.5">
+                        <div>
+                          <strong className="text-foreground">To:</strong>{' '}
+                          {coverLetter.recipientName}
+                        </div>
+                        <div>
+                          <strong className="text-foreground">Company:</strong>{' '}
+                          {coverLetter.companyName}
+                        </div>
+                        <div>
+                          <strong className="text-foreground">Role:</strong> {coverLetter.jobTitle}
+                        </div>
+                      </div>
+
+                      <p className="font-semibold text-foreground">
+                        Dear {coverLetter.recipientName},
+                      </p>
+                      <p>{coverLetter.opening}</p>
+                      {coverLetter.bodyParagraphs?.map((para: string, idx: number) => (
+                        <p key={idx}>{para}</p>
+                      ))}
+                      <p>{coverLetter.closing}</p>
+
+                      <div className="pt-2">
+                        <p>{coverLetter.signOff}</p>
+                        <p className="font-bold text-foreground mt-1">{coverLetter.senderName}</p>
+                      </div>
                     </div>
-                    <div>
-                      <strong className="text-foreground">Company:</strong>{' '}
-                      {coverLetter.companyName}
-                    </div>
-                    <div>
-                      <strong className="text-foreground">Role:</strong> {coverLetter.jobTitle}
+
+                    {/* Right Pane: LaTeX Code Viewer */}
+                    <div className="p-4 rounded-lg border border-border/80 bg-slate-950 text-slate-200 font-mono text-xs max-h-120 overflow-y-auto">
+                      <pre
+                        className={cn(
+                          'tab-size-2',
+                          coverLetterWrap
+                            ? 'whitespace-pre-wrap break-words'
+                            : 'whitespace-pre overflow-x-auto',
+                        )}
+                      >
+                        {coverLetterLatex || '% LaTeX source not yet generated'}
+                      </pre>
                     </div>
                   </div>
-
-                  <p className="font-semibold text-foreground">Dear {coverLetter.recipientName},</p>
-
-                  <p>{coverLetter.opening}</p>
-
-                  {coverLetter.bodyParagraphs?.map((para: string, idx: number) => (
-                    <p key={idx}>{para}</p>
-                  ))}
-
-                  <p>{coverLetter.closing}</p>
-
-                  <div className="pt-2">
-                    <p>{coverLetter.signOff}</p>
-                    <p className="font-bold text-foreground mt-1">{coverLetter.senderName}</p>
+                ) : coverLetterViewMode === 'latex' ? (
+                  <div className="p-4 rounded-lg border border-border/80 bg-slate-950 text-slate-200 font-mono text-xs max-h-120 overflow-y-auto">
+                    <pre
+                      className={cn(
+                        'tab-size-2',
+                        coverLetterWrap
+                          ? 'whitespace-pre-wrap break-words'
+                          : 'whitespace-pre overflow-x-auto',
+                      )}
+                    >
+                      {coverLetterLatex || '% LaTeX source not yet generated'}
+                    </pre>
                   </div>
-                </div>
+                ) : (
+                  <div className="p-4 rounded-lg border border-border/80 bg-muted/20 space-y-3 text-xs text-foreground font-sans leading-relaxed max-h-96 overflow-y-auto">
+                    <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-[11px] space-y-0.5">
+                      <div>
+                        <strong className="text-foreground">To:</strong> {coverLetter.recipientName}
+                      </div>
+                      <div>
+                        <strong className="text-foreground">Company:</strong>{' '}
+                        {coverLetter.companyName}
+                      </div>
+                      <div>
+                        <strong className="text-foreground">Role:</strong> {coverLetter.jobTitle}
+                      </div>
+                    </div>
+
+                    <p className="font-semibold text-foreground">
+                      Dear {coverLetter.recipientName},
+                    </p>
+                    <p>{coverLetter.opening}</p>
+                    {coverLetter.bodyParagraphs?.map((para: string, idx: number) => (
+                      <p key={idx}>{para}</p>
+                    ))}
+                    <p>{coverLetter.closing}</p>
+
+                    <div className="pt-2">
+                      <p>{coverLetter.signOff}</p>
+                      <p className="font-bold text-foreground mt-1">{coverLetter.senderName}</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Cover Letter Actions */}
                 <div className="flex flex-wrap items-center gap-2 pt-2">
@@ -268,6 +404,29 @@ ${coverLetter.senderName}
                       </>
                     )}
                   </Button>
+
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent(
+                      `Application: ${coverLetter.jobTitle} — ${coverLetter.senderName}`,
+                    )}&body=${encodeURIComponent(
+                      `Dear ${coverLetter.recipientName},\n\n${coverLetter.opening}\n\n${(
+                        coverLetter.bodyParagraphs || []
+                      ).join('\n\n')}\n\n${coverLetter.closing}\n\n${coverLetter.signOff}\n${
+                        coverLetter.senderName
+                      }`,
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs border-border gap-1 bg-card hover:bg-muted cursor-pointer"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-brand-cyan" />
+                      <span>Open Mail Client</span>
+                    </Button>
+                  </a>
 
                   <Button
                     size="sm"
@@ -433,7 +592,13 @@ ${coverLetter.senderName}
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      const fullEmail = `Subject: ${recruiterEmail.subject}\n\n${recruiterEmail.salutation}\n\n${recruiterEmail.hook}\n\n${(recruiterEmail.highlights || []).map((h: string) => `• ${h}`).join('\n')}\n\n${recruiterEmail.callToAction}\n\n${recruiterEmail.signOff}\n${recruiterEmail.senderName}`;
+                      const fullEmail = `Subject: ${recruiterEmail.subject}\n\n${recruiterEmail.salutation}\n\n${recruiterEmail.hook}\n\n${(
+                        recruiterEmail.highlights || []
+                      )
+                        .map((h: string) => `• ${h}`)
+                        .join('\n')}\n\n${recruiterEmail.callToAction}\n\n${
+                        recruiterEmail.signOff
+                      }\n${recruiterEmail.senderName}`;
                       handleCopy(fullEmail, 'email_full');
                     }}
                     className="text-xs border-border gap-1 bg-card hover:bg-muted cursor-pointer"
@@ -447,6 +612,37 @@ ${coverLetter.senderName}
                       <>
                         <Copy className="w-3.5 h-3.5" />
                         <span>Copy Full Email</span>
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const salutationName =
+                        recruiterEmail.salutation?.replace(/^Dear\s+/i, '').replace(/,$/, '') ||
+                        'Hiring Team';
+                      const inMail = `Subject: ${recruiterEmail.subject}\n\nHi ${salutationName},\n\n${recruiterEmail.hook}\n\n${(
+                        recruiterEmail.highlights || []
+                      )
+                        .map((h: string) => `• ${h}`)
+                        .join('\n')}\n\n${recruiterEmail.callToAction}\n\nBest regards,\n${
+                        recruiterEmail.senderName
+                      }`;
+                      handleCopy(inMail, 'inmail');
+                    }}
+                    className="text-xs border-border gap-1 bg-card hover:bg-muted cursor-pointer"
+                  >
+                    {copiedSection === 'inmail' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-brand-pink" />
+                        <span className="text-brand-pink">Copied InMail!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-3.5 h-3.5 text-brand-pink" />
+                        <span>LinkedIn InMail</span>
                       </>
                     )}
                   </Button>
