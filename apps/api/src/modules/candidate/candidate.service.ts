@@ -6,6 +6,7 @@ import type {
   CreateExperienceDto,
   CreateProjectDto,
   CreateSkillDto,
+  UpdateCandidatePersonal,
 } from '@praman/schemas';
 import { PrismaService } from '../../core/database/prisma.service.js';
 
@@ -137,11 +138,26 @@ export class CandidateService {
     };
   }
 
-  async updatePersonal(personal: CandidatePersonal, targetUserId?: string) {
+  async updatePersonal(personal: UpdateCandidatePersonal | CandidatePersonal, targetUserId?: string) {
     const profile = await this.getProfile(targetUserId);
+    const existingPersonal = (profile.personal as Record<string, any>) || {};
+
+    const mergedPersonal = {
+      ...existingPersonal,
+      ...personal,
+      contact: {
+        ...(existingPersonal.contact || {}),
+        ...(personal.contact || {}),
+      },
+      links: {
+        ...(existingPersonal.links || {}),
+        ...(personal.links || {}),
+      },
+    };
+
     return this.prisma.client.orm.public.CandidateProfile.where({
       id: profile.id,
-    }).update({ personal });
+    }).update({ personal: mergedPersonal });
   }
 
   // Experience CRUD

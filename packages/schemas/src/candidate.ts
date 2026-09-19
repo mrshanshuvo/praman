@@ -59,13 +59,23 @@ export const CertificationSchema = z.object({
 });
 export type Certification = z.infer<typeof CertificationSchema>;
 
-export const CandidatePersonalSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  location: z.string().optional().nullable(),
-  contact: z.record(z.string()).default({}),
-  links: z.record(z.string()).default({}),
-});
+export const CandidatePersonalSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    title: z.string().optional().nullable(),
+    location: z.string().optional().nullable(),
+    summary: z.string().optional().nullable(),
+    bio: z.string().optional().nullable(),
+    achievements: z.array(z.string()).optional().default([]),
+    languages: z.array(z.string()).optional().default([]),
+    contact: z.record(z.string()).default({}),
+    links: z.record(z.string()).default({}),
+  })
+  .passthrough();
 export type CandidatePersonal = z.infer<typeof CandidatePersonalSchema>;
+
+export const UpdateCandidatePersonalSchema = CandidatePersonalSchema.partial();
+export type UpdateCandidatePersonal = z.infer<typeof UpdateCandidatePersonalSchema>;
 
 export const CandidateProfileSchema = z.object({
   id: z.string().optional(),

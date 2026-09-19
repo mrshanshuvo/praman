@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import {
   CreateExperienceDtoSchema,
   CreateProjectDtoSchema,
   CreateSkillDtoSchema,
+  UpdateCandidatePersonalSchema,
 } from '@praman/schemas';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { CandidateService } from './candidate.service.js';
@@ -37,7 +39,7 @@ export class CandidateController {
   @ApiOperation({ summary: 'Update personal contact details and links' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
   async updatePersonal(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CandidatePersonalSchema.safeParse(body);
+    const parse = UpdateCandidatePersonalSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
@@ -48,6 +50,20 @@ export class CandidateController {
   @ApiOperation({ summary: 'Update personal contact details and links (alias)' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
   async updatePersonalAlias(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
+    return this.updatePersonal(body, user);
+  }
+
+  @Patch()
+  @ApiOperation({ summary: 'Partially update personal details and links' })
+  @ApiResponse({ status: 200, description: 'Personal details updated' })
+  async patchPersonal(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
+    return this.updatePersonal(body, user);
+  }
+
+  @Patch('personal')
+  @ApiOperation({ summary: 'Partially update personal details and links (alias)' })
+  @ApiResponse({ status: 200, description: 'Personal details updated' })
+  async patchPersonalAlias(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     return this.updatePersonal(body, user);
   }
 

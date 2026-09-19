@@ -304,7 +304,7 @@ export function useProfileMutations() {
   const updatePersonal = useMutation({
     mutationFn: (personal: any) =>
       fetcher(`${API_URL}/candidate-profile/personal`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(personal),
       }),
