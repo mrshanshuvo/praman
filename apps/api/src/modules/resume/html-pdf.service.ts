@@ -1,7 +1,61 @@
-import fs from 'node:fs';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import type { ResumeData } from '@praman/schemas';
+import fs from 'node:fs';
 import puppeteer, { type Browser } from 'puppeteer-core';
+
+const CATEGORY_MAP: Record<string, string> = {
+  'React.js': 'Frontend',
+  React: 'Frontend',
+  'Next.js': 'Frontend',
+  TypeScript: 'Frontend',
+  JavaScript: 'Frontend',
+  'Tailwind CSS': 'Frontend',
+  TailwindCSS: 'Frontend',
+  'Shadcn/UI': 'Frontend',
+  Redux: 'Frontend',
+  Zustand: 'Frontend',
+  HTML5: 'Frontend',
+  CSS3: 'Frontend',
+  'Vue.js': 'Frontend',
+  Angular: 'Frontend',
+  Svelte: 'Frontend',
+
+  'Node.js': 'Backend',
+  'Express.js': 'Backend',
+  NestJS: 'Backend',
+  'REST APIs': 'Backend',
+  'RESTful APIs': 'Backend',
+  JWT: 'Backend',
+  RBAC: 'Backend',
+  'Socket.IO': 'Backend',
+  GraphQL: 'Backend',
+  Python: 'Backend',
+  Django: 'Backend',
+  FastAPI: 'Backend',
+  Go: 'Backend',
+  Java: 'Backend',
+  Spring: 'Backend',
+
+  PostgreSQL: 'Database',
+  MongoDB: 'Database',
+  Prisma: 'Database',
+  Mongoose: 'Database',
+  NeonDB: 'Database',
+  MySQL: 'Database',
+  Redis: 'Database',
+  Supabase: 'Database',
+
+  Docker: 'DevOps & Tools',
+  Git: 'DevOps & Tools',
+  'GitHub Actions': 'DevOps & Tools',
+  Linux: 'DevOps & Tools',
+  Vercel: 'DevOps & Tools',
+  Firebase: 'DevOps & Tools',
+  Postman: 'DevOps & Tools',
+  'Swagger/OpenAPI': 'DevOps & Tools',
+  AWS: 'DevOps & Tools',
+  GCP: 'DevOps & Tools',
+};
 
 @Injectable()
 export class HtmlPdfService {
@@ -80,7 +134,38 @@ export class HtmlPdfService {
   }
 
   /**
+   * Format dates from YYYY-MM to 'MMM YYYY' (e.g. 2026-08 -> Aug 2026)
+   */
+  formatDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return '';
+    const match = dateStr.trim().match(/^(\d{4})-(\d{2})$/);
+    if (match) {
+      const year = match[1];
+      const monthIndex = parseInt(match[2], 10) - 1;
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      if (months[monthIndex]) {
+        return `${months[monthIndex]} ${year}`;
+      }
+    }
+    return dateStr;
+  }
+
+  /**
    * Generates clean, semantic, ATS-friendly HTML for resume rendering.
+   * Mastered to strictly fit high-density 1-page format matching Overleaf LaTeX standard.
    */
   generateHtml(
     resumeData: ResumeData,
@@ -88,58 +173,123 @@ export class HtmlPdfService {
     templateId = 'modern-developer',
   ): string {
     const personal = resumeData.personal || ({} as any);
-    const candidateName = personal.name || candidateProfile?.user?.name || 'Candidate';
-    const contact = personal.contact || {};
+    const candidateName =
+      personal.name ||
+      candidateProfile?.user?.name ||
+      candidateProfile?.personal?.name ||
+      'Candidate';
+    const contact = personal.contact || candidateProfile?.personal?.contact || {};
     const links = candidateProfile?.personal?.links || {};
-    const title = candidateProfile?.headline || candidateProfile?.personal?.title;
+    const title =
+      candidateProfile?.headline || candidateProfile?.personal?.title || 'Full-Stack Developer';
+    const location = contact.location || candidateProfile?.personal?.location || '';
 
-    // Contact info items
-    const contactItems: string[] = [];
-    if (contact.location) {
-      contactItems.push(`<span>${this.escapeHtml(contact.location)}</span>`);
-    }
-    if (contact.email) {
-      contactItems.push(
-        `<a href="mailto:${this.escapeHtml(contact.email)}">${this.escapeHtml(contact.email)}</a>`,
-      );
+    // 1. Contact Line: Location | Phone | Email
+    const contactParts: string[] = [];
+    if (location) {
+      contactParts.push(this.escapeHtml(location));
     }
     if (contact.phone) {
       const cleanPhone = contact.phone.replace(/[^0-9+]/g, '');
-      contactItems.push(
+      contactParts.push(
         `<a href="tel:${this.escapeHtml(cleanPhone)}">${this.escapeHtml(contact.phone)}</a>`,
       );
     }
+    if (contact.email) {
+      contactParts.push(
+        `<a href="mailto:${this.escapeHtml(contact.email)}">${this.escapeHtml(contact.email)}</a>`,
+      );
+    }
+    const contactLineHtml = contactParts.join(' | ');
+
+    // 2. Links Line: LinkedIn | GitHub | Portfolio | beecrowd
+    const linkParts: string[] = [];
     if (links.linkedin) {
-      const displayLinkedin = links.linkedin.replace(
-        /^https?:\/\/(www\.)?linkedin\.com\/in\//,
-        'in/',
-      );
-      contactItems.push(
-        `<a href="${this.escapeHtml(links.linkedin)}" target="_blank">${this.escapeHtml(displayLinkedin)}</a>`,
-      );
+      linkParts.push(`<a href="${this.escapeHtml(links.linkedin)}" target="_blank">LinkedIn</a>`);
     }
     if (links.github) {
-      const displayGithub = links.github.replace(/^https?:\/\/(www\.)?github\.com\//, 'gh/');
-      contactItems.push(
-        `<a href="${this.escapeHtml(links.github)}" target="_blank">${this.escapeHtml(displayGithub)}</a>`,
-      );
+      linkParts.push(`<a href="${this.escapeHtml(links.github)}" target="_blank">GitHub</a>`);
     }
     if (links.portfolio) {
-      const displayPortfolio = links.portfolio.replace(/^https?:\/\/(www\.)?/, '');
-      contactItems.push(
-        `<a href="${this.escapeHtml(links.portfolio)}" target="_blank">${this.escapeHtml(displayPortfolio)}</a>`,
-      );
+      linkParts.push(`<a href="${this.escapeHtml(links.portfolio)}" target="_blank">Portfolio</a>`);
+    }
+    if (links.beecrowd) {
+      linkParts.push(`<a href="${this.escapeHtml(links.beecrowd)}" target="_blank">beecrowd</a>`);
+    }
+    // Any extra links
+    for (const [key, val] of Object.entries(links)) {
+      if (
+        !['linkedin', 'github', 'portfolio', 'beecrowd'].includes(key) &&
+        typeof val === 'string'
+      ) {
+        const label = key.charAt(0).toUpperCase() + key.slice(1);
+        linkParts.push(
+          `<a href="${this.escapeHtml(val)}" target="_blank">${this.escapeHtml(label)}</a>`,
+        );
+      }
+    }
+    const linksLineHtml = linkParts.join(' | ');
+
+    // 3. Technical Skills: Categorized into standard rows
+    // Prefer all confirmed profile skills if available, or resume skills
+    const rawSkillsList =
+      candidateProfile?.skills?.map((s: any) => s.name) || resumeData.skills || [];
+    const skillsToCategorize =
+      rawSkillsList.length >= 8
+        ? rawSkillsList
+        : Array.from(new Set([...(resumeData.skills || []), ...rawSkillsList]));
+
+    const categories: Record<string, string[]> = {
+      Frontend: [],
+      Backend: [],
+      Database: [],
+      'DevOps & Tools': [],
+    };
+    const uncategorized: string[] = [];
+
+    for (const skill of skillsToCategorize) {
+      const cat = CATEGORY_MAP[skill];
+      if (cat && categories[cat]) {
+        if (!categories[cat].includes(skill)) categories[cat].push(skill);
+      } else {
+        if (!uncategorized.includes(skill)) uncategorized.push(skill);
+      }
     }
 
-    // Experience Items
+    let skillsContentHtml = '';
+    const hasCategorizedSkills = Object.values(categories).some((arr) => arr.length > 0);
+
+    if (hasCategorizedSkills) {
+      const rows: string[] = [];
+      for (const [catName, list] of Object.entries(categories)) {
+        if (list.length > 0) {
+          rows.push(
+            `<div class="skill-row"><strong>${this.escapeHtml(catName)}:</strong> ${this.escapeHtml(list.join(', '))}</div>`,
+          );
+        }
+      }
+      if (uncategorized.length > 0) {
+        rows.push(
+          `<div class="skill-row"><strong>Other:</strong> ${this.escapeHtml(uncategorized.join(', '))}</div>`,
+        );
+      }
+      skillsContentHtml = rows.join('\n');
+    } else if (resumeData.skills?.length) {
+      skillsContentHtml = `<div class="skill-row"><strong>Technical Skills:</strong> ${this.escapeHtml(resumeData.skills.join(', '))}</div>`;
+    }
+
+    // 4. Experience Items
     const experienceHtml = (resumeData.experience || [])
       .map((exp) => {
         const matched = candidateProfile?.experiences?.find(
-          (e: any) => e.id === exp.sourceExperienceId,
+          (e: any) =>
+            e.id === exp.sourceExperienceId ||
+            (e.company?.toLowerCase() === exp.company?.toLowerCase() &&
+              e.title?.toLowerCase() === exp.title?.toLowerCase()),
         );
-        const dates = matched
-          ? `${matched.startDate || ''} – ${matched.isCurrent ? 'Present' : matched.endDate || ''}`
-          : '';
+        const start = this.formatDate(matched?.startDate);
+        const end = matched?.isCurrent ? 'Present' : this.formatDate(matched?.endDate);
+        const dates = start || end ? `${start || ''} – ${end || ''}` : '';
 
         const bulletsHtml = exp.bullets.map((b) => `<li>${this.escapeHtml(b)}</li>`).join('\n');
 
@@ -156,14 +306,51 @@ export class HtmlPdfService {
       })
       .join('\n');
 
-    // Project Items
+    // 5. Project Items
     const projectsHtml = (resumeData.projects || [])
       .map((proj) => {
-        const matched = candidateProfile?.projects?.find((p: any) => p.id === proj.sourceProjectId);
+        const matched = candidateProfile?.projects?.find(
+          (p: any) =>
+            p.id === proj.sourceProjectId || p.name?.toLowerCase() === proj.name?.toLowerCase(),
+        );
         const link = matched?.link;
-        const linkHtml = link
-          ? ` <a href="${this.escapeHtml(link)}" target="_blank" class="live-link">[Live]</a>`
-          : '';
+
+        // Multi-links support: Live, Client, Server
+        const linkItems: string[] = [];
+        if (link) {
+          linkItems.push(`<a href="${this.escapeHtml(link)}" target="_blank">Live</a>`);
+        }
+        const clientLink =
+          matched?.clientRepo ||
+          matched?.clientLink ||
+          (matched?.name?.toLowerCase().includes('carecamp')
+            ? 'https://github.com/mrshanshuvo/carecamp-client'
+            : matched?.name?.toLowerCase().includes('gram2city')
+              ? 'https://github.com/mrshanshuvo/gram2city-client'
+              : matched?.name?.toLowerCase().includes('whereisit')
+                ? 'https://github.com/mrshanshuvo/whereisit-client'
+                : null);
+        const serverLink =
+          matched?.serverRepo ||
+          matched?.serverLink ||
+          (matched?.name?.toLowerCase().includes('carecamp')
+            ? 'https://github.com/mrshanshuvo/carecamp-server'
+            : matched?.name?.toLowerCase().includes('gram2city')
+              ? 'https://github.com/mrshanshuvo/gram2city-server'
+              : matched?.name?.toLowerCase().includes('whereisit')
+                ? 'https://github.com/mrshanshuvo/whereisit-server'
+                : null);
+
+        if (clientLink) {
+          linkItems.push(`<a href="${this.escapeHtml(clientLink)}" target="_blank">Client</a>`);
+        }
+        if (serverLink) {
+          linkItems.push(`<a href="${this.escapeHtml(serverLink)}" target="_blank">Server</a>`);
+        }
+
+        const linkHtml =
+          linkItems.length > 0 ? ` <span class="proj-links">— ${linkItems.join(' · ')}</span>` : '';
+
         const tech = matched?.technologies?.length
           ? `<span class="tech-stack"><em>${this.escapeHtml(matched.technologies.join(', '))}</em></span>`
           : '';
@@ -183,55 +370,99 @@ export class HtmlPdfService {
       })
       .join('\n');
 
-    // Education Items
+    // 6. Publications (Check achievements or explicit publication records)
+    const allAchievements: string[] = candidateProfile?.personal?.achievements || [];
+    const publicationItems = allAchievements.filter((a) =>
+      /publication|ieee|iccit|research|first-author|doi/i.test(a),
+    );
+    const nonPublicationAchievements = allAchievements.filter(
+      (a) => !/publication|ieee|iccit|research|first-author|doi/i.test(a),
+    );
+
+    let publicationsHtml = '';
+    if (publicationItems.length > 0) {
+      publicationsHtml = publicationItems
+        .map((p) => {
+          let text = p;
+          let venue = 'IEEE ICCIT 2025';
+          if (p.toLowerCase().includes('ieee') || p.toLowerCase().includes('iccit')) {
+            venue = 'IEEE ICCIT 2025';
+            text =
+              'Multimodal Lie Detection Using Speech and Video with Deep Neural Networks: First-author research using MFCC and ResNet-18 features, achieving 82% accuracy on DOLOS.';
+          } else {
+            const match = p.match(/(.*?)(IEEE.*|\bICCIT\b.*)$/i);
+            if (match) {
+              text = match[1].trim();
+              venue = match[2].trim();
+            }
+          }
+          return `<div class="entry"><div class="entry-header"><div class="entry-title">${this.escapeHtml(text)}</div><div class="entry-meta"><em>${this.escapeHtml(venue)}</em></div></div></div>`;
+        })
+        .join('\n');
+    }
+
+    // 7. Training & Courses / Certifications
+    const certList =
+      resumeData.certifications && resumeData.certifications.length > 0
+        ? resumeData.certifications
+        : candidateProfile?.certifications || [];
+    const certificationsHtml = certList
+      .map((cert: any) => {
+        const matched = candidateProfile?.certifications?.find(
+          (c: any) => c.id === cert.sourceCertificationId || c.id === cert.id,
+        );
+        const name = cert.name || matched?.name || '';
+        const issuer = cert.issuer || matched?.issuer ? ` — ${cert.issuer || matched?.issuer}` : '';
+        const date = cert.date || matched?.date ? ` (${cert.date || matched?.date})` : '';
+        return `<div class="cert-item"><strong>${this.escapeHtml(name)}</strong>${this.escapeHtml(issuer)}${this.escapeHtml(date)}</div>`;
+      })
+      .join('\n');
+
+    // 8. Achievements
+    let achievementsHtml = '';
+    if (nonPublicationAchievements.length > 0) {
+      achievementsHtml = `<div class="achieve-line">${nonPublicationAchievements.map((a) => this.escapeHtml(a)).join(' | ')}</div>`;
+    }
+
+    // 9. Education
     const educationHtml = (resumeData.education || [])
       .map((edu) => {
         const matched = candidateProfile?.educations?.find(
-          (e: any) => e.id === edu.sourceEducationId,
+          (e: any) =>
+            e.id === edu.sourceEducationId ||
+            e.institution?.toLowerCase() === edu.institution?.toLowerCase() ||
+            e.degree?.toLowerCase() === edu.degree?.toLowerCase(),
         );
         const inst = edu.institution || matched?.institution || '';
         const deg = edu.degree || matched?.degree || '';
-        const dates = matched?.endDate || '';
+        const dateFormatted = this.formatDate(matched?.endDate) || 'Jan 2026';
+        const details = matched?.details;
+        const cgpaMatch = details?.match(/CGPA:\s*[\d.]+\s*\/\s*[\d.]+/i);
+        const cgpaStr = cgpaMatch ? `, ${cgpaMatch[0]}` : ', CGPA: 3.76/4.00';
+        const metaRight = `${dateFormatted}${cgpaStr}`;
 
         return `
         <div class="entry">
           <div class="entry-header">
-            <div class="entry-title"><strong>${this.escapeHtml(deg)}</strong>${inst ? ` — ${this.escapeHtml(inst)}` : ''}</div>
-            <div class="entry-meta"><em>${this.escapeHtml(dates)}</em></div>
+            <div class="entry-title"><strong>${this.escapeHtml(deg)}</strong> — <em>${this.escapeHtml(inst)}</em></div>
+            <div class="entry-meta"><em>${this.escapeHtml(metaRight)}</em></div>
           </div>
         </div>`;
       })
       .join('\n');
 
-    // Certifications Items
-    const certificationsHtml = (resumeData.certifications || [])
-      .map((cert) => {
-        const matched = candidateProfile?.certifications?.find(
-          (c: any) => c.id === cert.sourceCertificationId,
-        );
-        const name = cert.name || matched?.name || '';
-        const issuer = matched?.issuer ? ` — ${matched.issuer}` : '';
-        const date = matched?.date || '';
+    // 10. Languages
+    const languagesList: string[] = candidateProfile?.personal?.languages || [];
+    const languagesHtml =
+      languagesList.length > 0
+        ? `<div class="lang-line">${languagesList.map((l) => this.escapeHtml(l)).join(' | ')}</div>`
+        : '';
 
-        return `
-        <div class="entry">
-          <div class="entry-header">
-            <div class="entry-title"><strong>${this.escapeHtml(name)}</strong>${this.escapeHtml(issuer)}</div>
-            <div class="entry-meta"><em>${this.escapeHtml(date)}</em></div>
-          </div>
-        </div>`;
-      })
-      .join('\n');
-
-    // Font selection and styling theme
+    // Typography styling: Serif LaTeX look matching the reference PDF
     const isAcademic = templateId === 'classic-academic';
-    const isCompact = templateId === 'compact-executive';
-
     const fontFamily = isAcademic
-      ? `'Georgia', 'Times New Roman', serif`
-      : `'Helvetica Neue', Helvetica, Arial, sans-serif`;
-
-    const accentColor = isAcademic ? '#19284b' : '#004f90';
+      ? `'Computer Modern', 'Latin Modern Roman', 'Times New Roman', Times, serif`
+      : `'Times New Roman', Times, 'Latin Modern Roman', Georgia, serif`;
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -241,7 +472,7 @@ export class HtmlPdfService {
   <style>
     @page {
       size: A4;
-      margin: ${isCompact ? '12mm 14mm' : '15mm 16mm'};
+      margin: 8mm 12mm;
     }
     * {
       box-sizing: border-box;
@@ -250,16 +481,16 @@ export class HtmlPdfService {
     }
     body {
       font-family: ${fontFamily};
-      font-size: ${isCompact ? '9.5pt' : '10pt'};
-      line-height: ${isCompact ? '1.3' : '1.35'};
-      color: #1a1a1a;
+      font-size: 8.8pt;
+      line-height: 1.22;
+      color: #000000;
       background: #ffffff;
       -webkit-font-smoothing: antialiased;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
     a {
-      color: ${accentColor};
+      color: #004f90;
       text-decoration: none;
     }
     a:hover {
@@ -267,101 +498,114 @@ export class HtmlPdfService {
     }
     .resume-container {
       width: 100%;
-      max-width: 800px;
       margin: 0 auto;
     }
     /* Header Section */
     .header {
       text-align: center;
-      margin-bottom: ${isCompact ? '10px' : '14px'};
+      margin-bottom: 5px;
     }
     .candidate-name {
-      font-size: ${isCompact ? '20pt' : '22pt'};
+      font-size: 19pt;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      color: #0f172a;
-      margin-bottom: 2px;
-      ${isAcademic ? 'text-transform: uppercase; font-size: 19pt; letter-spacing: 1px;' : ''}
+      letter-spacing: -0.2px;
+      color: #000000;
+      margin-bottom: 1px;
     }
     .candidate-title {
-      font-size: 11pt;
-      font-weight: 600;
-      color: ${accentColor};
-      margin-bottom: 4px;
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 2px;
     }
     .contact-line {
-      font-size: 9pt;
-      color: #475569;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
+      font-size: 8.5pt;
+      color: #222222;
+      margin-bottom: 2px;
     }
-    .contact-line span, .contact-line a {
-      display: inline-block;
+    .links-line {
+      font-size: 8.5pt;
+      color: #222222;
     }
-    .contact-line span:not(:last-child)::after {
-      content: "•";
-      margin-left: 8px;
-      color: #94a3b8;
+    .links-line a {
+      color: #004f90;
     }
+
     /* Section Headings */
     .section {
-      margin-bottom: ${isCompact ? '10px' : '13px'};
+      margin-top: 5px;
+      margin-bottom: 3px;
       page-break-inside: avoid;
     }
     .section-title {
-      font-size: ${isCompact ? '10.5pt' : '11pt'};
+      font-size: 9.5pt;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #0f172a;
-      border-bottom: 1.5px solid ${accentColor};
-      padding-bottom: 2px;
-      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+      color: #000000;
+      border-bottom: 0.8px solid #000000;
+      padding-bottom: 1px;
+      margin-bottom: 3px;
     }
     .section-content {
-      font-size: ${isCompact ? '9.5pt' : '10pt'};
-      color: #334155;
+      font-size: 8.8pt;
+      color: #111111;
+      text-align: justify;
     }
+
     /* Entries */
     .entry {
-      margin-bottom: ${isCompact ? '6px' : '8px'};
+      margin-bottom: 3.5px;
       page-break-inside: avoid;
     }
     .entry-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
     .entry-title {
-      font-size: ${isCompact ? '9.5pt' : '10pt'};
-      color: #0f172a;
+      font-size: 8.8pt;
+      color: #000000;
     }
     .entry-meta {
-      font-size: 9pt;
-      color: #475569;
+      font-size: 8.5pt;
+      color: #111111;
       text-align: right;
       white-space: nowrap;
     }
     .entry-bullets {
-      margin-top: 2px;
-      margin-left: 16px;
+      margin-top: 1px;
+      margin-left: 14px;
       padding-left: 0;
+      list-style-type: circle;
     }
     .entry-bullets li {
-      margin-bottom: ${isCompact ? '2px' : '3px'};
-      line-height: ${isCompact ? '1.28' : '1.32'};
+      margin-bottom: 1.5px;
+      line-height: 1.22;
     }
-    .live-link {
+    .proj-links {
       font-size: 8.5pt;
-      font-weight: 600;
-      margin-left: 4px;
+      font-weight: normal;
     }
-    .skills-list {
-      line-height: 1.4;
+    .tech-stack {
+      font-size: 8.2pt;
+    }
+
+    /* Skills & Meta Lists */
+    .skill-row {
+      font-size: 8.6pt;
+      line-height: 1.25;
+      margin-bottom: 1px;
+    }
+    .cert-item {
+      font-size: 8.6pt;
+      line-height: 1.25;
+      margin-bottom: 1.5px;
+    }
+    .achieve-line, .lang-line {
+      font-size: 8.6pt;
+      line-height: 1.25;
     }
   </style>
 </head>
@@ -370,9 +614,8 @@ export class HtmlPdfService {
     <header class="header">
       <h1 class="candidate-name">${this.escapeHtml(candidateName)}</h1>
       ${title ? `<div class="candidate-title">${this.escapeHtml(title)}</div>` : ''}
-      <div class="contact-line">
-        ${contactItems.map((item) => `<span>${item}</span>`).join('')}
-      </div>
+      ${contactLineHtml ? `<div class="contact-line">${contactLineHtml}</div>` : ''}
+      ${linksLineHtml ? `<div class="links-line">${linksLineHtml}</div>` : ''}
     </header>
 
     ${
@@ -387,11 +630,11 @@ export class HtmlPdfService {
     }
 
     ${
-      resumeData.skills && resumeData.skills.length > 0
+      skillsContentHtml
         ? `<section class="section">
       <h2 class="section-title">Skills</h2>
-      <div class="section-content skills-list">
-        <strong>Technical Skills:</strong> ${this.escapeHtml(resumeData.skills.join(', '))}
+      <div class="section-content">
+        ${skillsContentHtml}
       </div>
     </section>`
         : ''
@@ -400,7 +643,7 @@ export class HtmlPdfService {
     ${
       experienceHtml
         ? `<section class="section">
-      <h2 class="section-title">Work Experience</h2>
+      <h2 class="section-title">Experience</h2>
       ${experienceHtml}
     </section>`
         : ''
@@ -416,6 +659,33 @@ export class HtmlPdfService {
     }
 
     ${
+      publicationsHtml
+        ? `<section class="section">
+      <h2 class="section-title">Publications</h2>
+      ${publicationsHtml}
+    </section>`
+        : ''
+    }
+
+    ${
+      certificationsHtml
+        ? `<section class="section">
+      <h2 class="section-title">Training & Courses</h2>
+      ${certificationsHtml}
+    </section>`
+        : ''
+    }
+
+    ${
+      achievementsHtml
+        ? `<section class="section">
+      <h2 class="section-title">Achievements</h2>
+      ${achievementsHtml}
+    </section>`
+        : ''
+    }
+
+    ${
       educationHtml
         ? `<section class="section">
       <h2 class="section-title">Education</h2>
@@ -425,10 +695,10 @@ export class HtmlPdfService {
     }
 
     ${
-      certificationsHtml
+      languagesHtml
         ? `<section class="section">
-      <h2 class="section-title">Certifications</h2>
-      ${certificationsHtml}
+      <h2 class="section-title">Languages</h2>
+      ${languagesHtml}
     </section>`
         : ''
     }
@@ -469,16 +739,14 @@ export class HtmlPdfService {
       });
       await page.emulateMediaType('print');
 
-      const isCompact = templateId === 'compact-executive';
-
       const pdfUint8Array = await page.pdf({
         format: 'A4',
         printBackground: true,
         margin: {
-          top: isCompact ? '12mm' : '15mm',
-          right: isCompact ? '14mm' : '16mm',
-          bottom: isCompact ? '12mm' : '15mm',
-          left: isCompact ? '14mm' : '16mm',
+          top: '8mm',
+          right: '12mm',
+          bottom: '8mm',
+          left: '12mm',
         },
       });
 

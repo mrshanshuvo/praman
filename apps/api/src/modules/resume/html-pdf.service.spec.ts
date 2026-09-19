@@ -107,10 +107,7 @@ describe('HtmlPdfService', () => {
 
   it('supports alternative templates with proper styling classes', () => {
     const academicHtml = service.generateHtml(mockResume, mockProfile, 'classic-academic');
-    expect(academicHtml).toContain('Georgia');
-
-    const compactHtml = service.generateHtml(mockResume, mockProfile, 'compact-executive');
-    expect(compactHtml).toContain('12mm 14mm');
+    expect(academicHtml).toContain('Computer Modern');
   });
 
   it('escapes special characters to prevent HTML injection', () => {
