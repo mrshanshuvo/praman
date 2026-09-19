@@ -9,7 +9,6 @@ export function AuthBackground() {
           src="/auth/pexels-nikolaydemirev-35330876.jpg"
           alt="Auth Backdrop"
           fill
-          priority
           className="object-cover"
         />
       </div>
@@ -20,7 +19,6 @@ export function AuthBackground() {
           src="/auth/auth-bg-light.png"
           alt="Auth Backdrop"
           fill
-          priority
           className="object-cover"
         />
       </div>

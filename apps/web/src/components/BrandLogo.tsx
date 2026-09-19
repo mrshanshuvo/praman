@@ -43,7 +43,7 @@ export function BrandLogo({
   href = '/',
   size = 'md',
   showText = true,
-  priority = true,
+  priority = false,
   className,
 }: BrandLogoProps) {
   const config = sizeConfig[size];
