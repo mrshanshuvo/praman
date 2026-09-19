@@ -208,12 +208,11 @@ export function getResumePdfUrl(id: string, templateId?: string, versionOrId?: s
   return `${API_URL}/job-descriptions/${id}/resume/pdf${qs ? `?${qs}` : ''}`;
 }
 
-export async function downloadResumePdf(
+export async function fetchResumePdfBlob(
   id: string,
   templateId?: string,
   versionOrId?: string,
-  filename?: string,
-) {
+): Promise<Blob> {
   const url = getResumePdfUrl(id, templateId, versionOrId);
   const headers = new Headers();
 
@@ -262,10 +261,19 @@ export async function downloadResumePdf(
   }
 
   if (!response.ok) {
-    throw new Error(`Failed to download PDF: ${response.statusText}`);
+    throw new Error(`Failed to fetch PDF: ${response.statusText}`);
   }
 
-  const blob = await response.blob();
+  return response.blob();
+}
+
+export async function downloadResumePdf(
+  id: string,
+  templateId?: string,
+  versionOrId?: string,
+  filename?: string,
+) {
+  const blob = await fetchResumePdfBlob(id, templateId, versionOrId);
   const downloadUrl = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = downloadUrl;

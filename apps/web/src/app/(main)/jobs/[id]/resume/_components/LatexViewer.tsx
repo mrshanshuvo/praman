@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
-import { DocumentPreviewSheet } from './DocumentPreviewSheet';
+import { CompiledPdfPreview } from './CompiledPdfPreview';
 
 export const TEMPLATES = [
   {
@@ -465,10 +465,15 @@ export function LatexViewer({
           </div>
         )}
 
-        {/* Live Document Preview Pane */}
+        {/* Live Document Preview Pane (Overleaf-Style Compiled PDF) */}
         {(viewMode === 'preview' || viewMode === 'split') && (
-          <div className="p-4 bg-muted/20 overflow-y-auto h-155 flex justify-center items-start">
-            <DocumentPreviewSheet resume={resumeData} />
+          <div className="p-3 bg-muted/20 overflow-hidden h-155 flex flex-col">
+            <CompiledPdfPreview
+              jobId={jobId}
+              selectedTemplate={selectedTemplate}
+              resumeData={resumeData}
+              candidateName={candidateName}
+            />
           </div>
         )}
       </div>
