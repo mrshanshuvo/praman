@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ValidationReportPanel } from '@/components/ValidationReportPanel';
+import { type EvidenceTarget, ValidationReportPanel } from '@/components/ValidationReportPanel';
 import {
   useCandidateProfile,
   useJob,
@@ -36,6 +36,14 @@ export default function ResumeAuditPage() {
   const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
   const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
   const [showAuditPanel, setShowAuditPanel] = useState(true);
+  const [activeEvidenceTarget, setActiveEvidenceTarget] = useState<EvidenceTarget | null>(null);
+
+  const handleSelectEvidenceTarget = (target: EvidenceTarget | null) => {
+    setActiveEvidenceTarget(target);
+    if (target && !showAuditPanel) {
+      setShowAuditPanel(true);
+    }
+  };
 
   const { data: jd } = useJob(id);
   const { data: versions } = useResumeVersions(id);
@@ -192,6 +200,8 @@ export default function ResumeAuditPage() {
                 resume={resume}
                 validationReport={report}
                 candidateProfile={candidateProfile}
+                activeTarget={activeEvidenceTarget}
+                onSelectTarget={handleSelectEvidenceTarget}
               />
             </TabsContent>
 
@@ -242,7 +252,12 @@ export default function ResumeAuditPage() {
                   <PanelRightClose className="w-3.5 h-3.5" />
                 </Button>
               </div>
-              <ValidationReportPanel report={report} status={status} />
+              <ValidationReportPanel
+                report={report}
+                status={status}
+                activeTarget={activeEvidenceTarget}
+                onSelectTarget={handleSelectEvidenceTarget}
+              />
             </div>
           </div>
         )}

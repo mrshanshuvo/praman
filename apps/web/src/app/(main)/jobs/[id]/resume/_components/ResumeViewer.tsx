@@ -1,6 +1,7 @@
 'use client';
 
 import type { ValidationReport } from '@praman/schemas';
+import { cn } from 'cn';
 import {
   AlertTriangle,
   Award,
@@ -10,21 +11,30 @@ import {
   Hash,
   Search,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   EvidenceInspectorModal,
   type InspectedEvidence,
 } from '@/components/EvidenceInspectorModal';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import type { EvidenceTarget } from '@/components/ValidationReportPanel';
 
 interface ResumeViewerProps {
   resume: any;
   validationReport?: ValidationReport | null;
   candidateProfile?: any;
+  activeTarget?: EvidenceTarget | null;
+  onSelectTarget?: (target: EvidenceTarget | null) => void;
 }
 
-export function ResumeViewer({ resume, validationReport, candidateProfile }: ResumeViewerProps) {
+export function ResumeViewer({
+  resume,
+  validationReport,
+  candidateProfile,
+  activeTarget,
+  onSelectTarget,
+}: ResumeViewerProps) {
   const [inspectedEvidence, setInspectedEvidence] = useState<InspectedEvidence | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,6 +45,34 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
 
   const numberFlags = validationReport?.numberFlags || [];
   const skillChecks = validationReport?.skillChecks || [];
+
+  // Auto-scroll to matching target when triggered from audit panel
+  useEffect(() => {
+    if (!activeTarget) return;
+
+    let targetId = '';
+    if (activeTarget.type === 'skill') {
+      targetId = `resume-skill-${activeTarget.key.toLowerCase().trim()}`;
+    } else if (activeTarget.type === 'source') {
+      targetId = `resume-source-${activeTarget.key.trim()}`;
+    } else if (activeTarget.type === 'bullet') {
+      const match = document.querySelector(
+        `[data-bullet-text="${encodeURIComponent(activeTarget.key.trim())}"]`,
+      );
+      if (match) {
+        match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      if (activeTarget.sourceId) {
+        targetId = `resume-source-${activeTarget.sourceId.trim()}`;
+      }
+    }
+
+    if (targetId) {
+      const el = document.getElementById(targetId);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [activeTarget]);
 
   return (
     <>
@@ -75,7 +113,7 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                 Technical Skills & Proficiency
               </h3>
               <span className="text-[11px] text-muted-foreground">
-                Click any skill to view profile verification
+                Double-click to locate in audit panel • Click to inspect
               </span>
             </div>
 
@@ -88,11 +126,23 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                   (s: any) => s.name?.toLowerCase() === sk.trim().toLowerCase(),
                 );
                 const isAllowed = check ? check.isAllowed : true;
+                const isSelected =
+                  activeTarget?.type === 'skill' &&
+                  activeTarget.key.toLowerCase().trim() === sk.toLowerCase().trim();
 
                 return (
                   <button
                     type="button"
                     key={i}
+                    id={`resume-skill-${sk.toLowerCase().trim()}`}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      onSelectTarget?.({
+                        type: 'skill',
+                        key: sk,
+                        timestamp: Date.now(),
+                      });
+                    }}
                     onClick={() =>
                       openInspector({
                         type: 'skill',
@@ -105,7 +155,13 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                         candidateRecord: candidateSkill,
                       })
                     }
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono transition-all bg-muted/60 border-border hover:border-brand-cyan/50 hover:bg-muted cursor-pointer text-left"
+                    title="Click to inspect ground truth • Double-click to jump to audit panel (Overleaf style)"
+                    className={cn(
+                      'flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono transition-all cursor-pointer text-left',
+                      isSelected
+                        ? 'bg-brand-cyan/20 border-brand-cyan ring-2 ring-brand-cyan/50 shadow-md scale-105'
+                        : 'bg-muted/60 border-border hover:border-brand-cyan/50 hover:bg-muted',
+                    )}
                   >
                     <Award className="w-3.5 h-3.5 text-brand-cyan shrink-0" />
                     <span className="text-foreground">{sk}</span>
@@ -134,7 +190,7 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                 Work Experience & Evidence Audits
               </h3>
               <span className="text-[11px] text-muted-foreground">
-                Hover or click bullets to inspect ground truth
+                Double-click any bullet or header to jump to audit evidence
               </span>
             </div>
 
@@ -142,13 +198,33 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
               const matchedCandidateExp = candidateProfile?.experiences?.find(
                 (ce: any) => ce.id === exp.sourceExperienceId,
               );
+              const isSourceSelected =
+                (activeTarget?.type === 'source' && activeTarget.key === exp.sourceExperienceId) ||
+                (activeTarget?.type === 'bullet' &&
+                  activeTarget.sourceId === exp.sourceExperienceId);
 
               return (
                 <div
                   key={i}
-                  className="p-4 rounded-xl border border-border/80 bg-background/50 space-y-2.5"
+                  id={`resume-source-${exp.sourceExperienceId}`}
+                  className={cn(
+                    'p-4 rounded-xl border transition-all space-y-2.5',
+                    isSourceSelected
+                      ? 'border-brand-cyan/70 bg-brand-cyan/5 ring-1 ring-brand-cyan/40 shadow-sm'
+                      : 'border-border/80 bg-background/50',
+                  )}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div
+                    className="flex items-start justify-between gap-3 cursor-pointer select-text"
+                    onDoubleClick={() =>
+                      onSelectTarget?.({
+                        type: 'source',
+                        key: exp.sourceExperienceId,
+                        timestamp: Date.now(),
+                      })
+                    }
+                    title="Double-click to locate source record in audit panel (Overleaf style)"
+                  >
                     <div>
                       <h4 className="text-base font-semibold text-foreground">{exp.title}</h4>
                       <p className="text-sm text-muted-foreground">{exp.company}</p>
@@ -178,15 +254,33 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                   <ul className="space-y-2 text-sm text-foreground/90 leading-relaxed">
                     {exp.bullets?.map((b: string, bIdx: number) => {
                       const flagged = numberFlags.find((f) => f.bullet.trim() === b.trim());
+                      const isBulletSelected =
+                        activeTarget?.type === 'bullet' &&
+                        (activeTarget.key.trim() === b.trim() ||
+                          b.includes(activeTarget.key) ||
+                          activeTarget.key.includes(b));
 
                       return (
                         <li
                           key={bIdx}
-                          className={`p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 ${
-                            flagged
-                              ? 'bg-amber-500/10 border-amber-500/30'
-                              : 'bg-card/40 border-border/60 hover:border-border hover:bg-muted/30'
-                          }`}
+                          data-bullet-text={encodeURIComponent(b.trim())}
+                          onDoubleClick={() =>
+                            onSelectTarget?.({
+                              type: 'bullet',
+                              key: b,
+                              sourceId: exp.sourceExperienceId,
+                              timestamp: Date.now(),
+                            })
+                          }
+                          title="Double-click to jump to audit evidence (Overleaf style)"
+                          className={cn(
+                            'p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 select-text',
+                            isBulletSelected
+                              ? 'bg-amber-500/20 border-amber-500 ring-2 ring-amber-400/60 shadow-md'
+                              : flagged
+                                ? 'bg-amber-500/10 border-amber-500/30'
+                                : 'bg-card/40 border-border/60 hover:border-border hover:bg-muted/30',
+                          )}
                         >
                           <div className="flex-1">
                             <span className="text-xs sm:text-sm">{b}</span>
@@ -247,7 +341,7 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                 Featured Projects & Evidence Audits
               </h3>
               <span className="text-[11px] text-muted-foreground">
-                Click project badges to inspect profile records
+                Double-click any project or bullet to jump to audit evidence
               </span>
             </div>
 
@@ -255,13 +349,32 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
               const matchedCandidateProj = candidateProfile?.projects?.find(
                 (cp: any) => cp.id === proj.sourceProjectId,
               );
+              const isSourceSelected =
+                (activeTarget?.type === 'source' && activeTarget.key === proj.sourceProjectId) ||
+                (activeTarget?.type === 'bullet' && activeTarget.sourceId === proj.sourceProjectId);
 
               return (
                 <div
                   key={i}
-                  className="p-4 rounded-xl border border-border/80 bg-background/50 space-y-2.5"
+                  id={`resume-source-${proj.sourceProjectId}`}
+                  className={cn(
+                    'p-4 rounded-xl border transition-all space-y-2.5',
+                    isSourceSelected
+                      ? 'border-brand-cyan/70 bg-brand-cyan/5 ring-1 ring-brand-cyan/40 shadow-sm'
+                      : 'border-border/80 bg-background/50',
+                  )}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div
+                    className="flex items-start justify-between gap-3 cursor-pointer select-text"
+                    onDoubleClick={() =>
+                      onSelectTarget?.({
+                        type: 'source',
+                        key: proj.sourceProjectId,
+                        timestamp: Date.now(),
+                      })
+                    }
+                    title="Double-click to locate project in audit panel (Overleaf style)"
+                  >
                     <h4 className="text-base font-semibold text-foreground">{proj.name}</h4>
 
                     <button
@@ -288,15 +401,33 @@ export function ResumeViewer({ resume, validationReport, candidateProfile }: Res
                   <ul className="space-y-2 text-sm text-foreground/90 leading-relaxed">
                     {proj.bullets?.map((b: string, bIdx: number) => {
                       const flagged = numberFlags.find((f) => f.bullet.trim() === b.trim());
+                      const isBulletSelected =
+                        activeTarget?.type === 'bullet' &&
+                        (activeTarget.key.trim() === b.trim() ||
+                          b.includes(activeTarget.key) ||
+                          activeTarget.key.includes(b));
 
                       return (
                         <li
                           key={bIdx}
-                          className={`p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 ${
-                            flagged
-                              ? 'bg-amber-500/10 border-amber-500/30'
-                              : 'bg-card/40 border-border/60 hover:border-border hover:bg-muted/30'
-                          }`}
+                          data-bullet-text={encodeURIComponent(b.trim())}
+                          onDoubleClick={() =>
+                            onSelectTarget?.({
+                              type: 'bullet',
+                              key: b,
+                              sourceId: proj.sourceProjectId,
+                              timestamp: Date.now(),
+                            })
+                          }
+                          title="Double-click to jump to audit evidence (Overleaf style)"
+                          className={cn(
+                            'p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 select-text',
+                            isBulletSelected
+                              ? 'bg-amber-500/20 border-amber-500 ring-2 ring-amber-400/60 shadow-md'
+                              : flagged
+                                ? 'bg-amber-500/10 border-amber-500/30'
+                                : 'bg-card/40 border-border/60 hover:border-border hover:bg-muted/30',
+                          )}
                         >
                           <div className="flex-1">
                             <span className="text-xs sm:text-sm">{b}</span>

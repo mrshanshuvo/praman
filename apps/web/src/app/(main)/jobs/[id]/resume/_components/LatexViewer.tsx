@@ -238,7 +238,7 @@ export function LatexViewer({
         'border-border bg-card/90 overflow-hidden shadow-lg space-y-0 gap-0 p-0 flex flex-col transition-all duration-200',
         isFullscreen
           ? 'fixed inset-0 z-50 rounded-none border-0 h-screen w-screen bg-background shadow-2xl'
-          : 'h-[calc(100vh-14rem)] min-h-[540px]',
+          : 'h-[calc(100vh-14rem)] min-h-135',
       )}
     >
       {/* Top Toolbar */}

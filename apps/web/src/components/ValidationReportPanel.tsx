@@ -1,6 +1,7 @@
 'use client';
 
 import type { ResumeStatus, ValidationReport } from '@praman/schemas';
+import { cn } from 'cn';
 import {
   AlertCircle,
   Award,
@@ -12,20 +13,79 @@ import {
   XCircle,
 } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+
+export interface EvidenceTarget {
+  type: 'skill' | 'source' | 'bullet';
+  key: string;
+  sourceId?: string;
+  timestamp?: number;
+}
 
 interface ValidationReportPanelProps {
   report: ValidationReport | null | undefined;
   status?: ResumeStatus;
+  activeTarget?: EvidenceTarget | null;
+  onSelectTarget?: (target: EvidenceTarget | null) => void;
 }
 
 export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
   report,
   status = report?.status ?? 'DRAFT',
+  activeTarget,
+  onSelectTarget,
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'skills' | 'sources' | 'all'>('skills');
+
+  // Auto-switch subtabs and scroll into view when an activeTarget is selected from resume
+  useEffect(() => {
+    if (!activeTarget) return;
+
+    if (activeTarget.type === 'skill') {
+      if (activeSubTab !== 'all') setActiveSubTab('skills');
+      const targetId = `audit-skill-${activeTarget.key.toLowerCase().trim()}`;
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 60);
+    } else if (activeTarget.type === 'source') {
+      if (activeSubTab !== 'all') setActiveSubTab('sources');
+      const targetId = `audit-source-${activeTarget.key.trim()}`;
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 60);
+    } else if (activeTarget.type === 'bullet') {
+      // Find matching numeric flag if exists
+      if (report?.numberFlags?.length) {
+        const flagIdx = report.numberFlags.findIndex(
+          (f) =>
+            f.bullet.trim() === activeTarget.key.trim() ||
+            f.bullet.includes(activeTarget.key) ||
+            activeTarget.key.includes(f.bullet),
+        );
+        if (flagIdx !== -1) {
+          setTimeout(() => {
+            const el = document.getElementById(`audit-bullet-${flagIdx}`);
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 60);
+          return;
+        }
+      }
+      // If no numeric flag, jump to the parent source record
+      if (activeTarget.sourceId) {
+        if (activeSubTab !== 'all') setActiveSubTab('sources');
+        const targetId = `audit-source-${activeTarget.sourceId.trim()}`;
+        setTimeout(() => {
+          const el = document.getElementById(targetId);
+          el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 60);
+      }
+    }
+  }, [activeTarget]);
+
   if (!report) {
     return (
       <Card className="border-border bg-card p-5 text-center text-muted-foreground">
@@ -115,7 +175,7 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
           <button
             type="button"
             onClick={() => setActiveSubTab('skills')}
-            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
               activeSubTab === 'skills'
                 ? 'bg-background text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
@@ -126,7 +186,7 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
           <button
             type="button"
             onClick={() => setActiveSubTab('sources')}
-            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
               activeSubTab === 'sources'
                 ? 'bg-background text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
@@ -137,7 +197,7 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
           <button
             type="button"
             onClick={() => setActiveSubTab('all')}
-            className={`px-2 py-1 text-xs font-medium rounded-md transition-all ${
+            className={`px-2 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
               activeSubTab === 'all'
                 ? 'bg-background text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
@@ -170,35 +230,55 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
             </div>
 
             <div className="space-y-1.5 max-h-60 overflow-y-auto overflow-x-hidden pr-1">
-              {report.skillChecks?.map((chk, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between gap-2 text-xs p-2.5 rounded-lg bg-muted/40 border border-border/70 hover:bg-muted/60 transition-colors min-w-0 overflow-hidden"
-                >
-                  <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                    <span
-                      className="font-medium text-foreground text-xs truncate"
-                      title={chk.skill}
-                    >
-                      {chk.skill}
-                    </span>
-                    {chk.candidateLevel && (
-                      <span className="text-[10px] font-mono text-muted-foreground shrink-0 bg-muted px-1.5 py-0.5 rounded border border-border/50 uppercase">
-                        {chk.candidateLevel}
+              {report.skillChecks?.map((chk, i) => {
+                const isSelected =
+                  activeTarget?.type === 'skill' &&
+                  activeTarget.key.toLowerCase().trim() === chk.skill.toLowerCase().trim();
+
+                return (
+                  <div
+                    key={i}
+                    id={`audit-skill-${chk.skill.toLowerCase().trim()}`}
+                    onDoubleClick={() =>
+                      onSelectTarget?.({
+                        type: 'skill',
+                        key: chk.skill,
+                        timestamp: Date.now(),
+                      })
+                    }
+                    title="Double-click to locate skill in resume (Overleaf style)"
+                    className={cn(
+                      'flex items-center justify-between gap-2 text-xs p-2.5 rounded-lg border transition-all min-w-0 overflow-hidden cursor-pointer select-text',
+                      isSelected
+                        ? 'bg-brand-cyan/15 border-brand-cyan/60 ring-2 ring-brand-cyan/50 shadow-sm'
+                        : 'bg-muted/40 border-border/70 hover:bg-muted/60 hover:border-border',
+                    )}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+                      <span
+                        className="font-medium text-foreground text-xs truncate"
+                        title={chk.skill}
+                      >
+                        {chk.skill}
+                      </span>
+                      {chk.candidateLevel && (
+                        <span className="text-[10px] font-mono text-muted-foreground shrink-0 bg-muted px-1.5 py-0.5 rounded border border-border/50 uppercase">
+                          {chk.candidateLevel}
+                        </span>
+                      )}
+                    </div>
+                    {chk.isAllowed ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
+                        <CheckCircle2 className="w-3 h-3" /> Valid
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
+                        <XCircle className="w-3 h-3" /> {chk.violation || 'Rejected'}
                       </span>
                     )}
                   </div>
-                  {chk.isAllowed ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
-                      <CheckCircle2 className="w-3 h-3" /> Valid
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
-                      <XCircle className="w-3 h-3" /> {chk.violation || 'Rejected'}
-                    </span>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
         )}
@@ -221,35 +301,58 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
             </div>
 
             <div className="space-y-1.5 max-h-60 overflow-y-auto overflow-x-hidden pr-1">
-              {report.sourceIdChecks?.map((chk, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between gap-2 text-xs p-2.5 rounded-lg bg-muted/40 border border-border/70 hover:bg-muted/60 transition-colors min-w-0 overflow-hidden"
-                >
-                  <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                    <span className="font-semibold text-foreground uppercase tracking-wider text-[10px] px-1.5 py-0.5 rounded bg-muted border border-border shrink-0">
-                      {chk.field}
-                    </span>
-                    <span
-                      className="font-mono text-muted-foreground text-xs truncate block"
-                      title={chk.sourceId}
-                    >
-                      {chk.sourceId.length > 20
-                        ? `${chk.sourceId.slice(0, 8)}...${chk.sourceId.slice(-6)}`
-                        : chk.sourceId}
-                    </span>
+              {report.sourceIdChecks?.map((chk, i) => {
+                const isSelected =
+                  (activeTarget?.type === 'source' &&
+                    (activeTarget.key.trim() === chk.sourceId.trim() ||
+                      activeTarget.sourceId?.trim() === chk.sourceId.trim())) ||
+                  (activeTarget?.type === 'bullet' &&
+                    activeTarget.sourceId?.trim() === chk.sourceId.trim());
+
+                return (
+                  <div
+                    key={i}
+                    id={`audit-source-${chk.sourceId.trim()}`}
+                    onDoubleClick={() =>
+                      onSelectTarget?.({
+                        type: 'source',
+                        key: chk.sourceId,
+                        timestamp: Date.now(),
+                      })
+                    }
+                    title="Double-click to locate source record in resume (Overleaf style)"
+                    className={cn(
+                      'flex items-center justify-between gap-2 text-xs p-2.5 rounded-lg border transition-all min-w-0 overflow-hidden cursor-pointer select-text',
+                      isSelected
+                        ? 'bg-brand-cyan/15 border-brand-cyan/60 ring-2 ring-brand-cyan/50 shadow-sm'
+                        : 'bg-muted/40 border-border/70 hover:bg-muted/60 hover:border-border',
+                    )}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+                      <span className="font-semibold text-foreground uppercase tracking-wider text-[10px] px-1.5 py-0.5 rounded bg-muted border border-border shrink-0">
+                        {chk.field}
+                      </span>
+                      <span
+                        className="font-mono text-muted-foreground text-xs truncate block"
+                        title={chk.sourceId}
+                      >
+                        {chk.sourceId.length > 20
+                          ? `${chk.sourceId.slice(0, 8)}...${chk.sourceId.slice(-6)}`
+                          : chk.sourceId}
+                      </span>
+                    </div>
+                    {chk.exists ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
+                        <CheckCircle2 className="w-3 h-3" /> Found
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
+                        <XCircle className="w-3 h-3" /> Missing
+                      </span>
+                    )}
                   </div>
-                  {chk.exists ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
-                      <CheckCircle2 className="w-3 h-3" /> Found
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
-                      <XCircle className="w-3 h-3" /> Missing
-                    </span>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
         )}
@@ -269,18 +372,40 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
             bullet text. Flagged for review to ensure metrics were not exaggerated or hallucinated.
           </p>
           <div className="space-y-2">
-            {report.numberFlags.map((flag, idx) => (
-              <div
-                key={idx}
-                className="p-2.5 rounded-lg bg-card border border-brand-pink/20 text-xs"
-              >
-                <div className="flex items-center gap-2 font-mono text-brand-pink text-xs mb-1">
-                  <span>{flag.location}</span>
-                  <span>• Numbers: {flag.flaggedNumbers.join(', ')}</span>
+            {report.numberFlags.map((flag, idx) => {
+              const isSelected =
+                activeTarget?.type === 'bullet' &&
+                (activeTarget.key.trim() === flag.bullet.trim() ||
+                  flag.bullet.includes(activeTarget.key) ||
+                  activeTarget.key.includes(flag.bullet));
+
+              return (
+                <div
+                  key={idx}
+                  id={`audit-bullet-${idx}`}
+                  onDoubleClick={() =>
+                    onSelectTarget?.({
+                      type: 'bullet',
+                      key: flag.bullet,
+                      timestamp: Date.now(),
+                    })
+                  }
+                  title="Double-click to locate flagged bullet in resume (Overleaf style)"
+                  className={cn(
+                    'p-2.5 rounded-lg border text-xs transition-all cursor-pointer select-text',
+                    isSelected
+                      ? 'bg-amber-500/20 border-amber-500/60 ring-2 ring-amber-400/50 shadow-sm'
+                      : 'bg-card border-brand-pink/20 hover:border-brand-pink/40 hover:bg-card/80',
+                  )}
+                >
+                  <div className="flex items-center gap-2 font-mono text-brand-pink text-xs mb-1">
+                    <span>{flag.location}</span>
+                    <span>• Numbers: {flag.flaggedNumbers.join(', ')}</span>
+                  </div>
+                  <p className="text-foreground font-mono text-xs">{flag.bullet}</p>
                 </div>
-                <p className="text-foreground font-mono text-xs">{flag.bullet}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       )}
