@@ -7,7 +7,8 @@ export async function seed() {
 
   const userEmail = 'mrshanshuvo@gmail.com';
   const userName = 'Shahid Hasan Shovu';
-  const defaultPasswordHash = bcrypt.hashSync('Password123!', 10);
+  const rawPassword = process.env.SEED_DEFAULT_PASSWORD || 'Password123!';
+  const defaultPasswordHash = bcrypt.hashSync(rawPassword, 10);
 
   // Check if user already exists
   let user = await db.orm.public.User.where({ email: userEmail }).first();
