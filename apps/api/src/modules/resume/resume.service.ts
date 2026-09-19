@@ -21,12 +21,16 @@ export class ResumeService {
     private readonly storageService: StorageService,
   ) {}
 
-  async generateAndValidate(jobDescriptionId: string) {
+  async generateAndValidate(jobDescriptionId: string, userId?: string) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
 
     if (!jd) {
+      throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+    }
+
+    if (userId && jd.userId !== userId) {
       throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
     }
 
@@ -46,8 +50,9 @@ export class ResumeService {
       throw new NotFoundException(`Strategy not found for JD ${jobDescriptionId}`);
     }
 
-    const profile = await this.candidateService.getProfile();
-    const sanitizedProfile = await this.candidateService.getSanitizedProfile();
+    const targetUserId = userId || jd.userId;
+    const profile = await this.candidateService.getProfile(targetUserId);
+    const sanitizedProfile = await this.candidateService.getSanitizedProfile(targetUserId);
 
     // Stage 4: Resume Generator call 1
     let resumeJson = await this.aiService.runStructuredCall<ResumeData>({
@@ -94,29 +99,31 @@ export class ResumeService {
       }
     }
 
-    // Save Resume to Database
-    let resumeRecord = await this.prisma.client.orm.public.Resume.where({
+    // Version History: Mark existing resumes for this strategy as not latest
+    const priorResumes = await this.prisma.client.orm.public.Resume.where({
       resumeStrategyId: strategy.id,
-    }).first();
+    }).all();
 
+    for (const old of priorResumes) {
+      if (old.isLatest) {
+        await this.prisma.client.orm.public.Resume.where({ id: old.id }).update({
+          isLatest: false,
+        });
+      }
+    }
+
+    const version = priorResumes.length + 1;
     const statusToSave: ResumeStatus = validationReport.status;
 
-    if (resumeRecord) {
-      resumeRecord = await this.prisma.client.orm.public.Resume.where({
-        id: resumeRecord.id,
-      }).update({
-        resumeJson,
-        validationReport,
-        status: statusToSave,
-      });
-    } else {
-      resumeRecord = await this.prisma.client.orm.public.Resume.create({
-        resumeStrategyId: strategy.id,
-        resumeJson,
-        validationReport,
-        status: statusToSave,
-      });
-    }
+    // Always create a new version (never overwrite)
+    const resumeRecord = await this.prisma.client.orm.public.Resume.create({
+      resumeStrategyId: strategy.id,
+      resumeJson,
+      validationReport,
+      status: statusToSave,
+      version,
+      isLatest: true,
+    });
 
     // Generate dynamic LaTeX code and upload to Cloudflare R2
     let texKey: string | null = null;
@@ -124,8 +131,8 @@ export class ResumeService {
     if (resumeRecord) {
       try {
         const texContent = await this.latexService.generateLatex(resumeJson, profile);
-        const userId = jd.userId || 'default-user';
-        texKey = `resumes/${userId}/${(resumeRecord as any).id}/resume.tex`;
+        const ownerId = targetUserId || 'default-user';
+        texKey = `resumes/${ownerId}/${(resumeRecord as any).id}/resume.tex`;
 
         await this.storageService.uploadFile(texKey, texContent, 'application/x-tex');
         downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600); // 1-hour presigned URL
@@ -141,12 +148,20 @@ export class ResumeService {
     };
   }
 
-  async getLatestResume(jobDescriptionId: string) {
+  async getLatestResume(
+    jobDescriptionId: string,
+    versionOrId?: string,
+    userId?: string,
+  ) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
 
     if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+
+    if (userId && jd.userId !== userId) {
+      throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+    }
 
     const analysis = await this.prisma.client.orm.public.CandidateJdAnalysis.where({
       jobDescriptionId: jd.id,
@@ -160,14 +175,40 @@ export class ResumeService {
 
     if (!strategy) return null;
 
-    const resume = await this.prisma.client.orm.public.Resume.where({
-      resumeStrategyId: strategy.id,
-    }).first();
+    let resume: any = null;
+
+    if (versionOrId) {
+      // Check if versionOrId is a number or UUID
+      const versionNum = Number(versionOrId);
+      if (!Number.isNaN(versionNum)) {
+        resume = await this.prisma.client.orm.public.Resume.where({
+          resumeStrategyId: strategy.id,
+          version: versionNum,
+        }).first();
+      } else {
+        resume = await this.prisma.client.orm.public.Resume.where({
+          id: versionOrId,
+        }).first();
+      }
+    }
+
+    if (!resume) {
+      resume = await this.prisma.client.orm.public.Resume.where({
+        resumeStrategyId: strategy.id,
+        isLatest: true,
+      }).first();
+    }
+
+    if (!resume) {
+      resume = await this.prisma.client.orm.public.Resume.where({
+        resumeStrategyId: strategy.id,
+      }).first();
+    }
 
     if (!resume) return null;
 
-    const userId = jd.userId || 'default-user';
-    const texKey = `resumes/${userId}/${resume.id}/resume.tex`;
+    const ownerId = jd.userId || 'default-user';
+    const texKey = `resumes/${ownerId}/${resume.id}/resume.tex`;
     let downloadUrl: string | null = null;
     try {
       downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600);
@@ -182,20 +223,55 @@ export class ResumeService {
     };
   }
 
-  async getLatexSource(jobDescriptionId: string, templateId?: string) {
+  async getResumeVersions(jobDescriptionId: string, userId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({
+      id: jobDescriptionId,
+    }).first();
+
+    if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+
+    if (userId && jd.userId !== userId) {
+      throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+    }
+
+    const analysis = await this.prisma.client.orm.public.CandidateJdAnalysis.where({
+      jobDescriptionId: jd.id,
+    }).first();
+
+    if (!analysis) return [];
+
+    const strategy = await this.prisma.client.orm.public.ResumeStrategy.where({
+      candidateJdAnalysisId: analysis.id,
+    }).first();
+
+    if (!strategy) return [];
+
+    const resumes = await this.prisma.client.orm.public.Resume.where({
+      resumeStrategyId: strategy.id,
+    }).all();
+
+    return resumes.sort((a: any, b: any) => (b.version || 1) - (a.version || 1));
+  }
+
+  async getLatexSource(
+    jobDescriptionId: string,
+    templateId?: string,
+    versionOrId?: string,
+    userId?: string,
+  ) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
     if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
 
-    const resumeRecord = await this.getLatestResume(jobDescriptionId);
+    const resumeRecord = await this.getLatestResume(jobDescriptionId, versionOrId, userId);
     if (!resumeRecord) {
       throw new NotFoundException(`Resume not found for job description ${jobDescriptionId}`);
     }
 
-    const userId = jd.userId || 'default-user';
+    const ownerId = jd.userId || 'default-user';
     const targetTemplate = templateId || 'modern-developer';
-    const texKey = `resumes/${userId}/${resumeRecord.id}/${targetTemplate}.tex`;
+    const texKey = `resumes/${ownerId}/${resumeRecord.id}/${targetTemplate}.tex`;
 
     // Check if customized LaTeX exists in Cloudflare R2 for this template
     try {
@@ -207,7 +283,7 @@ export class ResumeService {
       // fallback to dynamic generator
     }
 
-    const profile = await this.candidateService.getProfile();
+    const profile = await this.candidateService.getProfile(ownerId);
     return await this.latexService.generateLatex(
       resumeRecord.resumeJson as ResumeData,
       profile,
@@ -215,20 +291,26 @@ export class ResumeService {
     );
   }
 
-  async updateLatexSource(jobDescriptionId: string, latex: string, templateId?: string) {
+  async updateLatexSource(
+    jobDescriptionId: string,
+    latex: string,
+    templateId?: string,
+    versionOrId?: string,
+    userId?: string,
+  ) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
     if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
 
-    const resumeRecord = await this.getLatestResume(jobDescriptionId);
+    const resumeRecord = await this.getLatestResume(jobDescriptionId, versionOrId, userId);
     if (!resumeRecord) {
       throw new NotFoundException(`Resume not found for job description ${jobDescriptionId}`);
     }
 
-    const userId = jd.userId || 'default-user';
+    const ownerId = jd.userId || 'default-user';
     const targetTemplate = templateId || 'modern-developer';
-    const texKey = `resumes/${userId}/${resumeRecord.id}/${targetTemplate}.tex`;
+    const texKey = `resumes/${ownerId}/${resumeRecord.id}/${targetTemplate}.tex`;
 
     await this.storageService.uploadFile(texKey, latex, 'application/x-tex');
     const downloadUrl = await this.storageService.getPresignedDownloadUrl(texKey, 3600);

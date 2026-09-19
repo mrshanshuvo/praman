@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Check, Copy, Download, Play, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Download, History, Play, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
@@ -20,6 +20,10 @@ interface ResumeAuditHeaderProps {
   isRegenerating: boolean;
   onRefresh: () => void;
   onRegenerate: () => void;
+  versions?: any[];
+  selectedVersion?: string;
+  onSelectVersion?: (version: string) => void;
+  currentVersion?: number;
 }
 
 export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
@@ -34,6 +38,10 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   isRegenerating,
   onRefresh,
   onRegenerate,
+  versions,
+  selectedVersion,
+  onSelectVersion,
+  currentVersion,
 }) => {
   const [copied, setCopied] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -75,6 +83,37 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
             >
               {status || 'DRAFT'}
             </Badge>
+
+            {/* Version Badge or Selector */}
+            {versions && versions.length > 1 ? (
+              <div className="flex items-center gap-1.5 bg-muted/60 px-2 py-0.5 rounded-lg border border-border">
+                <History className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-[11px] text-muted-foreground">Ver:</span>
+                <select
+                  value={
+                    selectedVersion ||
+                    (versions.find((v) => v.isLatest)?.version?.toString() || '1')
+                  }
+                  onChange={(e) => onSelectVersion?.(e.target.value)}
+                  className="bg-transparent text-xs font-mono font-bold text-foreground focus:outline-none cursor-pointer"
+                >
+                  {versions.map((v: any) => (
+                    <option
+                      key={v.id}
+                      value={v.version?.toString()}
+                      className="bg-card text-foreground"
+                    >
+                      v{v.version} {v.isLatest ? '(Latest)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : currentVersion ? (
+              <Badge variant="outline" className="text-xs font-mono text-muted-foreground border-border bg-muted/50 px-2 py-0.5">
+                v{currentVersion}
+              </Badge>
+            ) : null}
+
             {matchAnalysis && <MatchScoreBadge analysis={matchAnalysis} variant="pill" />}
           </div>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">

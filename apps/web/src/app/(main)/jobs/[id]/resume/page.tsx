@@ -13,6 +13,7 @@ import {
   useJob,
   useJobResume,
   useJobResumeLatex,
+  useResumeVersions,
   useRunStage,
 } from '@/hooks/usePramanApi';
 import { LatexViewer } from './_components/LatexViewer';
@@ -25,15 +26,22 @@ export default function ResumeAuditPage() {
   const id = params.id as string;
 
   const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
+  const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
+
   const { data: jd } = useJob(id);
+  const { data: versions } = useResumeVersions(id);
   const {
     data: resumeData,
     isLoading: loading,
     isFetching,
     error: fetchError,
     refetch,
-  } = useJobResume(id);
-  const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(id, selectedTemplate);
+  } = useJobResume(id, selectedVersion);
+  const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(
+    id,
+    selectedTemplate,
+    selectedVersion,
+  );
   const { data: candidateProfile } = useCandidateProfile();
   const runStageMutation = useRunStage(id);
 
@@ -100,6 +108,10 @@ export default function ResumeAuditPage() {
         isRegenerating={runStageMutation.isPending}
         onRefresh={() => refetch()}
         onRegenerate={handleRegenerate}
+        versions={versions}
+        selectedVersion={selectedVersion}
+        onSelectVersion={setSelectedVersion}
+        currentVersion={resumeData?.version}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
