@@ -10,6 +10,7 @@ import {
   ExternalLink,
   FileCode,
   FileDown,
+  GitCompare,
   History,
   Play,
   RefreshCw,
@@ -54,6 +55,7 @@ interface ResumeAuditHeaderProps {
   onSelectVersion?: (version: string) => void;
   currentVersion?: number;
   validationReport?: any;
+  onOpenDiff?: () => void;
 }
 
 export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
@@ -73,6 +75,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   onSelectVersion,
   currentVersion,
   validationReport,
+  onOpenDiff,
 }) => {
   const [copied, setCopied] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -255,6 +258,18 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
                       </option>
                     ))}
                   </select>
+                  {onOpenDiff && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onOpenDiff}
+                      className="h-6 px-1.5 text-[10px] font-medium text-amber-400 hover:text-amber-300 hover:bg-amber-500/15 gap-1 cursor-pointer ml-1 rounded border border-amber-500/25"
+                      title="Compare versions diff"
+                    >
+                      <GitCompare className="w-3 h-3" />
+                      <span>Diff</span>
+                    </Button>
+                  )}
                 </div>
               ) : currentVersion ? (
                 <Badge

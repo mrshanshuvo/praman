@@ -4,6 +4,7 @@ import { cn } from 'cn';
 import {
   ArrowLeft,
   FileCode,
+  GitCompare,
   Mail,
   PanelRightClose,
   PanelRightOpen,
@@ -27,6 +28,7 @@ import {
 import { LatexViewer } from './_components/LatexViewer';
 import { OutreachTab } from './_components/OutreachTab';
 import { ResumeAuditHeader } from './_components/ResumeAuditHeader';
+import { ResumeDiffViewer } from './_components/ResumeDiffViewer';
 import { ResumeViewer } from './_components/ResumeViewer';
 
 export default function ResumeAuditPage() {
@@ -36,6 +38,7 @@ export default function ResumeAuditPage() {
   const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
   const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
   const [showAuditPanel, setShowAuditPanel] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>('preview');
 
   const { data: jd } = useJob(id);
   const { data: versions } = useResumeVersions(id);
@@ -122,6 +125,7 @@ export default function ResumeAuditPage() {
         onSelectVersion={setSelectedVersion}
         currentVersion={resumeData?.version}
         validationReport={report}
+        onOpenDiff={() => setActiveTab('diff')}
       />
 
       <div
@@ -136,7 +140,7 @@ export default function ResumeAuditPage() {
             showAuditPanel ? 'lg:col-span-8' : 'w-full',
           )}
         >
-          <Tabs defaultValue="preview" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
               <TabsList className="bg-muted/60 p-1 border border-border">
                 <TabsTrigger value="preview" className="text-xs px-4">
@@ -149,6 +153,15 @@ export default function ResumeAuditPage() {
                 <TabsTrigger value="outreach" className="text-xs px-4 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-brand-pink" />
                   <span>Cover Letter & Outreach</span>
+                </TabsTrigger>
+                <TabsTrigger value="diff" className="text-xs px-4 flex items-center gap-1.5">
+                  <GitCompare className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Version Diff</span>
+                  {versions && versions.length > 1 && (
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                      {versions.length}
+                    </span>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -221,6 +234,17 @@ export default function ResumeAuditPage() {
 
             <TabsContent value="outreach">
               <OutreachTab jobId={id} candidateName={resume.personal?.name} />
+            </TabsContent>
+
+            <TabsContent value="diff" className="mt-0 outline-none">
+              <ResumeDiffViewer
+                jobId={id}
+                currentResume={resume}
+                currentVersion={resumeData?.version || selectedVersion}
+                versions={versions}
+                onRegenerate={handleRegenerate}
+                isRegenerating={runStageMutation.isPending}
+              />
             </TabsContent>
           </Tabs>
         </div>
