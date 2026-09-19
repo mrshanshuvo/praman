@@ -296,5 +296,48 @@ describe('LatexService', () => {
       expect(tex).toContain('\\section{Key Competencies}');
       expect(tex).toContain('\\section{Leadership \\& Professional Experience}');
     });
+
+    it('ensures no dangling {{ or }} template tokens remain in generated output', async () => {
+      // Test with full data
+      const texFull = await service.generateLatex(mockResumeData, mockCandidateProfile);
+      expect(texFull).not.toMatch(/\{\{.*?\}\}/);
+
+      // Test with partial data (empty summary, empty projects, empty certifications)
+      const partialResumeData = {
+        ...mockResumeData,
+        summary: '',
+        projects: [],
+        certifications: [],
+      };
+      const texPartial = await service.generateLatex(partialResumeData, mockCandidateProfile);
+      expect(texPartial).not.toMatch(/\{\{.*?\}\}/);
+      expect(texPartial).not.toContain('\\section{Projects}');
+      expect(texPartial).not.toContain('\\section{Certifications}');
+    });
+
+    it('respects cache TTL and refetches when cache expires', async () => {
+      mockStorageService.getFileString.mockClear();
+      mockStorageService.getFileString.mockResolvedValue('template content 1');
+
+      const first = await service.getTemplate('custom-tmpl');
+      expect(first).toBe('template content 1');
+      expect(mockStorageService.getFileString).toHaveBeenCalledTimes(1);
+
+      // Second call within TTL should return cached
+      const second = await service.getTemplate('custom-tmpl');
+      expect(second).toBe('template content 1');
+      expect(mockStorageService.getFileString).toHaveBeenCalledTimes(1);
+
+      // Advance time beyond 10 min TTL
+      const viTime = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 11 * 60 * 1000);
+      mockStorageService.getFileString.mockResolvedValue('template content 2');
+
+      const third = await service.getTemplate('custom-tmpl');
+      expect(third).toBe('template content 2');
+      expect(mockStorageService.getFileString).toHaveBeenCalledTimes(2);
+
+      viTime.mockRestore();
+    });
   });
 });
+

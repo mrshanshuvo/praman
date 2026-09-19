@@ -40,7 +40,8 @@ export const RESUME_TEMPLATES: ResumeTemplateMeta[] = [
 @Injectable()
 export class LatexService {
   private readonly logger = new Logger(LatexService.name);
-  private templateCache = new Map<string, string>();
+  private templateCache = new Map<string, { content: string; cachedAt: number }>();
+  private readonly CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
   constructor(@Optional() private readonly storageService?: StorageService) {}
 
@@ -48,8 +49,9 @@ export class LatexService {
    * Fetches LaTeX template directly from Cloudflare R2 with in-memory caching
    */
   async getTemplate(templateId = 'modern-developer'): Promise<string> {
-    if (this.templateCache.has(templateId)) {
-      return this.templateCache.get(templateId)!;
+    const cached = this.templateCache.get(templateId);
+    if (cached && Date.now() - cached.cachedAt < this.CACHE_TTL_MS) {
+      return cached.content;
     }
 
     const r2Key = `templates/${templateId}.tex`;
@@ -59,7 +61,7 @@ export class LatexService {
         const r2Template = await this.storageService.getFileString(r2Key);
         if (r2Template) {
           this.logger.log(`Loaded template '${templateId}' from Cloudflare R2`);
-          this.templateCache.set(templateId, r2Template);
+          this.templateCache.set(templateId, { content: r2Template, cachedAt: Date.now() });
           return r2Template;
         }
       } catch (err: any) {
@@ -123,7 +125,7 @@ export class LatexService {
 {{CERTIFICATION_ENTRIES}}
 {{/if}}
 \\end{document}`;
-      this.templateCache.set(templateId, fallback);
+      this.templateCache.set(templateId, { content: fallback, cachedAt: Date.now() });
       return fallback;
     }
 
@@ -181,7 +183,7 @@ export class LatexService {
 {{CERTIFICATION_ENTRIES}}
 {{/if}}
 \\end{document}`;
-      this.templateCache.set(templateId, fallback);
+      this.templateCache.set(templateId, { content: fallback, cachedAt: Date.now() });
       return fallback;
     }
 
@@ -240,7 +242,7 @@ export class LatexService {
 {{CERTIFICATION_ENTRIES}}
 {{/if}}
 \\end{document}`;
-      this.templateCache.set(templateId, fallback);
+      this.templateCache.set(templateId, { content: fallback, cachedAt: Date.now() });
       return fallback;
     }
 
@@ -286,9 +288,9 @@ export class LatexService {
     const title =
       candidateProfile?.profile?.desiredTitle || candidateProfile?.experiences?.[0]?.title;
     if (title) {
-      tex = tex.replace('{{TITLE_LINE}}', `\\textbf{${this.escapeLatex(title)}}\\\\[3pt]`);
+      tex = tex.replaceAll('{{TITLE_LINE}}', `\\textbf{${this.escapeLatex(title)}}\\\\[3pt]`);
     } else {
-      tex = tex.replace('{{TITLE_LINE}}', '');
+      tex = tex.replaceAll('{{TITLE_LINE}}', '');
     }
 
     // Contact info
@@ -302,7 +304,7 @@ export class LatexService {
     if (contact.email) {
       contactParts.push(`\\href{mailto:${contact.email}}{${this.escapeLatex(contact.email)}}`);
     }
-    tex = tex.replace('{{CONTACT_LINE}}', contactParts.join(' \\textbar\\ '));
+    tex = tex.replaceAll('{{CONTACT_LINE}}', contactParts.join(' \\textbar\\ '));
 
     // Links (LinkedIn, GitHub, Portfolio, etc.)
     const linkParts: string[] = [];
@@ -315,31 +317,28 @@ export class LatexService {
     if (contact.portfolio) {
       linkParts.push(`\\href{${contact.portfolio}}{Portfolio}`);
     }
-    tex = tex.replace('{{LINKS_LINE}}', linkParts.join(' \\textbar\\ '));
+    tex = tex.replaceAll('{{LINKS_LINE}}', linkParts.join(' \\textbar\\ '));
 
     // 2. Professional Summary
     if (resumeData.summary) {
-      tex = tex.replace('{{#if SUMMARY}}', '');
-      tex = tex.replace('{{/if}}', '');
-      tex = tex.replace('{{SUMMARY}}', this.escapeLatex(resumeData.summary));
+      tex = tex.replace(/\{\{#if SUMMARY\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
+      tex = tex.replaceAll('{{SUMMARY}}', this.escapeLatex(resumeData.summary));
     } else {
-      tex = tex.replace(/\{\{#if SUMMARY\}\}[\s\S]*?\{\{\/if\}\}/, '');
+      tex = tex.replace(/\{\{#if SUMMARY\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
 
     // 3. Skills
     if (resumeData.skills && resumeData.skills.length > 0) {
-      tex = tex.replace('{{#if SKILLS}}', '');
-      tex = tex.replace('{{/if}}', '');
+      tex = tex.replace(/\{\{#if SKILLS\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
       const skillsEscaped = resumeData.skills.map((s) => this.escapeLatex(s)).join(', ');
-      tex = tex.replace('{{SKILLS}}', skillsEscaped);
+      tex = tex.replaceAll('{{SKILLS}}', skillsEscaped);
     } else {
-      tex = tex.replace(/\{\{#if SKILLS\}\}[\s\S]*?\{\{\/if\}\}/, '');
+      tex = tex.replace(/\{\{#if SKILLS\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
 
     // 4. Experience
     if (resumeData.experience && resumeData.experience.length > 0) {
-      tex = tex.replace('{{#if HAS_EXPERIENCE}}', '');
-      tex = tex.replace('{{/if}}', '');
+      tex = tex.replace(/\{\{#if HAS_EXPERIENCE\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
 
       const expBlocks = resumeData.experience.map((exp) => {
         // Find matching raw experience from candidateProfile for dates if available
@@ -356,15 +355,14 @@ export class LatexService {
         return `\\begin{onecolentry}\n${headerLine}\n\\begin{highlights}\n${bullets}\n\\end{highlights}\n\\end{onecolentry}\n`;
       });
 
-      tex = tex.replace('{{EXPERIENCE_ENTRIES}}', expBlocks.join('\n'));
+      tex = tex.replaceAll('{{EXPERIENCE_ENTRIES}}', expBlocks.join('\n'));
     } else {
-      tex = tex.replace(/\{\{#if HAS_EXPERIENCE\}\}[\s\S]*?\{\{\/if\}\}/, '');
+      tex = tex.replace(/\{\{#if HAS_EXPERIENCE\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
 
     // 5. Projects
     if (resumeData.projects && resumeData.projects.length > 0) {
-      tex = tex.replace('{{#if HAS_PROJECTS}}', '');
-      tex = tex.replace('{{/if}}', '');
+      tex = tex.replace(/\{\{#if HAS_PROJECTS\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
 
       const projBlocks = resumeData.projects.map((proj) => {
         const matchedProfileProj = candidateProfile?.projects?.find(
@@ -382,15 +380,14 @@ export class LatexService {
         return `\\begin{onecolentry}\n${headerLine}\n\\begin{highlights}\n${bullets}\n\\end{highlights}\n\\end{onecolentry}\n`;
       });
 
-      tex = tex.replace('{{PROJECT_ENTRIES}}', projBlocks.join('\n'));
+      tex = tex.replaceAll('{{PROJECT_ENTRIES}}', projBlocks.join('\n'));
     } else {
-      tex = tex.replace(/\{\{#if HAS_PROJECTS\}\}[\s\S]*?\{\{\/if\}\}/, '');
+      tex = tex.replace(/\{\{#if HAS_PROJECTS\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
 
     // 6. Education
     if (resumeData.education && resumeData.education.length > 0) {
-      tex = tex.replace('{{#if HAS_EDUCATION}}', '');
-      tex = tex.replace('{{/if}}', '');
+      tex = tex.replace(/\{\{#if HAS_EDUCATION\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
 
       const eduBlocks = resumeData.education.map((edu) => {
         const matchedProfileEdu = candidateProfile?.educations?.find(
@@ -405,15 +402,14 @@ export class LatexService {
         return `\\begin{onecolentry}\n\\textbf{${deg}} — ${inst}${dates}\n\\end{onecolentry}`;
       });
 
-      tex = tex.replace('{{EDUCATION_ENTRIES}}', eduBlocks.join('\n\n'));
+      tex = tex.replaceAll('{{EDUCATION_ENTRIES}}', eduBlocks.join('\n\n'));
     } else {
-      tex = tex.replace(/\{\{#if HAS_EDUCATION\}\}[\s\S]*?\{\{\/if\}\}/, '');
+      tex = tex.replace(/\{\{#if HAS_EDUCATION\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
 
     // 7. Certifications
     if (resumeData.certifications && resumeData.certifications.length > 0) {
-      tex = tex.replace('{{#if HAS_CERTIFICATIONS}}', '');
-      tex = tex.replace('{{/if}}', '');
+      tex = tex.replace(/\{\{#if HAS_CERTIFICATIONS\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
 
       const certBlocks = resumeData.certifications.map((cert) => {
         const matchedProfileCert = candidateProfile?.certifications?.find(
@@ -430,10 +426,14 @@ export class LatexService {
         return `\\begin{onecolentry}\n\\textbf{${name}}${issuer}${date}\n\\end{onecolentry}`;
       });
 
-      tex = tex.replace('{{CERTIFICATION_ENTRIES}}', certBlocks.join('\n\n'));
+      tex = tex.replaceAll('{{CERTIFICATION_ENTRIES}}', certBlocks.join('\n\n'));
     } else {
-      tex = tex.replace(/\{\{#if HAS_CERTIFICATIONS\}\}[\s\S]*?\{\{\/if\}\}/, '');
+      tex = tex.replace(/\{\{#if HAS_CERTIFICATIONS\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
+
+    // Clean up any remaining conditional tags or delimiters that might have been unhandled
+    tex = tex.replace(/\{\{#if [A-Z_]+\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+    tex = tex.replaceAll(/\{\{\/?if.*?\}\}/g, '');
 
     return tex;
   }
