@@ -8,6 +8,7 @@ import { useCandidateProfile, useProfileMutations } from '@/hooks/usePramanApi';
 import { CertificationsTab, EducationTab } from './_components/EducationCertsTabs';
 import { ExperiencesTab } from './_components/ExperiencesTab';
 import { PersonalTab } from './_components/PersonalTab';
+import { ProfileCompletenessCard } from './_components/ProfileCompletenessCard';
 import { ProfileHeaderCard } from './_components/ProfileHeaderCard';
 import { ProfileNavTabs, type ProfileTabId } from './_components/ProfileNavTabs';
 import { ProfileSkeleton } from './_components/ProfileSkeleton';
@@ -67,6 +68,16 @@ export default function ProfilePage() {
         isFetching={isFetching}
         onRefresh={refetch}
         onUpdatePersonal={actions.handleUpdatePersonal}
+      />
+
+      <ProfileCompletenessCard
+        personal={personal}
+        experiences={experiences}
+        projects={projects}
+        skills={skills}
+        educations={educations}
+        certifications={certifications}
+        onNavigateTab={setActiveTab}
       />
 
       <ProfileNavTabs

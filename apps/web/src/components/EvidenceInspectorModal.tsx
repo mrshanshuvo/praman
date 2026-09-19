@@ -209,6 +209,17 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                   </div>
                 )}
 
+                {evidence.candidateRecord.evidence && (
+                  <div className="space-y-1 pt-1">
+                    <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                      Skill Evidence:
+                    </span>
+                    <p className="text-muted-foreground leading-relaxed bg-muted/40 p-2.5 rounded-lg border border-border/60">
+                      {evidence.candidateRecord.evidence}
+                    </p>
+                  </div>
+                )}
+
                 {/* Raw Achievements or Responsibilities */}
                 {evidence.candidateRecord.achievements?.length > 0 && (
                   <div className="space-y-1">
