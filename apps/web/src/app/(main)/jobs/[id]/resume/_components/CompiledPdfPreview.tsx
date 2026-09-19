@@ -23,6 +23,7 @@ interface CompiledPdfPreviewProps {
   version?: string;
   resumeData: any;
   candidateName?: string;
+  recompileTrigger?: number;
 }
 
 export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
@@ -31,6 +32,7 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
   version,
   resumeData,
   candidateName = 'Candidate',
+  recompileTrigger,
 }) => {
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,7 +61,7 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
     }
   };
 
-  // Re-fetch when template, version, or jobId changes
+  // Re-fetch when template, version, jobId, or recompileTrigger changes
   useEffect(() => {
     loadPdf();
 
@@ -68,7 +70,7 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
         URL.revokeObjectURL(pdfBlobUrl);
       }
     };
-  }, [jobId, selectedTemplate, version]);
+  }, [jobId, selectedTemplate, version, recompileTrigger]);
 
   const handleDownload = async () => {
     try {

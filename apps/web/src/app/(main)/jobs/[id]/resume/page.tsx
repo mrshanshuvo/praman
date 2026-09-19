@@ -209,6 +209,7 @@ export default function ResumeAuditPage() {
                   downloadUrl={downloadUrl}
                   candidateName={resume.personal?.name}
                   resumeData={resume}
+                  version={selectedVersion}
                 />
               ) : (
                 <div className="p-8 text-center text-xs text-muted-foreground">

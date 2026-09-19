@@ -54,6 +54,7 @@ interface LatexViewerProps {
   downloadUrl?: string | null;
   candidateName?: string;
   resumeData?: any;
+  version?: string;
 }
 
 export function LatexViewer({
@@ -64,6 +65,7 @@ export function LatexViewer({
   downloadUrl,
   candidateName = 'resume',
   resumeData,
+  version,
 }: LatexViewerProps) {
   const [code, setCode] = useState(latex);
   const [viewMode, setViewMode] = useState<'split' | 'code' | 'preview'>('code');
@@ -71,6 +73,7 @@ export function LatexViewer({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [wordWrap, setWordWrap] = useState(true);
   const [lineHeights, setLineHeights] = useState<number[]>([]);
+  const [recompileKey, setRecompileKey] = useState(0);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
@@ -133,6 +136,7 @@ export function LatexViewer({
         templateId: selectedTemplate,
       });
       setSaveSuccess(true);
+      setRecompileKey((k) => k + 1);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
       console.error('Failed to save LaTeX to R2:', err);
@@ -471,6 +475,8 @@ export function LatexViewer({
             <CompiledPdfPreview
               jobId={jobId}
               selectedTemplate={selectedTemplate}
+              version={version}
+              recompileTrigger={recompileKey}
               resumeData={resumeData}
               candidateName={candidateName}
             />
