@@ -89,3 +89,26 @@ export const ValidationReportSchema = z.object({
   checkedAt: z.string().optional(),
 });
 export type ValidationReport = z.infer<typeof ValidationReportSchema>;
+
+export interface ResumeRecord {
+  id: string;
+  resumeStrategyId: string;
+  resumeJson: ResumeData;
+  validationReport: ValidationReport;
+  status: ResumeStatus;
+  version: number;
+  isLatest: boolean;
+  coverLetterJson?: any;
+  recruiterEmailJson?: any;
+  downloadUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResumeVersionSummary {
+  id: string;
+  version: number;
+  isLatest: boolean;
+  status: ResumeStatus;
+  createdAt: string;
+}

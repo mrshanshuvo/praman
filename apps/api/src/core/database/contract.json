@@ -53,6 +53,31 @@
     "namespaces": {
       "public": {
         "enum": {
+          "ApplicationStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "SAVED",
+                "value": "SAVED"
+              },
+              {
+                "name": "APPLIED",
+                "value": "APPLIED"
+              },
+              {
+                "name": "INTERVIEWING",
+                "value": "INTERVIEWING"
+              },
+              {
+                "name": "OFFER",
+                "value": "OFFER"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              }
+            ]
+          },
           "ResumeStatus": {
             "codecId": "pg/text@1",
             "members": [
@@ -116,6 +141,20 @@
                   "kind": "scalar"
                 }
               },
+              "matchLabel": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "matchScore": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "result": {
                 "nullable": false,
                 "type": {
@@ -175,6 +214,12 @@
                 },
                 "jobDescriptionId": {
                   "column": "jobDescriptionId"
+                },
+                "matchLabel": {
+                  "column": "matchLabel"
+                },
+                "matchScore": {
+                  "column": "matchScore"
                 },
                 "result": {
                   "column": "result"
@@ -740,6 +785,19 @@
                   "kind": "scalar"
                 }
               },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ApplicationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "structured": {
                 "nullable": false,
                 "type": {
@@ -806,6 +864,9 @@
                 },
                 "rawText": {
                   "column": "rawText"
+                },
+                "status": {
+                  "column": "status"
                 },
                 "structured": {
                   "column": "structured"
@@ -953,6 +1014,13 @@
           },
           "Resume": {
             "fields": {
+              "coverLetterJson": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -964,6 +1032,20 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "isLatest": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "recruiterEmailJson": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
                   "kind": "scalar"
                 }
               },
@@ -1007,6 +1089,13 @@
                   "codecId": "pg/json@1",
                   "kind": "scalar"
                 }
+              },
+              "version": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -1029,11 +1118,20 @@
             },
             "storage": {
               "fields": {
+                "coverLetterJson": {
+                  "column": "coverLetterJson"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
                 "id": {
                   "column": "id"
+                },
+                "isLatest": {
+                  "column": "isLatest"
+                },
+                "recruiterEmailJson": {
+                  "column": "recruiterEmailJson"
                 },
                 "resumeJson": {
                   "column": "resumeJson"
@@ -1049,6 +1147,9 @@
                 },
                 "validationReport": {
                   "column": "validationReport"
+                },
+                "version": {
+                  "column": "version"
                 }
               },
               "namespaceId": "public",
@@ -1110,9 +1211,8 @@
                   "namespace": "public"
                 }
               },
-              "resume": {
-                "cardinality": "1:1",
-                "nullable": true,
+              "resumes": {
+                "cardinality": "1:N",
                 "on": {
                   "localFields": [
                     "id"
@@ -1395,6 +1495,16 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "matchLabel": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "matchScore": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "result": {
                   "codecId": "pg/json@1",
@@ -1799,6 +1909,13 @@
               "uniques": []
             },
             "jobDescription": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('SAVED', 'APPLIED', 'INTERVIEWING', 'OFFER', 'REJECTED')",
+                  "name": "jobDescription_status_check_08663422",
+                  "prefix": "jobDescription_status_check"
+                }
+              ],
               "columns": {
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -1818,6 +1935,21 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "SAVED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ApplicationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "structured": {
                   "codecId": "pg/json@1",
@@ -1985,6 +2117,11 @@
                 }
               ],
               "columns": {
+                "coverLetterJson": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -1998,6 +2135,20 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "isLatest": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": true
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "recruiterEmailJson": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
                 },
                 "resumeJson": {
                   "codecId": "pg/json@1",
@@ -2033,6 +2184,15 @@
                   "codecId": "pg/json@1",
                   "nativeType": "json",
                   "nullable": false
+                },
+                "version": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 1
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
                 }
               },
               "foreignKeys": [
@@ -2053,19 +2213,22 @@
                   }
                 }
               ],
-              "indexes": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "resumeStrategyId"
+                  ],
+                  "name": "resume_resumeStrategyId_idx_113e25cd",
+                  "prefix": "resume_resumeStrategyId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
                 ]
               },
-              "uniques": [
-                {
-                  "columns": [
-                    "resumeStrategyId"
-                  ]
-                }
-              ]
+              "uniques": []
             },
             "resumeStrategy": {
               "columns": {
@@ -2280,6 +2443,16 @@
             }
           },
           "valueSet": {
+            "ApplicationStatus": {
+              "kind": "valueSet",
+              "values": [
+                "SAVED",
+                "APPLIED",
+                "INTERVIEWING",
+                "OFFER",
+                "REJECTED"
+              ]
+            },
             "ResumeStatus": {
               "kind": "valueSet",
               "values": [
@@ -2303,7 +2476,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a262553a4d3ca1f33717d8d0154140ef48644bdd4ba93b7487c48e3657bd543e"
+    "storageHash": "8573f2e3d8903e16497b027e130460559bdde7d702ca83161a0b1e16232fc141"
   },
   "execution": {
     "executionHash": "0ef841f71a95bc453d5bb993a110e3634a6b437ab48383edd7e4d87f1374008c",

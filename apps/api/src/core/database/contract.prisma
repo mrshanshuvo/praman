@@ -105,6 +105,7 @@ model JobDescription {
   user       User                 @relation(fields: [userId], references: [id])
   rawText    String
   structured Json
+  status     ApplicationStatus    @default(SAVED)
   createdAt  TimestamptzString    @default(now())
   updatedAt  temporal.updatedAtString()
   analysis   CandidateJdAnalysis?
@@ -115,6 +116,8 @@ model CandidateJdAnalysis {
   jobDescriptionId String          @unique
   jobDescription   JobDescription  @relation(fields: [jobDescriptionId], references: [id])
   result           Json
+  matchScore       Int?
+  matchLabel       String?
   createdAt        TimestamptzString @default(now())
   updatedAt        temporal.updatedAtString()
   strategy         ResumeStrategy?
@@ -127,22 +130,34 @@ model ResumeStrategy {
   result                Json
   createdAt             TimestamptzString   @default(now())
   updatedAt             temporal.updatedAtString()
-  resume                Resume?
+  resumes               Resume[]
 }
 
 model Resume {
-  id               String          @id @default(uuid())
-  resumeStrategyId String          @unique
-  resumeStrategy   ResumeStrategy  @relation(fields: [resumeStrategyId], references: [id])
-  resumeJson       Json
-  validationReport Json
-  status           ResumeStatus    @default(DRAFT)
-  createdAt        TimestamptzString @default(now())
-  updatedAt        temporal.updatedAtString()
+  id                 String            @id @default(uuid())
+  resumeStrategyId   String
+  resumeStrategy     ResumeStrategy    @relation(fields: [resumeStrategyId], references: [id])
+  resumeJson         Json
+  validationReport   Json
+  status             ResumeStatus      @default(DRAFT)
+  version            Int               @default(1)
+  isLatest           Boolean           @default(true)
+  coverLetterJson    Json?
+  recruiterEmailJson Json?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
 }
 
 enum ResumeStatus {
   DRAFT
   VALIDATED
+  REJECTED
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  INTERVIEWING
+  OFFER
   REJECTED
 }

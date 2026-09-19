@@ -50,5 +50,50 @@ export type StructuredJd = z.infer<typeof StructuredJdSchema>;
 
 export const CreateJobDescriptionDtoSchema = z.object({
   rawText: z.string().min(10, 'Job description must be at least 10 characters long'),
+  force: z.boolean().optional(),
 });
 export type CreateJobDescriptionDto = z.infer<typeof CreateJobDescriptionDtoSchema>;
+
+export const ApplicationStatusSchema = z.enum([
+  'SAVED',
+  'APPLIED',
+  'INTERVIEWING',
+  'OFFER',
+  'REJECTED',
+]);
+export type ApplicationStatus = z.infer<typeof ApplicationStatusSchema>;
+
+export const UpdateJobStatusDtoSchema = z.object({
+  status: ApplicationStatusSchema,
+});
+export type UpdateJobStatusDto = z.infer<typeof UpdateJobStatusDtoSchema>;
+
+export interface CandidateJdAnalysisRecord {
+  id: string;
+  jobDescriptionId: string;
+  result: any;
+  matchScore?: number | null;
+  matchLabel?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  strategy?: {
+    id: string;
+    candidateJdAnalysisId: string;
+    result: any;
+    resume?: any;
+    resumes?: any[];
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+}
+
+export interface JobDescriptionRecord {
+  id: string;
+  userId: string;
+  rawText: string;
+  structured: StructuredJd;
+  status: ApplicationStatus;
+  createdAt: string;
+  updatedAt: string;
+  analysis?: CandidateJdAnalysisRecord | null;
+}
