@@ -1,10 +1,18 @@
 'use client';
 
-import { ArrowLeft, FileCode, Mail, ShieldCheck } from 'lucide-react';
+import { cn } from 'cn';
+import {
+  ArrowLeft,
+  FileCode,
+  Mail,
+  PanelRightClose,
+  PanelRightOpen,
+  ShieldCheck,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
@@ -27,6 +35,7 @@ export default function ResumeAuditPage() {
 
   const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
   const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
+  const [showAuditPanel, setShowAuditPanel] = useState(true);
 
   const { data: jd } = useJob(id);
   const { data: versions } = useResumeVersions(id);
@@ -114,22 +123,69 @@ export default function ResumeAuditPage() {
         currentVersion={resumeData?.version}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 space-y-4">
+      <div
+        className={cn(
+          'grid gap-6 transition-all duration-200',
+          showAuditPanel ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1',
+        )}
+      >
+        <div
+          className={cn(
+            'space-y-4 transition-all duration-200',
+            showAuditPanel ? 'lg:col-span-8' : 'w-full',
+          )}
+        >
           <Tabs defaultValue="preview" className="w-full">
-            <TabsList className="mb-3 bg-muted/60 p-1 border border-border">
-              <TabsTrigger value="preview" className="text-xs px-4">
-                Structured Resume & Evidence
-              </TabsTrigger>
-              <TabsTrigger value="latex" className="text-xs px-4 flex items-center gap-1.5">
-                <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
-                <span>LaTeX Code (.tex)</span>
-              </TabsTrigger>
-              <TabsTrigger value="outreach" className="text-xs px-4 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-brand-pink" />
-                <span>Cover Letter & Outreach</span>
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <TabsList className="bg-muted/60 p-1 border border-border">
+                <TabsTrigger value="preview" className="text-xs px-4">
+                  Structured Resume & Evidence
+                </TabsTrigger>
+                <TabsTrigger value="latex" className="text-xs px-4 flex items-center gap-1.5">
+                  <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
+                  <span>LaTeX Code (.tex)</span>
+                </TabsTrigger>
+                <TabsTrigger value="outreach" className="text-xs px-4 flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-brand-pink" />
+                  <span>Cover Letter & Outreach</span>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Collapsible Inspector Toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAuditPanel((prev) => !prev)}
+                className={cn(
+                  'h-8.5 text-xs border-border bg-card hover:bg-muted gap-1.5 cursor-pointer font-medium shadow-xs transition-colors',
+                  showAuditPanel
+                    ? 'text-foreground'
+                    : 'text-brand-cyan border-brand-cyan/40 bg-brand-cyan/10 hover:bg-brand-cyan/15',
+                )}
+                title={
+                  showAuditPanel ? 'Collapse Evidence Audit panel' : 'Expand Evidence Audit panel'
+                }
+              >
+                {showAuditPanel ? (
+                  <PanelRightClose className="w-3.5 h-3.5 text-muted-foreground" />
+                ) : (
+                  <PanelRightOpen className="w-3.5 h-3.5 text-brand-cyan" />
+                )}
+                <span>{showAuditPanel ? 'Hide Audit' : 'Show Audit'}</span>
+                {status && (
+                  <span
+                    className={cn(
+                      'text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold',
+                      status === 'VALIDATED'
+                        ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
+                        : 'bg-muted border-border text-muted-foreground',
+                    )}
+                  >
+                    {status}
+                  </span>
+                )}
+              </Button>
+            </div>
 
             <TabsContent value="preview">
               <ResumeViewer
@@ -167,15 +223,28 @@ export default function ResumeAuditPage() {
           </Tabs>
         </div>
 
-        <div className="lg:col-span-5 space-y-4">
-          <div className="sticky top-20">
-            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-brand-cyan" />
-              Evidence Cross-Check Audit
-            </h3>
-            <ValidationReportPanel report={report} status={status} />
+        {showAuditPanel && (
+          <div className="lg:col-span-4 space-y-4 animate-in fade-in duration-200">
+            <div className="sticky top-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-brand-cyan" />
+                  <span>Evidence Cross-Check Audit</span>
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowAuditPanel(false)}
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
+                  title="Collapse Audit Panel"
+                >
+                  <PanelRightClose className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+              <ValidationReportPanel report={report} status={status} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
