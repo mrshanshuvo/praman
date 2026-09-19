@@ -1,14 +1,7 @@
 'use client';
 
 import { calculateMatchScore } from '@praman/schemas';
-import {
-  AlertCircle,
-  ArrowUpDown,
-  Filter,
-  PlusCircle,
-  RefreshCw,
-  Search,
-} from 'lucide-react';
+import { AlertCircle, ArrowUpDown, Filter, PlusCircle, RefreshCw, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -178,10 +171,18 @@ export default function JobsListPage() {
               aria-label="Sort jobs"
               className="text-xs bg-transparent text-foreground border-none outline-none cursor-pointer"
             >
-              <option value="newest" className="bg-card text-foreground">Newest First</option>
-              <option value="oldest" className="bg-card text-foreground">Oldest First</option>
-              <option value="highest_match" className="bg-card text-foreground">Highest Match</option>
-              <option value="lowest_match" className="bg-card text-foreground">Lowest Match</option>
+              <option value="newest" className="bg-card text-foreground">
+                Newest First
+              </option>
+              <option value="oldest" className="bg-card text-foreground">
+                Oldest First
+              </option>
+              <option value="highest_match" className="bg-card text-foreground">
+                Highest Match
+              </option>
+              <option value="lowest_match" className="bg-card text-foreground">
+                Lowest Match
+              </option>
             </select>
           </div>
         </div>
@@ -234,7 +235,9 @@ export default function JobsListPage() {
       ) : filteredAndSortedJds.length === 0 ? (
         <div className="p-12 text-center border border-dashed border-border rounded-xl bg-card/40">
           <Filter className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-          <p className="text-sm text-muted-foreground">No jobs matching your current filter criteria.</p>
+          <p className="text-sm text-muted-foreground">
+            No jobs matching your current filter criteria.
+          </p>
           <Button
             variant="ghost"
             size="sm"

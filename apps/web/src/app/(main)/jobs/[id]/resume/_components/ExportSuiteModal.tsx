@@ -8,9 +8,11 @@ import {
   Download,
   ExternalLink,
   FileCode,
+  FileDown,
   FileText,
   Palette,
   Printer,
+  RefreshCw,
   Sparkles,
 } from 'lucide-react';
 import React, { useState } from 'react';
@@ -25,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { downloadResumePdf } from '@/hooks/usePramanApi';
 import {
   generateAtsJsonResume,
   generateMarkdownResume,
@@ -46,6 +49,8 @@ interface ExportSuiteModalProps {
   templateId?: string;
   downloadUrl?: string | null;
   candidateName?: string;
+  jobId?: string;
+  version?: string;
 }
 
 export const ExportSuiteModal: React.FC<ExportSuiteModalProps> = ({
@@ -55,8 +60,11 @@ export const ExportSuiteModal: React.FC<ExportSuiteModalProps> = ({
   latexCode = '',
   templateId = 'modern-developer',
   candidateName = 'Resume',
+  jobId,
+  version,
 }) => {
   const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const safeFilenameBase = (candidateName || 'Candidate')
     .toLowerCase()
@@ -69,6 +77,22 @@ export const ExportSuiteModal: React.FC<ExportSuiteModalProps> = ({
     navigator.clipboard.writeText(text);
     setCopiedFormat(formatId);
     setTimeout(() => setCopiedFormat(null), 2000);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!jobId) {
+      handlePrintPdf();
+      return;
+    }
+    try {
+      setIsGeneratingPdf(true);
+      await downloadResumePdf(jobId, templateId, version, `${safeFilenameBase}_${templateId}.pdf`);
+    } catch (err: any) {
+      console.error('Failed to download PDF:', err);
+      handlePrintPdf();
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const handlePrintPdf = () => {
@@ -191,29 +215,44 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Printer className="w-4 h-4 text-brand-cyan" />
-                  <h4 className="text-sm font-semibold text-foreground">Formatted PDF</h4>
+                  <FileDown className="w-4 h-4 text-brand-cyan" />
+                  <h4 className="text-sm font-semibold text-foreground">ATS Resume PDF</h4>
                 </div>
                 <Badge
                   variant="outline"
                   className="text-[10px] bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan font-mono"
                 >
-                  PRINT / PDF
+                  1-CLICK PDF
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                Direct A4 document print with isolated print styling. Ideal for immediate recruiter
-                submissions.
+                Direct ATS-optimized A4 PDF with clean typography and selectable text. Ready to
+                upload to job portals.
               </p>
             </div>
-            <Button
-              size="sm"
-              onClick={handlePrintPdf}
-              className="w-full bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold text-xs gap-1.5 shadow-xs cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print / Save as PDF</span>
-            </Button>
+            <div className="space-y-1.5">
+              <Button
+                size="sm"
+                onClick={handleDownloadPdf}
+                disabled={isGeneratingPdf}
+                className="w-full bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold text-xs gap-1.5 shadow-xs cursor-pointer"
+              >
+                {isGeneratingPdf ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand-dark" />
+                ) : (
+                  <Download className="w-3.5 h-3.5" />
+                )}
+                <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download PDF'}</span>
+              </Button>
+              <button
+                type="button"
+                onClick={handlePrintPdf}
+                className="w-full text-center text-[11px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center justify-center gap-1 pt-0.5"
+              >
+                <Printer className="w-3 h-3" />
+                <span>Print via Browser dialog</span>
+              </button>
+            </div>
           </div>
 
           {/* 2. Overleaf Cloud Launch */}

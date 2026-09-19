@@ -6,6 +6,7 @@ import { AiService } from '../ai/ai.service.js';
 import { RESUME_GENERATOR_SYSTEM_PROMPT_V1 } from '../ai/prompts/resume-generator.v1.js';
 import { CandidateService } from '../candidate/candidate.service.js';
 import { ValidationService } from '../validation/validation.service.js';
+import { HtmlPdfService } from './html-pdf.service.js';
 import { LatexService } from './latex.service.js';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class ResumeService {
     private readonly candidateService: CandidateService,
     private readonly validationService: ValidationService,
     private readonly latexService: LatexService,
+    private readonly htmlPdfService: HtmlPdfService,
     private readonly storageService: StorageService,
   ) {}
 
@@ -148,11 +150,7 @@ export class ResumeService {
     };
   }
 
-  async getLatestResume(
-    jobDescriptionId: string,
-    versionOrId?: string,
-    userId?: string,
-  ) {
+  async getLatestResume(jobDescriptionId: string, versionOrId?: string, userId?: string) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
@@ -321,5 +319,38 @@ export class ResumeService {
       downloadUrl,
       updatedAt: new Date().toISOString(),
     };
+  }
+
+  async generateResumePdf(
+    jobDescriptionId: string,
+    templateId = 'modern-developer',
+    versionOrId?: string,
+    userId?: string,
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({
+      id: jobDescriptionId,
+    }).first();
+    if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+
+    const resumeRecord = await this.getLatestResume(jobDescriptionId, versionOrId, userId);
+    if (!resumeRecord) {
+      throw new NotFoundException(`Resume not found for job description ${jobDescriptionId}`);
+    }
+
+    const ownerId = jd.userId || 'default-user';
+    const profile = await this.candidateService.getProfile(ownerId);
+    const resumeData = resumeRecord.resumeJson as ResumeData;
+
+    const buffer = await this.htmlPdfService.generatePdf(resumeData, profile, templateId);
+
+    const rawName = resumeData.personal?.name || (profile as any)?.user?.name || 'Resume';
+    const candidateName = rawName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+
+    const filename = `${candidateName || 'resume'}_${templateId}.pdf`;
+
+    return { buffer, filename };
   }
 }

@@ -9,9 +9,11 @@ import {
   Post,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateJobDescriptionDtoSchema, UpdateJobStatusDtoSchema } from '@praman/schemas';
+import type { Response } from 'express';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { MatchService } from '../match/match.service.js';
 import { PipelineService } from '../pipeline/pipeline.service.js';
@@ -146,6 +148,30 @@ export class JobDescriptionController {
     @CurrentUser() user?: AuthUser,
   ) {
     return this.resumeService.updateLatexSource(id, latex, templateId, versionOrId, user?.id);
+  }
+
+  @Get(':id/resume/pdf')
+  @ApiOperation({ summary: 'Generate and download ATS-optimized resume PDF' })
+  @ApiResponse({ status: 200, description: 'Binary PDF file stream' })
+  async getResumePdf(
+    @Param('id') id: string,
+    @Query('template') templateId: string | undefined,
+    @Query('version') versionOrId: string | undefined,
+    @Res() res: Response,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const { buffer, filename } = await this.resumeService.generateResumePdf(
+      id,
+      templateId,
+      versionOrId,
+      user?.id,
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': buffer.length.toString(),
+    });
+    res.end(buffer);
   }
 
   // Orchestrator delegate (§4)

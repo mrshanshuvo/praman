@@ -9,7 +9,9 @@ import {
   ExternalLink,
   Eye,
   FileCode,
+  FileDown,
   Palette,
+  RefreshCw,
   RotateCcw,
   Save,
 } from 'lucide-react';
@@ -17,7 +19,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
+import { downloadResumePdf, useUpdateResumeLatex } from '@/hooks/usePramanApi';
 import { DocumentPreviewSheet } from './DocumentPreviewSheet';
 
 export const TEMPLATES = [
@@ -100,6 +102,28 @@ export function LatexViewer({
 
   const handleReset = () => {
     setCode(latex);
+  };
+
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloadingPdf(true);
+      const safeCandidate = candidateName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+      await downloadResumePdf(
+        jobId,
+        selectedTemplate,
+        undefined,
+        `${safeCandidate}_${selectedTemplate}.pdf`,
+      );
+    } catch (err: any) {
+      console.error('Failed to download PDF:', err);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   };
 
   const handleDownload = () => {
@@ -284,8 +308,24 @@ export function LatexViewer({
 
           <Button
             size="sm"
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
+            className="h-8 text-xs font-semibold bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark shadow-sm gap-1 cursor-pointer"
+            title="Download ATS-optimized PDF"
+          >
+            {isDownloadingPdf ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <FileDown className="w-3.5 h-3.5" />
+            )}
+            <span>{isDownloadingPdf ? 'Generating...' : 'Download PDF'}</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleDownload}
-            className="h-8 text-xs font-semibold bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark shadow-sm gap-1"
+            className="h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1 text-foreground cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Download .tex</span>
@@ -295,7 +335,7 @@ export function LatexViewer({
             variant="outline"
             size="sm"
             onClick={handleOpenOverleaf}
-            className="h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1 text-foreground"
+            className="h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1 text-foreground cursor-pointer"
             title="Open in Overleaf editor"
           >
             <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />

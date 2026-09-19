@@ -15,12 +15,7 @@ export function AuthBackground() {
 
       {/* Light Mode: Lush natural botanical framing */}
       <div className="relative w-full h-full block dark:hidden">
-        <Image
-          src="/auth/auth-bg-light.png"
-          alt="Auth Backdrop"
-          fill
-          className="object-cover"
-        />
+        <Image src="/auth/auth-bg-light.png" alt="Auth Backdrop" fill className="object-cover" />
       </div>
     </div>
   );

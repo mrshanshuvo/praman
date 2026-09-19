@@ -175,8 +175,7 @@ export class OutreachService {
       };
     }
 
-    const coverLetterData: any =
-      resume.coverLetterJson || (resume.resumeJson as any)?.outreach;
+    const coverLetterData: any = resume.coverLetterJson || (resume.resumeJson as any)?.outreach;
     const recruiterEmailData: any =
       resume.recruiterEmailJson || (resume.resumeJson as any)?.outreach;
 

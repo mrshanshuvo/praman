@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { type MatchAnalysis, MatchAnalysisSchema, calculateMatchScore } from '@praman/schemas';
+import { calculateMatchScore, type MatchAnalysis, MatchAnalysisSchema } from '@praman/schemas';
 import { PrismaService } from '../../core/database/prisma.service.js';
 import { AiService } from '../ai/ai.service.js';
 import { CANDIDATE_MATCHER_SYSTEM_PROMPT_V1 } from '../ai/prompts/candidate-matcher.v1.js';

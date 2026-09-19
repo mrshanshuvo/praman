@@ -99,11 +99,21 @@ export function JobCard({ jd }: JobCardProps) {
                   STATUS_CONFIG[currentStatus]?.className || STATUS_CONFIG.SAVED.className
                 }`}
               >
-                <option value="SAVED" className="bg-card text-foreground">Saved</option>
-                <option value="APPLIED" className="bg-card text-foreground">Applied</option>
-                <option value="INTERVIEWING" className="bg-card text-foreground">Interviewing</option>
-                <option value="OFFER" className="bg-card text-foreground">Offer</option>
-                <option value="REJECTED" className="bg-card text-foreground">Rejected</option>
+                <option value="SAVED" className="bg-card text-foreground">
+                  Saved
+                </option>
+                <option value="APPLIED" className="bg-card text-foreground">
+                  Applied
+                </option>
+                <option value="INTERVIEWING" className="bg-card text-foreground">
+                  Interviewing
+                </option>
+                <option value="OFFER" className="bg-card text-foreground">
+                  Offer
+                </option>
+                <option value="REJECTED" className="bg-card text-foreground">
+                  Rejected
+                </option>
               </select>
             </div>
 

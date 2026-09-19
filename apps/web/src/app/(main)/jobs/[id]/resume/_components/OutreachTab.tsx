@@ -182,7 +182,9 @@ ${coverLetter.senderName}
                     outreach.coverLetterValidation.numberFlags?.length === 0 ? (
                       <div className="flex items-center gap-2 p-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs">
                         <ShieldCheck className="w-4 h-4 shrink-0" />
-                        <span>Truth-Preserved: Zero discrepancies or unconfirmed claims detected.</span>
+                        <span>
+                          Truth-Preserved: Zero discrepancies or unconfirmed claims detected.
+                        </span>
                       </div>
                     ) : (
                       <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs space-y-1.5">
@@ -191,10 +193,15 @@ ${coverLetter.senderName}
                           <span>Audit Discrepancies Detected</span>
                         </div>
                         {outreach.coverLetterValidation.violations?.map((v: string, i: number) => (
-                          <p key={i} className="text-[11px] text-amber-200/90 pl-5">• {v}</p>
+                          <p key={i} className="text-[11px] text-amber-200/90 pl-5">
+                            • {v}
+                          </p>
                         ))}
                         {outreach.coverLetterValidation.numberFlags?.map((f: any, i: number) => (
-                          <div key={i} className="text-[11px] text-amber-200/90 pl-5 flex items-center gap-1">
+                          <div
+                            key={i}
+                            className="text-[11px] text-amber-200/90 pl-5 flex items-center gap-1"
+                          >
                             <Hash className="w-3 h-3 text-amber-400 shrink-0" />
                             <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
                           </div>

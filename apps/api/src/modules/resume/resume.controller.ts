@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { ResumeService } from './resume.service.js';
 
 @Controller('resumes')
@@ -27,5 +28,25 @@ export class ResumeController {
     @Body('latex') latex: string,
   ) {
     return this.resumeService.updateLatexSource(jobDescriptionId, latex);
+  }
+
+  @Get(':jobDescriptionId/pdf')
+  async getResumePdf(
+    @Param('jobDescriptionId') jobDescriptionId: string,
+    @Query('template') templateId: string | undefined,
+    @Query('version') version: string | undefined,
+    @Res() res: Response,
+  ) {
+    const { buffer, filename } = await this.resumeService.generateResumePdf(
+      jobDescriptionId,
+      templateId,
+      version,
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': buffer.length.toString(),
+    });
+    res.end(buffer);
   }
 }

@@ -1,11 +1,12 @@
 'use client';
 
-import { ArrowLeft, Check, Copy, Download, History, Play, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Download, FileDown, History, Play, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { downloadResumePdf } from '@/hooks/usePramanApi';
 import { ExportSuiteModal } from './ExportSuiteModal';
 
 interface ResumeAuditHeaderProps {
@@ -45,6 +46,22 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloadingPdf(true);
+      const safeName = (resumeJson?.personal?.name || 'Resume')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+      await downloadResumePdf(id, templateId, selectedVersion, `${safeName}_${templateId}.pdf`);
+    } catch (err: any) {
+      console.error('Failed to download PDF:', err);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
 
   const handleCopyJson = () => {
     if (!resumeJson) return;
@@ -91,8 +108,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
                 <span className="text-[11px] text-muted-foreground">Ver:</span>
                 <select
                   value={
-                    selectedVersion ||
-                    (versions.find((v) => v.isLatest)?.version?.toString() || '1')
+                    selectedVersion || versions.find((v) => v.isLatest)?.version?.toString() || '1'
                   }
                   onChange={(e) => onSelectVersion?.(e.target.value)}
                   className="bg-transparent text-xs font-mono font-bold text-foreground focus:outline-none cursor-pointer"
@@ -109,7 +125,10 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
                 </select>
               </div>
             ) : currentVersion ? (
-              <Badge variant="outline" className="text-xs font-mono text-muted-foreground border-border bg-muted/50 px-2 py-0.5">
+              <Badge
+                variant="outline"
+                className="text-xs font-mono text-muted-foreground border-border bg-muted/50 px-2 py-0.5"
+              >
                 v{currentVersion}
               </Badge>
             ) : null}
@@ -123,14 +142,30 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-        {/* Prominent Export Resume Button */}
+        {/* Direct 1-Click PDF Download Button */}
         <Button
           size="sm"
-          onClick={() => setIsExportOpen(true)}
+          onClick={handleDownloadPdf}
+          disabled={isDownloadingPdf}
           className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs gap-1.5 cursor-pointer"
         >
+          {isDownloadingPdf ? (
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand-dark" />
+          ) : (
+            <FileDown className="w-3.5 h-3.5" />
+          )}
+          <span>{isDownloadingPdf ? 'Generating PDF...' : 'Download PDF'}</span>
+        </Button>
+
+        {/* Multi-Format Export Suite Modal Trigger */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setIsExportOpen(true)}
+          className="text-foreground border-border bg-card hover:bg-muted font-medium shadow-xs gap-1.5 cursor-pointer"
+        >
           <Download className="w-3.5 h-3.5" />
-          <span>Export Resume</span>
+          <span>Export Suite</span>
         </Button>
 
         <Button
@@ -187,6 +222,8 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
         templateId={templateId}
         downloadUrl={downloadUrl}
         candidateName={resumeJson?.personal?.name}
+        jobId={id}
+        version={selectedVersion}
       />
     </div>
   );

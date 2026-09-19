@@ -112,8 +112,7 @@ export class JobDescriptionService {
 
         if (strategyWithResumes) {
           const resumes = strategyWithResumes.resumes || [];
-          const latestResume =
-            resumes.find((r: any) => r.isLatest) || resumes[0] || null;
+          const latestResume = resumes.find((r: any) => r.isLatest) || resumes[0] || null;
           analysisWithStrategy.strategy = {
             ...strategyWithResumes,
             resume: latestResume,
@@ -158,7 +157,9 @@ export class JobDescriptionService {
         await this.prisma.client.orm.public.ResumeStrategy.where({ id: strategy.id }).delete();
       }
 
-      await this.prisma.client.orm.public.CandidateJdAnalysis.where({ id: jd.analysis.id }).delete();
+      await this.prisma.client.orm.public.CandidateJdAnalysis.where({
+        id: jd.analysis.id,
+      }).delete();
     }
 
     await this.prisma.client.orm.public.JobDescription.where({ id }).delete();
@@ -187,4 +188,3 @@ export class JobDescriptionService {
     return updated;
   }
 }
-

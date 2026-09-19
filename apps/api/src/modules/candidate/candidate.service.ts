@@ -138,7 +138,10 @@ export class CandidateService {
     };
   }
 
-  async updatePersonal(personal: UpdateCandidatePersonal | CandidatePersonal, targetUserId?: string) {
+  async updatePersonal(
+    personal: UpdateCandidatePersonal | CandidatePersonal,
+    targetUserId?: string,
+  ) {
     const profile = await this.getProfile(targetUserId);
     const existingPersonal = (profile.personal as Record<string, any>) || {};
 

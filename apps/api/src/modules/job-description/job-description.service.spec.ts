@@ -137,7 +137,9 @@ describe('JobDescriptionService', () => {
         first: vi.fn().mockResolvedValue(null),
       });
 
-      await expect(service.updateStatus('jd-missing', 'APPLIED')).rejects.toThrow(NotFoundException);
+      await expect(service.updateStatus('jd-missing', 'APPLIED')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('throws NotFoundException if job description belongs to another user', async () => {
@@ -145,12 +147,14 @@ describe('JobDescriptionService', () => {
         first: vi.fn().mockResolvedValue({ id: 'jd-1', userId: 'user-other' }),
       });
 
-      await expect(service.updateStatus('jd-1', 'APPLIED', 'user-owner')).rejects.toThrow(NotFoundException);
+      await expect(service.updateStatus('jd-1', 'APPLIED', 'user-owner')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('successfully updates application status', async () => {
       const updateMock = vi.fn().mockResolvedValue({ id: 'jd-1', status: 'APPLIED' });
-      mockPrisma.client.orm.public.JobDescription.where.mockImplementation((query: any) => {
+      mockPrisma.client.orm.public.JobDescription.where.mockImplementation((_query: any) => {
         return {
           first: vi.fn().mockResolvedValue({ id: 'jd-1', userId: 'user-owner', status: 'SAVED' }),
           update: updateMock,
@@ -158,7 +162,7 @@ describe('JobDescriptionService', () => {
       });
 
       const result = await service.updateStatus('jd-1', 'APPLIED', 'user-owner');
-      expect(result.status).toBe('APPLIED');
+      expect(result?.status).toBe('APPLIED');
       expect(updateMock).toHaveBeenCalledWith({ status: 'APPLIED' });
     });
   });
@@ -181,9 +185,9 @@ describe('JobDescriptionService', () => {
         }),
       });
 
-      await expect(
-        service.createAndAnalyze(existingRaw, 'user-1', false),
-      ).rejects.toThrowError(/identical content/i);
+      await expect(service.createAndAnalyze(existingRaw, 'user-1', false)).rejects.toThrowError(
+        /identical content/i,
+      );
     });
 
     it('proceeds with creation if force is true even if duplicate text exists', async () => {

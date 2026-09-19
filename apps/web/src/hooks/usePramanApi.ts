@@ -144,7 +144,8 @@ export function useJobResume(id: string, versionOrId?: string) {
 export function useResumeVersions(id: string) {
   return useQuery({
     queryKey: ['jobs', id, 'resume', 'versions'],
-    queryFn: () => fetcher<ResumeVersionSummary[]>(`${API_URL}/job-descriptions/${id}/resume/versions`),
+    queryFn: () =>
+      fetcher<ResumeVersionSummary[]>(`${API_URL}/job-descriptions/${id}/resume/versions`),
     enabled: Boolean(id),
   });
 }
@@ -197,6 +198,43 @@ export function useUpdateResumeLatex(id: string) {
       queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
     },
   });
+}
+
+export function getResumePdfUrl(id: string, templateId?: string, versionOrId?: string) {
+  const queryParams = new URLSearchParams();
+  if (templateId) queryParams.set('template', templateId);
+  if (versionOrId) queryParams.set('version', versionOrId);
+  const qs = queryParams.toString();
+  return `${API_URL}/job-descriptions/${id}/resume/pdf${qs ? `?${qs}` : ''}`;
+}
+
+export async function downloadResumePdf(
+  id: string,
+  templateId?: string,
+  versionOrId?: string,
+  filename?: string,
+) {
+  const url = getResumePdfUrl(id, templateId, versionOrId);
+  const token = typeof window !== 'undefined' ? localStorage.getItem('praman_token') : null;
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, { headers });
+  if (!response.ok) {
+    throw new Error(`Failed to download PDF: ${response.statusText}`);
+  }
+
+  const blob = await response.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = filename || `resume_${templateId || 'modern-developer'}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(downloadUrl);
 }
 
 export function useJobOutreach(id: string) {

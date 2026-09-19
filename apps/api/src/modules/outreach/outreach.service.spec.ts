@@ -190,4 +190,3 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
     expect(outreach.recruiterEmail.subject).toContain('Full-Stack Developer');
   });
 });
-
