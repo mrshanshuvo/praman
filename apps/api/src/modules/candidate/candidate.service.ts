@@ -137,16 +137,16 @@ export class CandidateService {
     };
   }
 
-  async updatePersonal(personal: CandidatePersonal) {
-    const profile = await this.getProfile();
+  async updatePersonal(personal: CandidatePersonal, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return this.prisma.client.orm.public.CandidateProfile.where({
       id: profile.id,
     }).update({ personal });
   }
 
   // Experience CRUD
-  async addExperience(dto: CreateExperienceDto) {
-    const profile = await this.getProfile();
+  async addExperience(dto: CreateExperienceDto, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return this.prisma.client.orm.public.Experience.create({
       candidateProfileId: profile.id,
       company: dto.company,
@@ -187,8 +187,8 @@ export class CandidateService {
   }
 
   // Project CRUD
-  async addProject(dto: CreateProjectDto) {
-    const profile = await this.getProfile();
+  async addProject(dto: CreateProjectDto, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return this.prisma.client.orm.public.Project.create({
       candidateProfileId: profile.id,
       name: dto.name,
@@ -225,8 +225,8 @@ export class CandidateService {
   }
 
   // Skill CRUD
-  async addSkill(dto: CreateSkillDto) {
-    const profile = await this.getProfile();
+  async addSkill(dto: CreateSkillDto, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return this.prisma.client.orm.public.Skill.create({
       candidateProfileId: profile.id,
       name: dto.name,
@@ -257,8 +257,8 @@ export class CandidateService {
   }
 
   // Education CRUD
-  async addEducation(dto: CreateEducationDto) {
-    const profile = await this.getProfile();
+  async addEducation(dto: CreateEducationDto, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return this.prisma.client.orm.public.Education.create({
       candidateProfileId: profile.id,
       institution: dto.institution,
@@ -295,8 +295,8 @@ export class CandidateService {
   }
 
   // Certification CRUD
-  async addCertification(dto: CreateCertificationDto) {
-    const profile = await this.getProfile();
+  async addCertification(dto: CreateCertificationDto, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return this.prisma.client.orm.public.Certification.create({
       candidateProfileId: profile.id,
       name: dto.name,

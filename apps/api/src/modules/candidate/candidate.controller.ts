@@ -36,24 +36,31 @@ export class CandidateController {
   @Put()
   @ApiOperation({ summary: 'Update personal contact details and links' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
-  async updatePersonal(@Body() body: unknown) {
+  async updatePersonal(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     const parse = CandidatePersonalSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.candidateService.updatePersonal(parse.data);
+    return this.candidateService.updatePersonal(parse.data, user?.id);
+  }
+
+  @Put('personal')
+  @ApiOperation({ summary: 'Update personal contact details and links (alias)' })
+  @ApiResponse({ status: 200, description: 'Personal details updated' })
+  async updatePersonalAlias(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
+    return this.updatePersonal(body, user);
   }
 
   // Experiences
   @Post('experiences')
   @ApiOperation({ summary: 'Add a work experience entry' })
   @ApiResponse({ status: 201, description: 'Experience added' })
-  async addExperience(@Body() body: unknown) {
+  async addExperience(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     const parse = CreateExperienceDtoSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.candidateService.addExperience(parse.data);
+    return this.candidateService.addExperience(parse.data, user?.id);
   }
 
   @Put('experiences/:id')
@@ -76,12 +83,12 @@ export class CandidateController {
   @Post('projects')
   @ApiOperation({ summary: 'Add a project entry' })
   @ApiResponse({ status: 201, description: 'Project added' })
-  async addProject(@Body() body: unknown) {
+  async addProject(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     const parse = CreateProjectDtoSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.candidateService.addProject(parse.data);
+    return this.candidateService.addProject(parse.data, user?.id);
   }
 
   @Put('projects/:id')
@@ -104,12 +111,12 @@ export class CandidateController {
   @Post('skills')
   @ApiOperation({ summary: 'Add a skill entry' })
   @ApiResponse({ status: 201, description: 'Skill added' })
-  async addSkill(@Body() body: unknown) {
+  async addSkill(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     const parse = CreateSkillDtoSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.candidateService.addSkill(parse.data);
+    return this.candidateService.addSkill(parse.data, user?.id);
   }
 
   @Put('skills/:id')
@@ -132,12 +139,12 @@ export class CandidateController {
   @Post('educations')
   @ApiOperation({ summary: 'Add an education entry' })
   @ApiResponse({ status: 201, description: 'Education added' })
-  async addEducation(@Body() body: unknown) {
+  async addEducation(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     const parse = CreateEducationDtoSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.candidateService.addEducation(parse.data);
+    return this.candidateService.addEducation(parse.data, user?.id);
   }
 
   @Put('educations/:id')
@@ -160,12 +167,12 @@ export class CandidateController {
   @Post('certifications')
   @ApiOperation({ summary: 'Add a certification entry' })
   @ApiResponse({ status: 201, description: 'Certification added' })
-  async addCertification(@Body() body: unknown) {
+  async addCertification(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
     const parse = CreateCertificationDtoSchema.safeParse(body);
     if (!parse.success) {
       throw new BadRequestException(parse.error.flatten());
     }
-    return this.candidateService.addCertification(parse.data);
+    return this.candidateService.addCertification(parse.data, user?.id);
   }
 
   @Put('certifications/:id')
