@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
-  CandidatePersonalSchema,
   CreateCertificationDtoSchema,
   CreateEducationDtoSchema,
   CreateExperienceDtoSchema,

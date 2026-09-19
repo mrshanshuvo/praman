@@ -54,7 +54,8 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
     const hasSkillEvidence = skills.some((s) => s.evidence && s.evidence.trim().length > 0);
 
     const hasEdu = educations.length >= 1;
-    const hasCertOrEduDetails = certifications.length >= 1 || educations.some((e) => e.details?.trim());
+    const hasCertOrEduDetails =
+      certifications.length >= 1 || educations.some((e) => e.details?.trim());
 
     return [
       {
@@ -139,10 +140,29 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
   }, [checklist]);
 
   const tier = useMemo(() => {
-    if (percentage === 100) return { label: 'Complete & Ready', color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/30' };
-    if (percentage >= 80) return { label: 'Interview Ready', color: 'text-brand-cyan', bg: 'bg-brand-cyan/10 border-brand-cyan/30' };
-    if (percentage >= 50) return { label: 'Good Progress', color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/30' };
-    return { label: 'Needs Information', color: 'text-brand-pink', bg: 'bg-brand-pink/10 border-brand-pink/30' };
+    if (percentage === 100)
+      return {
+        label: 'Complete & Ready',
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10 border-emerald-500/30',
+      };
+    if (percentage >= 80)
+      return {
+        label: 'Interview Ready',
+        color: 'text-brand-cyan',
+        bg: 'bg-brand-cyan/10 border-brand-cyan/30',
+      };
+    if (percentage >= 50)
+      return {
+        label: 'Good Progress',
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10 border-amber-500/30',
+      };
+    return {
+      label: 'Needs Information',
+      color: 'text-brand-pink',
+      bg: 'bg-brand-pink/10 border-brand-pink/30',
+    };
   }, [percentage]);
 
   return (
@@ -155,12 +175,16 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-semibold text-foreground">Profile Completeness</h2>
-              <Badge variant="outline" className={`text-xs font-medium ${tier.bg} ${tier.color} px-2 py-0.5`}>
+              <Badge
+                variant="outline"
+                className={`text-xs font-medium ${tier.bg} ${tier.color} px-2 py-0.5`}
+              >
                 {tier.label}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              The AI tailoring engine uses your profile facts to eliminate hallucinations in resumes and outreach.
+              The AI tailoring engine uses your profile facts to eliminate hallucinations in resumes
+              and outreach.
             </p>
           </div>
         </div>
@@ -175,7 +199,7 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
       {/* Progress Bar */}
       <div className="w-full bg-muted/60 rounded-full h-2 overflow-hidden mb-4 border border-border/40">
         <div
-          className="h-full bg-gradient-to-r from-brand-cyan to-brand-pink transition-all duration-500 rounded-full"
+          className="h-full bg-linear-to-r from-brand-cyan to-brand-pink transition-all duration-500 rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -207,7 +231,10 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
       ) : (
         <div className="flex items-center gap-2 text-xs text-emerald-500 font-medium">
           <CheckCircle2 className="w-4 h-4" />
-          <span>All core resume profile dimensions are fully populated. Ready for optimal match accuracy!</span>
+          <span>
+            All core resume profile dimensions are fully populated. Ready for optimal match
+            accuracy!
+          </span>
         </div>
       )}
     </Card>
