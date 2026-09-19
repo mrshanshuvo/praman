@@ -215,13 +215,52 @@ export async function downloadResumePdf(
   filename?: string,
 ) {
   const url = getResumePdfUrl(id, templateId, versionOrId);
-  const token = typeof window !== 'undefined' ? localStorage.getItem('praman_token') : null;
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  const headers = new Headers();
+
+  if (typeof window !== 'undefined') {
+    const token =
+      localStorage.getItem(TOKEN_KEY) ||
+      localStorage.getItem('praman_auth_token') ||
+      localStorage.getItem('praman_token');
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
   }
 
-  const response = await fetch(url, { headers });
+  let response = await fetch(url, { headers });
+
+  // If 401 Unauthorized, attempt silent refresh
+  if (response.status === 401 && typeof window !== 'undefined') {
+    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    try {
+      const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
+      });
+
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+        const newAccessToken = data.accessToken;
+        const newRefreshToken = data.refreshToken;
+
+        localStorage.setItem(TOKEN_KEY, newAccessToken);
+        const isSecure = window.location.protocol === 'https:';
+        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+        document.cookie = `${TOKEN_KEY}=${encodeURIComponent(newAccessToken)}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`;
+        if (newRefreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+        }
+
+        headers.set('Authorization', `Bearer ${newAccessToken}`);
+        response = await fetch(url, { headers });
+      }
+    } catch {
+      // refresh attempt failed
+    }
+  }
+
   if (!response.ok) {
     throw new Error(`Failed to download PDF: ${response.statusText}`);
   }
