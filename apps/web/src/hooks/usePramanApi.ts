@@ -1,5 +1,9 @@
-'use client';
-
+import type {
+  CandidateProfile,
+  JobDescriptionRecord,
+  ResumeRecord,
+  ResumeVersionSummary,
+} from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -69,7 +73,10 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
     const message = Array.isArray(errorBody.message)
       ? errorBody.message.join(', ')
       : errorBody.message || `Request failed with status ${res.status}`;
-    throw new Error(message);
+    const err = new Error(message) as Error & { status?: number; data?: any };
+    err.status = res.status;
+    err.data = errorBody;
+    throw err;
   }
 
   return res.json();
@@ -82,7 +89,7 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
 export function useJobs(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['jobs'],
-    queryFn: () => fetcher<any[]>(`${API_URL}/job-descriptions`),
+    queryFn: () => fetcher<JobDescriptionRecord[]>(`${API_URL}/job-descriptions`),
     enabled: options?.enabled ?? true,
   });
 }
@@ -90,25 +97,76 @@ export function useJobs(options?: { enabled?: boolean }) {
 export function useJob(id: string) {
   return useQuery({
     queryKey: ['jobs', id],
-    queryFn: () => fetcher<any>(`${API_URL}/job-descriptions/${id}`),
+    queryFn: () => fetcher<JobDescriptionRecord>(`${API_URL}/job-descriptions/${id}`),
     enabled: Boolean(id),
   });
 }
 
-export function useJobResume(id: string) {
+export function useDeleteJob() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      fetcher<{ success: boolean; message: string }>(`${API_URL}/job-descriptions/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    },
+  });
+}
+
+export function useUpdateJobStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      fetcher<any>(`${API_URL}/job-descriptions/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['jobs', variables.id] });
+    },
+  });
+}
+
+export function useJobResume(id: string, versionOrId?: string) {
   return useQuery({
-    queryKey: ['jobs', id, 'resume'],
-    queryFn: () => fetcher<any>(`${API_URL}/job-descriptions/${id}/resume`),
+    queryKey: ['jobs', id, 'resume', versionOrId || 'latest'],
+    queryFn: () =>
+      fetcher<ResumeRecord>(
+        `${API_URL}/job-descriptions/${id}/resume${versionOrId ? `?version=${encodeURIComponent(versionOrId)}` : ''}`,
+      ),
     enabled: Boolean(id),
   });
 }
 
-export function useJobResumeLatex(id: string, templateId?: string) {
+export function useResumeVersions(id: string) {
   return useQuery({
-    queryKey: ['jobs', id, 'resume', 'latex', templateId || 'modern-developer'],
+    queryKey: ['jobs', id, 'resume', 'versions'],
+    queryFn: () => fetcher<ResumeVersionSummary[]>(`${API_URL}/job-descriptions/${id}/resume/versions`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useJobResumeLatex(id: string, templateId?: string, versionOrId?: string) {
+  const queryParams = new URLSearchParams();
+  if (templateId) queryParams.set('template', templateId);
+  if (versionOrId) queryParams.set('version', versionOrId);
+  const qs = queryParams.toString();
+
+  return useQuery({
+    queryKey: [
+      'jobs',
+      id,
+      'resume',
+      'latex',
+      templateId || 'modern-developer',
+      versionOrId || 'latest',
+    ],
     queryFn: () =>
       fetcher<{ latex: string; templateId?: string }>(
-        `${API_URL}/job-descriptions/${id}/resume/latex${templateId ? `?template=${encodeURIComponent(templateId)}` : ''}`,
+        `${API_URL}/job-descriptions/${id}/resume/latex${qs ? `?${qs}` : ''}`,
       ),
     enabled: Boolean(id),
   });
@@ -117,11 +175,17 @@ export function useJobResumeLatex(id: string, templateId?: string) {
 export function useUpdateResumeLatex(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: string | { latex: string; templateId?: string }) => {
+    mutationFn: (payload: string | { latex: string; templateId?: string; version?: string }) => {
       const latex = typeof payload === 'string' ? payload : payload.latex;
       const templateId = typeof payload === 'string' ? undefined : payload.templateId;
+      const version = typeof payload === 'string' ? undefined : payload.version;
+      const queryParams = new URLSearchParams();
+      if (templateId) queryParams.set('template', templateId);
+      if (version) queryParams.set('version', version);
+      const qs = queryParams.toString();
+
       return fetcher<{ success: boolean; downloadUrl: string }>(
-        `${API_URL}/job-descriptions/${id}/resume/latex${templateId ? `?template=${encodeURIComponent(templateId)}` : ''}`,
+        `${API_URL}/job-descriptions/${id}/resume/latex${qs ? `?${qs}` : ''}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -130,7 +194,6 @@ export function useUpdateResumeLatex(id: string) {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume', 'latex'] });
       queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
     },
   });
@@ -143,6 +206,7 @@ export function useJobOutreach(id: string) {
       fetcher<{
         coverLetter: any | null;
         coverLetterLatex: string | null;
+        coverLetterValidation: { numberFlags: any[]; violations: string[] } | null;
         recruiterEmail: any | null;
       }>(`${API_URL}/job-descriptions/${id}/outreach`),
     enabled: Boolean(id),
@@ -181,8 +245,8 @@ export function useGenerateRecruiterEmail(id: string) {
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { rawText: string; title?: string; company?: string }) =>
-      fetcher<any>(`${API_URL}/job-descriptions`, {
+    mutationFn: (data: { rawText: string; title?: string; company?: string; force?: boolean }) =>
+      fetcher<JobDescriptionRecord>(`${API_URL}/job-descriptions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -228,7 +292,7 @@ export function useRunFullPipeline(id: string) {
 export function useCandidateProfile(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['candidate-profile'],
-    queryFn: () => fetcher<any>(`${API_URL}/candidate-profile`),
+    queryFn: () => fetcher<CandidateProfile>(`${API_URL}/candidate-profile`),
     enabled: options?.enabled ?? true,
   });
 }
