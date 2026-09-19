@@ -1,27 +1,65 @@
-'use client';
-
+import { cn } from 'cn';
 import { Printer, ZoomIn, ZoomOut } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-interface DocumentPreviewSheetProps {
-  resume: any;
+export interface SheetSyncTarget {
+  section?: string;
+  text?: string;
+  percentage?: number;
+  timestamp?: number;
 }
 
-export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resume }) => {
+interface DocumentPreviewSheetProps {
+  resume: any;
+  syncTarget?: SheetSyncTarget | null;
+  onSyncToEditor?: (target: { section?: string; query?: string; timestamp: number }) => void;
+}
+
+export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
+  resume,
+  syncTarget,
+  onSyncToEditor,
+}) => {
   const [zoom, setZoom] = useState<number>(100);
+  const [highlightedSection, setHighlightedSection] = useState<string | null>(null);
 
   const handlePrint = () => {
     window.print();
   };
+
+  // React to forward sync from LaTeX editor double-click
+  useEffect(() => {
+    if (!syncTarget) return;
+
+    const section = syncTarget.section?.toLowerCase();
+    if (section) {
+      setHighlightedSection(section);
+      const el = document.getElementById(`sheet-sec-${section}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      const timer = setTimeout(() => setHighlightedSection(null), 2200);
+      return () => clearTimeout(timer);
+    }
+
+    if (typeof syncTarget.percentage === 'number') {
+      const container = document.getElementById('sheet-scroll-viewport');
+      if (container) {
+        const targetScroll =
+          syncTarget.percentage * (container.scrollHeight - container.clientHeight);
+        container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+      }
+    }
+  }, [syncTarget]);
 
   const personal = resume?.personal || {};
   const contact = personal.contact || {};
   const links = personal.links || {};
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div id="sheet-scroll-viewport" className="flex flex-col items-center space-y-4 w-full">
       {/* Zoom & Print Toolbar */}
       <div className="flex items-center justify-between w-full max-w-3xl px-4 py-2 rounded-xl bg-card border border-border shadow-xs">
         <div className="flex items-center gap-2">
@@ -86,7 +124,18 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
             className="w-198.5 min-h-280.75 bg-white text-slate-900 font-sans p-12 shadow-2xl rounded-none border border-slate-200 select-text print:shadow-none print:border-none print:m-0 print:p-8"
           >
             {/* Document Header */}
-            <div className="text-center border-b border-slate-300 pb-4 mb-5">
+            <div
+              id="sheet-sec-header"
+              onDoubleClick={() =>
+                onSyncToEditor?.({
+                  section: 'Personal',
+                  query: personal.name,
+                  timestamp: Date.now(),
+                })
+              }
+              title="Double-click to jump to code in LaTeX editor (Overleaf style)"
+              className="text-center border-b border-slate-300 pb-4 mb-5 cursor-pointer hover:bg-slate-50/80 p-2 rounded-lg transition-colors"
+            >
               <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 uppercase">
                 {personal.name || 'Candidate Name'}
               </h1>
@@ -105,7 +154,23 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
 
             {/* Professional Summary */}
             {resume?.summary && (
-              <div className="mb-5">
+              <div
+                id="sheet-sec-summary"
+                onDoubleClick={() =>
+                  onSyncToEditor?.({
+                    section: 'Summary',
+                    query: resume.summary?.slice(0, 35),
+                    timestamp: Date.now(),
+                  })
+                }
+                title="Double-click to jump to code in LaTeX editor (Overleaf style)"
+                className={cn(
+                  'mb-5 p-2 rounded-lg transition-all cursor-pointer',
+                  highlightedSection === 'summary' || highlightedSection === 'professionalsummary'
+                    ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
+                    : 'hover:bg-slate-50/80',
+                )}
+              >
                 <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
                   Professional Summary
                 </h2>
@@ -115,7 +180,23 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
 
             {/* Technical Skills */}
             {resume?.skills && resume.skills.length > 0 && (
-              <div className="mb-5">
+              <div
+                id="sheet-sec-skills"
+                onDoubleClick={() =>
+                  onSyncToEditor?.({
+                    section: 'Skills',
+                    query: resume.skills?.[0],
+                    timestamp: Date.now(),
+                  })
+                }
+                title="Double-click to jump to code in LaTeX editor (Overleaf style)"
+                className={cn(
+                  'mb-5 p-2 rounded-lg transition-all cursor-pointer',
+                  highlightedSection === 'skills' || highlightedSection === 'technicalskills'
+                    ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
+                    : 'hover:bg-slate-50/80',
+                )}
+              >
                 <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
                   Technical Skills
                 </h2>
@@ -127,12 +208,39 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
 
             {/* Work Experience */}
             {resume?.experience && resume.experience.length > 0 && (
-              <div className="mb-5 space-y-3">
+              <div
+                id="sheet-sec-experience"
+                onDoubleClick={() =>
+                  onSyncToEditor?.({
+                    section: 'Experience',
+                    query: resume.experience[0]?.title || 'Experience',
+                    timestamp: Date.now(),
+                  })
+                }
+                title="Double-click to jump to code in LaTeX editor (Overleaf style)"
+                className={cn(
+                  'mb-5 space-y-3 p-2 rounded-lg transition-all cursor-pointer',
+                  highlightedSection === 'experience'
+                    ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
+                    : 'hover:bg-slate-50/80',
+                )}
+              >
                 <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
                   Work Experience
                 </h2>
                 {resume.experience.map((exp: any, i: number) => (
-                  <div key={i} className="space-y-1">
+                  <div
+                    key={i}
+                    className="space-y-1"
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      onSyncToEditor?.({
+                        section: 'Experience',
+                        query: exp.title,
+                        timestamp: Date.now(),
+                      });
+                    }}
+                  >
                     <div className="flex items-baseline justify-between text-xs">
                       <span className="font-bold text-slate-950">
                         {exp.title}{' '}
@@ -141,7 +249,21 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
                     </div>
                     <ul className="pl-4 list-disc text-xs text-slate-800 space-y-1 leading-relaxed">
                       {exp.bullets?.map((b: string, idx: number) => (
-                        <li key={idx}>{b}</li>
+                        <li
+                          key={idx}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            onSyncToEditor?.({
+                              section: 'Experience',
+                              query: b.slice(0, 35),
+                              timestamp: Date.now(),
+                            });
+                          }}
+                          className="hover:text-brand-cyan transition-colors"
+                          title="Double-click to jump to this bullet in LaTeX editor (Overleaf style)"
+                        >
+                          {b}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -151,16 +273,57 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
 
             {/* Featured Projects */}
             {resume?.projects && resume.projects.length > 0 && (
-              <div className="mb-5 space-y-3">
+              <div
+                id="sheet-sec-projects"
+                onDoubleClick={() =>
+                  onSyncToEditor?.({
+                    section: 'Projects',
+                    query: resume.projects[0]?.name || 'Projects',
+                    timestamp: Date.now(),
+                  })
+                }
+                title="Double-click to jump to code in LaTeX editor (Overleaf style)"
+                className={cn(
+                  'mb-5 space-y-3 p-2 rounded-lg transition-all cursor-pointer',
+                  highlightedSection === 'projects'
+                    ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
+                    : 'hover:bg-slate-50/80',
+                )}
+              >
                 <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
                   Featured Projects
                 </h2>
                 {resume.projects.map((proj: any, i: number) => (
-                  <div key={i} className="space-y-1">
+                  <div
+                    key={i}
+                    className="space-y-1"
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      onSyncToEditor?.({
+                        section: 'Projects',
+                        query: proj.name,
+                        timestamp: Date.now(),
+                      });
+                    }}
+                  >
                     <div className="text-xs font-bold text-slate-950">{proj.name}</div>
                     <ul className="pl-4 list-disc text-xs text-slate-800 space-y-1 leading-relaxed">
                       {proj.bullets?.map((b: string, idx: number) => (
-                        <li key={idx}>{b}</li>
+                        <li
+                          key={idx}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            onSyncToEditor?.({
+                              section: 'Projects',
+                              query: b.slice(0, 35),
+                              timestamp: Date.now(),
+                            });
+                          }}
+                          className="hover:text-brand-cyan transition-colors"
+                          title="Double-click to jump to this bullet in LaTeX editor (Overleaf style)"
+                        >
+                          {b}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -170,7 +333,23 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({ resu
 
             {/* Education */}
             {resume?.education && resume.education.length > 0 && (
-              <div className="mb-4">
+              <div
+                id="sheet-sec-education"
+                onDoubleClick={() =>
+                  onSyncToEditor?.({
+                    section: 'Education',
+                    query: resume.education[0]?.degree || 'Education',
+                    timestamp: Date.now(),
+                  })
+                }
+                title="Double-click to jump to code in LaTeX editor (Overleaf style)"
+                className={cn(
+                  'mb-4 p-2 rounded-lg transition-all cursor-pointer',
+                  highlightedSection === 'education'
+                    ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
+                    : 'hover:bg-slate-50/80',
+                )}
+              >
                 <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
                   Education
                 </h2>

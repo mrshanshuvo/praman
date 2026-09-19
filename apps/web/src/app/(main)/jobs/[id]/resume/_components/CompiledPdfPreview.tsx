@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { downloadResumePdf, fetchResumePdfBlob } from '@/hooks/usePramanApi';
-import { DocumentPreviewSheet } from './DocumentPreviewSheet';
+import { DocumentPreviewSheet, type SheetSyncTarget } from './DocumentPreviewSheet';
 
 interface CompiledPdfPreviewProps {
   jobId: string;
@@ -24,6 +24,8 @@ interface CompiledPdfPreviewProps {
   resumeData: any;
   candidateName?: string;
   recompileTrigger?: number;
+  syncTarget?: SheetSyncTarget | null;
+  onSyncToEditor?: (target: { section?: string; query?: string; timestamp: number }) => void;
 }
 
 export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
@@ -33,6 +35,8 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
   resumeData,
   candidateName = 'Candidate',
   recompileTrigger,
+  syncTarget,
+  onSyncToEditor,
 }) => {
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -194,7 +198,11 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
       <div className="flex-1 w-full min-h-0 relative rounded-xl overflow-hidden border border-border bg-muted/10">
         {previewType === 'html' ? (
           <div className="w-full h-full overflow-y-auto p-4 flex justify-center items-start">
-            <DocumentPreviewSheet resume={resumeData} />
+            <DocumentPreviewSheet
+              resume={resumeData}
+              syncTarget={syncTarget}
+              onSyncToEditor={onSyncToEditor}
+            />
           </div>
         ) : isLoading ? (
           <div className="w-full h-full flex flex-col items-center justify-center space-y-4 p-8 bg-card/60">

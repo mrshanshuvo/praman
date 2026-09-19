@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
 import { CompiledPdfPreview } from './CompiledPdfPreview';
+import type { SheetSyncTarget } from './DocumentPreviewSheet';
 
 export const TEMPLATES = [
   {
@@ -77,6 +78,8 @@ export function LatexViewer({
   const [lineHeights, setLineHeights] = useState<number[]>([]);
   const [recompileKey, setRecompileKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [activeSyncLine, setActiveSyncLine] = useState<number | null>(null);
+  const [editorSyncTarget, setEditorSyncTarget] = useState<SheetSyncTarget | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
@@ -85,6 +88,101 @@ export function LatexViewer({
   const lines = code.split('\n');
 
   const updateLatexMutation = useUpdateResumeLatex(jobId);
+
+  // Overleaf SyncTeX: Forward Sync (Editor -> Preview on Double-Click)
+  const handleTextareaDoubleClick = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart;
+    const textUpToCursor = code.substring(0, cursorPos);
+    const lineIndex = textUpToCursor.split('\n').length - 1;
+    const currentLine = lines[lineIndex] || '';
+
+    // Detect section
+    let detectedSection = '';
+    const sectionMatch = currentLine.match(/\\section\{([^}]+)\}/i);
+    if (sectionMatch) {
+      detectedSection = sectionMatch[1];
+    } else {
+      // Look backward for nearest \section
+      for (let i = lineIndex; i >= 0; i--) {
+        const m = lines[i].match(/\\section\{([^}]+)\}/i);
+        if (m) {
+          detectedSection = m[1];
+          break;
+        }
+      }
+    }
+
+    const percentage = lines.length > 1 ? lineIndex / (lines.length - 1) : 0;
+
+    setActiveSyncLine(lineIndex);
+    setTimeout(() => setActiveSyncLine(null), 2500);
+
+    setEditorSyncTarget({
+      section: detectedSection,
+      text: currentLine,
+      percentage,
+      timestamp: Date.now(),
+    });
+  };
+
+  // Overleaf SyncTeX: Inverse Sync (Preview -> Editor on Double-Click)
+  const handleSyncFromPreview = (target: {
+    section?: string;
+    query?: string;
+    timestamp: number;
+  }) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    let matchedLineIdx = -1;
+
+    // 1. If query provided (e.g. bullet snippet or job title), search lines
+    if (target.query && target.query.length >= 6) {
+      const cleanQ = target.query
+        .slice(0, 30)
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+      matchedLineIdx = lines.findIndex((l) => {
+        const cleanL = l.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return cleanL.includes(cleanQ) || cleanQ.includes(cleanL);
+      });
+    }
+
+    // 2. Fallback to section header
+    if (matchedLineIdx === -1 && target.section) {
+      matchedLineIdx = lines.findIndex((l) => {
+        const match = l.match(/\\section\{([^}]+)\}/i);
+        return match?.[1].toLowerCase().includes(target.section!.toLowerCase());
+      });
+    }
+
+    if (matchedLineIdx !== -1) {
+      let cumHeight = 0;
+      for (let i = 0; i < matchedLineIdx; i++) {
+        cumHeight += lineHeights[i] || 20;
+      }
+      const targetScroll = Math.max(0, cumHeight - textarea.clientHeight / 2 + 20);
+      textarea.scrollTop = targetScroll;
+      if (lineNumbersRef.current) {
+        lineNumbersRef.current.scrollTop = targetScroll;
+      }
+
+      setActiveSyncLine(matchedLineIdx);
+      setTimeout(() => setActiveSyncLine(null), 2500);
+
+      // Highlight line text in textarea
+      let charStart = 0;
+      for (let i = 0; i < matchedLineIdx; i++) {
+        charStart += lines[i].length + 1;
+      }
+      textarea.selectionStart = charStart;
+      textarea.selectionEnd = charStart + lines[matchedLineIdx].length;
+      textarea.focus();
+    }
+  };
 
   // Exit fullscreen on Escape key
   useEffect(() => {
@@ -500,7 +598,11 @@ export function LatexViewer({
                 <div
                   key={i}
                   style={wordWrap && lineHeights[i] ? { height: `${lineHeights[i]}px` } : undefined}
-                  className="flex items-start justify-end"
+                  className={cn(
+                    'flex items-start justify-end transition-colors',
+                    activeSyncLine === i &&
+                      'text-brand-cyan font-bold bg-brand-cyan/25 px-1 rounded ring-1 ring-brand-cyan/50',
+                  )}
                 >
                   {i + 1}
                 </div>
@@ -514,6 +616,8 @@ export function LatexViewer({
               onChange={(e) => setCode(e.target.value)}
               onKeyDown={handleKeyDown}
               onScroll={handleScroll}
+              onDoubleClick={handleTextareaDoubleClick}
+              title="Double-click any line to jump preview to this section (Overleaf style)"
               spellCheck={false}
               className={cn(
                 'flex-1 p-4 bg-transparent text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none overflow-y-auto tab-size-2',
@@ -536,6 +640,8 @@ export function LatexViewer({
               recompileTrigger={recompileKey}
               resumeData={resumeData}
               candidateName={candidateName}
+              syncTarget={editorSyncTarget}
+              onSyncToEditor={handleSyncFromPreview}
             />
           </div>
         )}
