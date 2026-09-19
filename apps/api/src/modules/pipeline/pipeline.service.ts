@@ -25,12 +25,18 @@ export class PipelineService {
     private readonly resumeService: ResumeService,
   ) {}
 
-  async runFullPipeline(jobDescriptionId: string) {
+  async runFullPipeline(jobDescriptionId: string, userId?: string) {
     this.logger.log(`Executing full end-to-end pipeline for JD: ${jobDescriptionId}`);
 
-    const match = await this.matchService.runMatch(jobDescriptionId);
-    const strategy = await this.strategyService.runStrategy(jobDescriptionId);
-    const resume = await this.resumeService.generateAndValidate(jobDescriptionId);
+    const match = userId
+      ? await this.matchService.runMatch(jobDescriptionId, userId)
+      : await this.matchService.runMatch(jobDescriptionId);
+    const strategy = userId
+      ? await this.strategyService.runStrategy(jobDescriptionId, userId)
+      : await this.strategyService.runStrategy(jobDescriptionId);
+    const resume = userId
+      ? await this.resumeService.generateAndValidate(jobDescriptionId, userId)
+      : await this.resumeService.generateAndValidate(jobDescriptionId);
 
     return {
       jobDescriptionId,
@@ -40,7 +46,7 @@ export class PipelineService {
     };
   }
 
-  streamFullPipeline(jobDescriptionId: string): Observable<MessageEvent> {
+  streamFullPipeline(jobDescriptionId: string, userId?: string): Observable<MessageEvent> {
     return new Observable<MessageEvent>((subscriber) => {
       (async () => {
         try {
@@ -56,7 +62,9 @@ export class PipelineService {
             } satisfies PipelineStreamEvent,
           });
 
-          const match = await this.matchService.runMatch(jobDescriptionId);
+          const match = userId
+            ? await this.matchService.runMatch(jobDescriptionId, userId)
+            : await this.matchService.runMatch(jobDescriptionId);
 
           subscriber.next({
             data: {
@@ -78,7 +86,9 @@ export class PipelineService {
             } satisfies PipelineStreamEvent,
           });
 
-          const strategy = await this.strategyService.runStrategy(jobDescriptionId);
+          const strategy = userId
+            ? await this.strategyService.runStrategy(jobDescriptionId, userId)
+            : await this.strategyService.runStrategy(jobDescriptionId);
 
           subscriber.next({
             data: {
@@ -100,7 +110,9 @@ export class PipelineService {
             } satisfies PipelineStreamEvent,
           });
 
-          const resume = await this.resumeService.generateAndValidate(jobDescriptionId);
+          const resume = userId
+            ? await this.resumeService.generateAndValidate(jobDescriptionId, userId)
+            : await this.resumeService.generateAndValidate(jobDescriptionId);
 
           subscriber.next({
             data: {

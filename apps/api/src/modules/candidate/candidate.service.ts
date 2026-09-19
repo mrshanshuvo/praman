@@ -90,8 +90,8 @@ export class CandidateService {
     return profile;
   }
 
-  async getSanitizedProfile() {
-    const profile = await this.getProfile();
+  async getSanitizedProfile(targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
     return {
       personal: profile.personal,
       skills: profile.skills?.map((s) => ({

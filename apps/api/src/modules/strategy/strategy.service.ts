@@ -11,12 +11,16 @@ export class StrategyService {
     private readonly aiService: AiService,
   ) {}
 
-  async runStrategy(jobDescriptionId: string) {
+  async runStrategy(jobDescriptionId: string, userId?: string) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
 
     if (!jd) {
+      throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+    }
+
+    if (userId && jd.userId !== userId) {
       throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
     }
 

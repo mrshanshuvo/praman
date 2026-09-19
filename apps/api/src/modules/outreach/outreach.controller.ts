@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { OutreachService } from './outreach.service.js';
 
 @ApiTags('Outreach Suite')
@@ -11,21 +12,21 @@ export class OutreachController {
   @Get()
   @ApiOperation({ summary: 'Get generated cover letter and recruiter email for a job' })
   @ApiResponse({ status: 200, description: 'Saved outreach materials' })
-  async getOutreach(@Param('id') id: string) {
-    return this.outreachService.getOutreach(id);
+  async getOutreach(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.outreachService.getOutreach(id, user?.id);
   }
 
   @Post('cover-letter')
   @ApiOperation({ summary: 'Generate a tailored, truth-preserving cover letter' })
   @ApiResponse({ status: 201, description: 'Cover letter generated successfully' })
-  async generateCoverLetter(@Param('id') id: string) {
-    return this.outreachService.generateCoverLetter(id);
+  async generateCoverLetter(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.outreachService.generateCoverLetter(id, user?.id);
   }
 
   @Post('email')
   @ApiOperation({ summary: 'Generate a high-converting recruiter cold outreach email' })
   @ApiResponse({ status: 201, description: 'Recruiter email generated successfully' })
-  async generateRecruiterEmail(@Param('id') id: string) {
-    return this.outreachService.generateRecruiterEmail(id);
+  async generateRecruiterEmail(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.outreachService.generateRecruiterEmail(id, user?.id);
   }
 }
