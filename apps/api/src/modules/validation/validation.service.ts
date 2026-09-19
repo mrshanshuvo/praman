@@ -148,25 +148,7 @@ export class ValidationService {
     }
 
     // 2.5 Summary Ground Truth & Metric Checks (§0 P0 Fix)
-    const candidateFullSourceText = [
-      candidateProfile?.personal?.summary || '',
-      ...(candidateProfile?.experiences || []).flatMap((e: any) => [
-        e.company || '',
-        e.title || '',
-        ...(e.responsibilities || []),
-        ...(e.achievements || []),
-      ]),
-      ...(candidateProfile?.projects || []).flatMap((p: any) => [
-        p.name || '',
-        p.description || '',
-        ...(p.outcomes || []),
-      ]),
-      ...(candidateProfile?.educations || []).flatMap((ed: any) => [
-        ed.institution || '',
-        ed.degree || '',
-      ]),
-      ...(candidateProfile?.certifications || []).map((c: any) => c.name || ''),
-    ].join(' ');
+    const candidateFullSourceText = this.buildCandidateFullSourceText(candidateProfile);
 
     if (data.summary) {
       // Check for unconfirmed metrics or numbers in summary
@@ -313,5 +295,55 @@ export class ValidationService {
           'Numbers not found verbatim in candidate source record; flagged for accuracy audit.',
       });
     }
+  }
+
+  buildCandidateFullSourceText(candidateProfile: any): string {
+    return [
+      candidateProfile?.personal?.summary || '',
+      ...(candidateProfile?.experiences || []).flatMap((e: any) => [
+        e.company || '',
+        e.title || '',
+        ...(e.responsibilities || []),
+        ...(e.achievements || []),
+      ]),
+      ...(candidateProfile?.projects || []).flatMap((p: any) => [
+        p.name || '',
+        p.description || '',
+        ...(p.outcomes || []),
+      ]),
+      ...(candidateProfile?.educations || []).flatMap((ed: any) => [
+        ed.institution || '',
+        ed.degree || '',
+      ]),
+      ...(candidateProfile?.certifications || []).map((c: any) => c.name || ''),
+    ].join(' ');
+  }
+
+  validateFreeText(
+    text: string,
+    candidateProfile: any,
+    contextLabel = 'Cover Letter',
+  ): { numberFlags: NumberFlag[]; violations: string[] } {
+    const numberFlags: NumberFlag[] = [];
+    const violations: string[] = [];
+    const candidateFullSourceText = this.buildCandidateFullSourceText(candidateProfile);
+
+    // 1. Metric & number checks
+    this.checkNumbersInBullet(text, candidateFullSourceText, contextLabel, numberFlags);
+
+    // 2. Unlearned skill checks
+    for (const sk of candidateProfile?.skills || []) {
+      if (sk.level === 'NOT_LEARNED') {
+        const escaped = sk.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const skillRegex = new RegExp(`\\b${escaped}\\b`, 'i');
+        if (skillRegex.test(text)) {
+          violations.push(
+            `Forbidden skill claim in ${contextLabel.toLowerCase()}: candidate explicitly marked "${sk.name}" as NOT_LEARNED`,
+          );
+        }
+      }
+    }
+
+    return { numberFlags, violations };
   }
 }

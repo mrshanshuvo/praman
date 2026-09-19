@@ -6,6 +6,7 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
   let mockPrisma: any;
   let mockAiService: any;
   let mockCandidateService: any;
+  let mockValidationService: any;
 
   let storedResume: any = null;
 
@@ -67,7 +68,7 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
                 update: vi.fn().mockImplementation(async (data: any) => {
                   storedResume = {
                     ...storedResume,
-                    resumeJson: data.resumeJson,
+                    ...data,
                   };
                   return storedResume;
                 }),
@@ -101,6 +102,10 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
         ],
         skills: [{ name: 'TypeScript', level: 'EXPERIENCED' }],
       }),
+    };
+
+    mockValidationService = {
+      validateFreeText: vi.fn().mockReturnValue({ numberFlags: [], violations: [] }),
     };
 
     mockAiService = {
@@ -139,7 +144,12 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
       }),
     };
 
-    service = new OutreachService(mockPrisma, mockAiService, mockCandidateService);
+    service = new OutreachService(
+      mockPrisma,
+      mockAiService,
+      mockCandidateService,
+      mockValidationService,
+    );
   });
 
   it('generates tailored cover letter and generates valid matching LaTeX', async () => {
@@ -150,10 +160,11 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
     expect(res.coverLetterLatex).toContain('\\documentclass');
     expect(res.coverLetterLatex).toContain('Softvence Agency');
     expect(res.coverLetterLatex).toContain('Shahid Hasan Shuvo');
+    expect(mockValidationService.validateFreeText).toHaveBeenCalled();
 
-    // Verify stored in resumeJson.outreach
-    expect(storedResume.resumeJson.outreach.coverLetter).toBeDefined();
-    expect(storedResume.resumeJson.outreach.coverLetterLatex).toBeDefined();
+    // Verify stored in coverLetterJson
+    expect(storedResume.coverLetterJson.coverLetter).toBeDefined();
+    expect(storedResume.coverLetterJson.coverLetterLatex).toBeDefined();
   });
 
   it('generates recruiter cold email with punchy highlights and subject line', async () => {
@@ -163,8 +174,8 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
     expect(res.recruiterEmail.highlights).toHaveLength(2);
     expect(res.recruiterEmail.callToAction).toContain('10-minute chat');
 
-    // Verify stored in resumeJson.outreach
-    expect(storedResume.resumeJson.outreach.recruiterEmail).toBeDefined();
+    // Verify stored in recruiterEmailJson
+    expect(storedResume.recruiterEmailJson.recruiterEmail).toBeDefined();
   });
 
   it('retrieves saved outreach materials gracefully', async () => {
@@ -179,3 +190,4 @@ describe('OutreachService (Cover Letter & Recruiter Outreach Email)', () => {
     expect(outreach.recruiterEmail.subject).toContain('Full-Stack Developer');
   });
 });
+

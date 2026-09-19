@@ -1,16 +1,19 @@
 'use client';
 
 import {
+  AlertTriangle,
   Check,
   Copy,
   Download,
   ExternalLink,
   FileCode,
   FileText,
+  Hash,
   Loader2,
   Mail,
   RefreshCw,
   Send,
+  ShieldCheck,
   Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -172,6 +175,35 @@ ${coverLetter.senderName}
               </div>
             ) : (
               <div className="space-y-3 mt-3">
+                {/* Anti-Hallucination Validation Status */}
+                {outreach?.coverLetterValidation && (
+                  <div>
+                    {outreach.coverLetterValidation.violations?.length === 0 &&
+                    outreach.coverLetterValidation.numberFlags?.length === 0 ? (
+                      <div className="flex items-center gap-2 p-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs">
+                        <ShieldCheck className="w-4 h-4 shrink-0" />
+                        <span>Truth-Preserved: Zero discrepancies or unconfirmed claims detected.</span>
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs space-y-1.5">
+                        <div className="flex items-center gap-1.5 font-semibold">
+                          <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                          <span>Audit Discrepancies Detected</span>
+                        </div>
+                        {outreach.coverLetterValidation.violations?.map((v: string, i: number) => (
+                          <p key={i} className="text-[11px] text-amber-200/90 pl-5">• {v}</p>
+                        ))}
+                        {outreach.coverLetterValidation.numberFlags?.map((f: any, i: number) => (
+                          <div key={i} className="text-[11px] text-amber-200/90 pl-5 flex items-center gap-1">
+                            <Hash className="w-3 h-3 text-amber-400 shrink-0" />
+                            <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Letter Content Preview */}
                 <div className="p-4 rounded-lg border border-border/80 bg-muted/20 space-y-3 text-xs text-foreground font-sans leading-relaxed max-h-96 overflow-y-auto">
                   <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-[11px] space-y-0.5">

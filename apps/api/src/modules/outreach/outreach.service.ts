@@ -10,6 +10,7 @@ import { AiService } from '../ai/ai.service.js';
 import { COVER_LETTER_SYSTEM_PROMPT_V1 } from '../ai/prompts/cover-letter.v1.js';
 import { RECRUITER_EMAIL_SYSTEM_PROMPT_V1 } from '../ai/prompts/recruiter-email.v1.js';
 import { CandidateService } from '../candidate/candidate.service.js';
+import { ValidationService } from '../validation/validation.service.js';
 
 @Injectable()
 export class OutreachService {
@@ -19,13 +20,18 @@ export class OutreachService {
     private readonly prisma: PrismaService,
     private readonly aiService: AiService,
     private readonly candidateService: CandidateService,
+    private readonly validationService: ValidationService,
   ) {}
 
-  private async getContext(jobDescriptionId: string) {
+  private async getContext(jobDescriptionId: string, targetUserId?: string) {
     const jd = await this.prisma.client.orm.public.JobDescription.where({
       id: jobDescriptionId,
     }).first();
     if (!jd) throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description ${jobDescriptionId} not found`);
+    }
 
     const analysis = await this.prisma.client.orm.public.CandidateJdAnalysis.where({
       jobDescriptionId: jd.id,
@@ -40,21 +46,28 @@ export class OutreachService {
     const resume = strategy
       ? await this.prisma.client.orm.public.Resume.where({
           resumeStrategyId: strategy.id,
+          isLatest: true,
         }).first()
       : null;
 
-    const candidateProfile = await this.candidateService.getProfile(jd.userId);
+    const candidateProfile = await this.candidateService.getProfile(targetUserId || jd.userId);
 
     return { jd, analysis, strategy, resume, candidateProfile };
   }
 
-  async generateCoverLetter(jobDescriptionId: string): Promise<{
+  async generateCoverLetter(
+    jobDescriptionId: string,
+    targetUserId?: string,
+  ): Promise<{
     coverLetter: CoverLetter;
     coverLetterLatex: string;
+    validation?: { numberFlags: any[]; violations: string[] };
   }> {
     this.logger.log(`Generating tailored cover letter for JD: ${jobDescriptionId}`);
-    const { jd, analysis, strategy, resume, candidateProfile } =
-      await this.getContext(jobDescriptionId);
+    const { jd, analysis, strategy, resume, candidateProfile } = await this.getContext(
+      jobDescriptionId,
+      targetUserId,
+    );
 
     const userPrompt = JSON.stringify({
       structuredJd: jd.structured,
@@ -72,34 +85,54 @@ export class OutreachService {
 
     const coverLetterLatex = this.formatCoverLetterLatex(coverLetter);
 
-    if (resume) {
-      const currentJson: any = resume.resumeJson || {};
-      const currentOutreach = currentJson.outreach || {};
+    // Anti-hallucination validation on cover letter text
+    const fullCoverLetterText = [
+      coverLetter.opening,
+      ...(coverLetter.bodyParagraphs || []),
+      coverLetter.closing,
+    ].join(' ');
 
-      const updatedJson = {
-        ...currentJson,
-        outreach: {
-          ...currentOutreach,
-          coverLetter,
-          coverLetterLatex,
-          coverLetterGeneratedAt: new Date().toISOString(),
-        },
+    const validation = this.validationService.validateFreeText(
+      fullCoverLetterText,
+      candidateProfile,
+      'Cover Letter',
+    );
+
+    if (validation.violations.length > 0 || validation.numberFlags.length > 0) {
+      this.logger.warn(
+        `Cover letter generated with ${validation.violations.length} violations and ${validation.numberFlags.length} numeric audit flags`,
+      );
+    }
+
+    if (resume) {
+      const coverLetterRecord = {
+        coverLetter,
+        coverLetterLatex,
+        validation,
+        generatedAt: new Date().toISOString(),
       };
 
       await this.prisma.client.orm.public.Resume.where({
         id: resume.id,
-      }).update({ resumeJson: updatedJson });
+      }).update({
+        coverLetterJson: coverLetterRecord,
+      });
     }
 
-    return { coverLetter, coverLetterLatex };
+    return { coverLetter, coverLetterLatex, validation };
   }
 
-  async generateRecruiterEmail(jobDescriptionId: string): Promise<{
+  async generateRecruiterEmail(
+    jobDescriptionId: string,
+    targetUserId?: string,
+  ): Promise<{
     recruiterEmail: RecruiterEmail;
   }> {
     this.logger.log(`Generating recruiter outreach email for JD: ${jobDescriptionId}`);
-    const { jd, analysis, strategy, resume, candidateProfile } =
-      await this.getContext(jobDescriptionId);
+    const { jd, analysis, strategy, resume, candidateProfile } = await this.getContext(
+      jobDescriptionId,
+      targetUserId,
+    );
 
     const userPrompt = JSON.stringify({
       structuredJd: jd.structured,
@@ -116,37 +149,42 @@ export class OutreachService {
     });
 
     if (resume) {
-      const currentJson: any = resume.resumeJson || {};
-      const currentOutreach = currentJson.outreach || {};
-
-      const updatedJson = {
-        ...currentJson,
-        outreach: {
-          ...currentOutreach,
-          recruiterEmail,
-          recruiterEmailGeneratedAt: new Date().toISOString(),
-        },
+      const recruiterEmailRecord = {
+        recruiterEmail,
+        generatedAt: new Date().toISOString(),
       };
 
       await this.prisma.client.orm.public.Resume.where({
         id: resume.id,
-      }).update({ resumeJson: updatedJson });
+      }).update({
+        recruiterEmailJson: recruiterEmailRecord,
+      });
     }
 
     return { recruiterEmail };
   }
 
-  async getOutreach(jobDescriptionId: string) {
-    const { resume } = await this.getContext(jobDescriptionId);
-    if (!resume) return { coverLetter: null, recruiterEmail: null };
+  async getOutreach(jobDescriptionId: string, targetUserId?: string) {
+    const { resume } = await this.getContext(jobDescriptionId, targetUserId);
+    if (!resume) {
+      return {
+        coverLetter: null,
+        coverLetterLatex: null,
+        coverLetterValidation: null,
+        recruiterEmail: null,
+      };
+    }
 
-    const resumeJson: any = resume.resumeJson || {};
-    const outreach = resumeJson.outreach || {};
+    const coverLetterData: any =
+      resume.coverLetterJson || (resume.resumeJson as any)?.outreach;
+    const recruiterEmailData: any =
+      resume.recruiterEmailJson || (resume.resumeJson as any)?.outreach;
 
     return {
-      coverLetter: outreach.coverLetter || null,
-      coverLetterLatex: outreach.coverLetterLatex || null,
-      recruiterEmail: outreach.recruiterEmail || null,
+      coverLetter: coverLetterData?.coverLetter || null,
+      coverLetterLatex: coverLetterData?.coverLetterLatex || null,
+      coverLetterValidation: coverLetterData?.validation || null,
+      recruiterEmail: recruiterEmailData?.recruiterEmail || null,
     };
   }
 
