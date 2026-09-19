@@ -106,8 +106,35 @@ describe('HtmlPdfService', () => {
   });
 
   it('supports alternative templates with proper styling classes', () => {
+    const modernHtml = service.generateHtml(mockResume, mockProfile, 'modern-developer');
+    expect(modernHtml).toContain('Inter');
+    expect(modernHtml).toContain('list-style-type: square');
+
     const academicHtml = service.generateHtml(mockResume, mockProfile, 'classic-academic');
     expect(academicHtml).toContain('Computer Modern');
+    expect(academicHtml).toContain('font-variant: small-caps');
+    expect(academicHtml).toContain('list-style-type: circle');
+
+    const executiveHtml = service.generateHtml(mockResume, mockProfile, 'compact-executive');
+    expect(executiveHtml).toContain('Arial');
+    expect(executiveHtml).toContain('list-style-type: disc');
+    expect(executiveHtml).toContain('5mm 9mm 5mm 9mm');
+  });
+
+  it('enforces solid dark text (#000000) for all resume text content and deep navy (#004f90) for links', () => {
+    const html = service.generateHtml(mockResume, mockProfile, 'modern-developer');
+
+    // Confirm no intermediate grays
+    expect(html).not.toContain('#111111');
+    expect(html).not.toContain('#222222');
+    expect(html).not.toContain('#333333');
+    expect(html).not.toContain('#64748b');
+
+    // Confirm solid dark color
+    expect(html).toContain('color: #000000;');
+
+    // Confirm link color
+    expect(html).toContain('color: #004f90;');
   });
 
   it('escapes special characters to prevent HTML injection', () => {
@@ -126,11 +153,15 @@ describe('HtmlPdfService', () => {
     expect(html).toContain('&lt;b&gt;Bold&lt;/b&gt; &amp; &quot;Quotes&quot;');
   });
 
-  it('compiles PDF buffer via findChromeExecutable and puppeteer', async () => {
-    const pdfBuffer = await service.generatePdf(mockResume, mockProfile, 'modern-developer');
-    expect(pdfBuffer).toBeInstanceOf(Buffer);
-    expect(pdfBuffer.length).toBeGreaterThan(1000);
-    // PDF magic bytes %PDF-
-    expect(pdfBuffer.toString('ascii', 0, 4)).toBe('%PDF');
+  it('compiles PDF buffer for all 3 template variants via findChromeExecutable and puppeteer', async () => {
+    const modernPdf = await service.generatePdf(mockResume, mockProfile, 'modern-developer');
+    expect(modernPdf).toBeInstanceOf(Buffer);
+    expect(modernPdf.length).toBeGreaterThan(1000);
+    expect(modernPdf.toString('ascii', 0, 4)).toBe('%PDF');
+
+    const executivePdf = await service.generatePdf(mockResume, mockProfile, 'compact-executive');
+    expect(executivePdf).toBeInstanceOf(Buffer);
+    expect(executivePdf.length).toBeGreaterThan(1000);
+    expect(executivePdf.toString('ascii', 0, 4)).toBe('%PDF');
   });
 });

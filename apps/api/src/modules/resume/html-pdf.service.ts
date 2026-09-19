@@ -57,6 +57,91 @@ const CATEGORY_MAP: Record<string, string> = {
   GCP: 'DevOps & Tools',
 };
 
+export interface TemplateConfig {
+  id: string;
+  fontFamily: string;
+  bodyFontSize: string;
+  lineHeight: string;
+  nameFontSize: string;
+  titleFontSize: string;
+  sectionTitleFontSize: string;
+  sectionTitleStyle: string;
+  sectionBorder: string;
+  bulletStyle: string;
+  bulletMarginBottom: string;
+  entrySpacing: string;
+  pageMargin: {
+    top: string;
+    right: string;
+    bottom: string;
+    left: string;
+  };
+}
+
+export const TEMPLATE_CONFIGS: Record<string, TemplateConfig> = {
+  'modern-developer': {
+    id: 'modern-developer',
+    fontFamily: `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif`,
+    bodyFontSize: '8.6pt',
+    lineHeight: '1.24',
+    nameFontSize: '18.5pt',
+    titleFontSize: '10pt',
+    sectionTitleFontSize: '9.2pt',
+    sectionTitleStyle: 'font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;',
+    sectionBorder: '0.9px solid #000000',
+    bulletStyle: 'square',
+    bulletMarginBottom: '1.5px',
+    entrySpacing: '3.5px',
+    pageMargin: {
+      top: '8mm',
+      right: '11mm',
+      bottom: '8mm',
+      left: '11mm',
+    },
+  },
+  'classic-academic': {
+    id: 'classic-academic',
+    fontFamily: `'Computer Modern', 'Latin Modern Roman', 'Times New Roman', Times, serif`,
+    bodyFontSize: '8.8pt',
+    lineHeight: '1.22',
+    nameFontSize: '19pt',
+    titleFontSize: '10.5pt',
+    sectionTitleFontSize: '10pt',
+    sectionTitleStyle:
+      'font-variant: small-caps; text-transform: lowercase; font-weight: 700; letter-spacing: 0.5px;',
+    sectionBorder: '0.5pt solid #000000',
+    bulletStyle: 'circle',
+    bulletMarginBottom: '1.5px',
+    entrySpacing: '3.5px',
+    pageMargin: {
+      top: '9mm',
+      right: '12mm',
+      bottom: '9mm',
+      left: '12mm',
+    },
+  },
+  'compact-executive': {
+    id: 'compact-executive',
+    fontFamily: `'Arial', 'Helvetica Neue', Helvetica, sans-serif`,
+    bodyFontSize: '8.4pt',
+    lineHeight: '1.18',
+    nameFontSize: '17.5pt',
+    titleFontSize: '9.8pt',
+    sectionTitleFontSize: '9pt',
+    sectionTitleStyle: 'font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;',
+    sectionBorder: '1.5px solid #000000',
+    bulletStyle: 'disc',
+    bulletMarginBottom: '1px',
+    entrySpacing: '2.5px',
+    pageMargin: {
+      top: '5mm',
+      right: '9mm',
+      bottom: '5mm',
+      left: '9mm',
+    },
+  },
+};
+
 @Injectable()
 export class HtmlPdfService {
   private readonly logger = new Logger(HtmlPdfService.name);
@@ -458,11 +543,8 @@ export class HtmlPdfService {
         ? `<div class="lang-line">${languagesList.map((l) => this.escapeHtml(l)).join(' | ')}</div>`
         : '';
 
-    // Typography styling: Serif LaTeX look matching the reference PDF
-    const isAcademic = templateId === 'classic-academic';
-    const fontFamily = isAcademic
-      ? `'Computer Modern', 'Latin Modern Roman', 'Times New Roman', Times, serif`
-      : `'Times New Roman', Times, 'Latin Modern Roman', Georgia, serif`;
+    // Template configuration styling
+    const config = TEMPLATE_CONFIGS[templateId] || TEMPLATE_CONFIGS['modern-developer'];
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -472,7 +554,7 @@ export class HtmlPdfService {
   <style>
     @page {
       size: A4;
-      margin: 8mm 12mm;
+      margin: ${config.pageMargin.top} ${config.pageMargin.right} ${config.pageMargin.bottom} ${config.pageMargin.left};
     }
     * {
       box-sizing: border-box;
@@ -480,9 +562,9 @@ export class HtmlPdfService {
       padding: 0;
     }
     body {
-      font-family: ${fontFamily};
-      font-size: 8.8pt;
-      line-height: 1.22;
+      font-family: ${config.fontFamily};
+      font-size: ${config.bodyFontSize};
+      line-height: ${config.lineHeight};
       color: #000000;
       background: #ffffff;
       -webkit-font-smoothing: antialiased;
@@ -506,26 +588,26 @@ export class HtmlPdfService {
       margin-bottom: 5px;
     }
     .candidate-name {
-      font-size: 19pt;
+      font-size: ${config.nameFontSize};
       font-weight: 700;
       letter-spacing: -0.2px;
       color: #000000;
       margin-bottom: 1px;
     }
     .candidate-title {
-      font-size: 10.5pt;
+      font-size: ${config.titleFontSize};
       font-weight: 700;
-      color: #111111;
+      color: #000000;
       margin-bottom: 2px;
     }
     .contact-line {
       font-size: 8.5pt;
-      color: #222222;
+      color: #000000;
       margin-bottom: 2px;
     }
     .links-line {
       font-size: 8.5pt;
-      color: #222222;
+      color: #000000;
     }
     .links-line a {
       color: #004f90;
@@ -538,24 +620,22 @@ export class HtmlPdfService {
       page-break-inside: avoid;
     }
     .section-title {
-      font-size: 9.5pt;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
+      font-size: ${config.sectionTitleFontSize};
+      ${config.sectionTitleStyle}
       color: #000000;
-      border-bottom: 0.8px solid #000000;
+      border-bottom: ${config.sectionBorder};
       padding-bottom: 1px;
       margin-bottom: 3px;
     }
     .section-content {
-      font-size: 8.8pt;
-      color: #111111;
+      font-size: ${config.bodyFontSize};
+      color: #000000;
       text-align: justify;
     }
 
     /* Entries */
     .entry {
-      margin-bottom: 3.5px;
+      margin-bottom: ${config.entrySpacing};
       page-break-inside: avoid;
     }
     .entry-header {
@@ -565,12 +645,12 @@ export class HtmlPdfService {
       margin-bottom: 1px;
     }
     .entry-title {
-      font-size: 8.8pt;
+      font-size: ${config.bodyFontSize};
       color: #000000;
     }
     .entry-meta {
       font-size: 8.5pt;
-      color: #111111;
+      color: #000000;
       text-align: right;
       white-space: nowrap;
     }
@@ -578,11 +658,12 @@ export class HtmlPdfService {
       margin-top: 1px;
       margin-left: 14px;
       padding-left: 0;
-      list-style-type: circle;
+      list-style-type: ${config.bulletStyle};
     }
     .entry-bullets li {
-      margin-bottom: 1.5px;
-      line-height: 1.22;
+      margin-bottom: ${config.bulletMarginBottom};
+      line-height: ${config.lineHeight};
+      color: #000000;
     }
     .proj-links {
       font-size: 8.5pt;
@@ -590,6 +671,7 @@ export class HtmlPdfService {
     }
     .tech-stack {
       font-size: 8.2pt;
+      color: #000000;
     }
 
     /* Skills & Meta Lists */
@@ -597,15 +679,18 @@ export class HtmlPdfService {
       font-size: 8.6pt;
       line-height: 1.25;
       margin-bottom: 1px;
+      color: #000000;
     }
     .cert-item {
       font-size: 8.6pt;
       line-height: 1.25;
       margin-bottom: 1.5px;
+      color: #000000;
     }
     .achieve-line, .lang-line {
       font-size: 8.6pt;
       line-height: 1.25;
+      color: #000000;
     }
   </style>
 </head>
@@ -715,6 +800,7 @@ export class HtmlPdfService {
     candidateProfile?: any,
     templateId = 'modern-developer',
   ): Promise<Buffer> {
+    const config = TEMPLATE_CONFIGS[templateId] || TEMPLATE_CONFIGS['modern-developer'];
     const executablePath = this.findChromeExecutable();
     const htmlContent = this.generateHtml(resumeData, candidateProfile, templateId);
 
@@ -742,12 +828,7 @@ export class HtmlPdfService {
       const pdfUint8Array = await page.pdf({
         format: 'A4',
         printBackground: true,
-        margin: {
-          top: '8mm',
-          right: '12mm',
-          bottom: '8mm',
-          left: '12mm',
-        },
+        margin: config.pageMargin,
       });
 
       return Buffer.from(pdfUint8Array);
