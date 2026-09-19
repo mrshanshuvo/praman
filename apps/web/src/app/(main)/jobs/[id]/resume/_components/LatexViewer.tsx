@@ -10,6 +10,8 @@ import {
   ExternalLink,
   Eye,
   FileCode,
+  Maximize2,
+  Minimize2,
   Palette,
   RotateCcw,
   Save,
@@ -74,6 +76,7 @@ export function LatexViewer({
   const [wordWrap, setWordWrap] = useState(true);
   const [lineHeights, setLineHeights] = useState<number[]>([]);
   const [recompileKey, setRecompileKey] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
@@ -82,6 +85,29 @@ export function LatexViewer({
   const lines = code.split('\n');
 
   const updateLatexMutation = useUpdateResumeLatex(jobId);
+
+  // Exit fullscreen on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+
+  // Lock body scroll in fullscreen mode to prevent background jitter
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
 
   useEffect(() => {
     setCode(latex);
@@ -207,9 +233,16 @@ export function LatexViewer({
   };
 
   return (
-    <Card className="p-0 border-border bg-card/90 overflow-hidden shadow-lg space-y-0 gap-0">
+    <Card
+      className={cn(
+        'border-border bg-card/90 overflow-hidden shadow-lg space-y-0 gap-0 p-0 flex flex-col transition-all duration-200',
+        isFullscreen
+          ? 'fixed inset-0 z-50 rounded-none border-0 h-screen w-screen bg-background shadow-2xl'
+          : 'h-[calc(100vh-14rem)] min-h-[540px]',
+      )}
+    >
       {/* Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b border-border bg-muted/40">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-border bg-muted/40 shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <FileCode className="w-4 h-4 text-brand-cyan" />
@@ -370,11 +403,34 @@ export function LatexViewer({
             <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
             <span>Overleaf</span>
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsFullscreen((prev) => !prev)}
+            className={cn(
+              'h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1 text-foreground cursor-pointer',
+              isFullscreen && 'bg-brand-cyan/15 text-brand-cyan border-brand-cyan/40',
+            )}
+            title={isFullscreen ? 'Exit Fullscreen Studio (Esc)' : 'Open in Fullscreen Studio'}
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5 text-brand-cyan" />
+                <span className="hidden sm:inline">Exit</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Focus</span>
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
       {/* Template Selector Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 bg-muted/20 border-b border-border text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 bg-muted/20 border-b border-border text-xs shrink-0">
         <div className="flex items-center gap-2 flex-wrap">
           <Palette className="w-3.5 h-3.5 text-brand-cyan" />
           <span className="text-xs font-semibold text-foreground">LaTeX Style:</span>
@@ -409,15 +465,16 @@ export function LatexViewer({
 
       {/* Main Workspace: Code, Split, or Preview */}
       <div
-        className={`w-full ${
+        className={cn(
+          'w-full flex-1 min-h-0 overflow-hidden',
           viewMode === 'split'
-            ? 'grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border'
-            : ''
-        }`}
+            ? 'grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border h-full'
+            : 'h-full flex flex-col',
+        )}
       >
         {/* Code Editor Pane */}
         {(viewMode === 'code' || viewMode === 'split') && (
-          <div className="relative flex bg-slate-950 text-slate-100 font-mono text-xs overflow-hidden h-155">
+          <div className="relative flex bg-slate-950 text-slate-100 font-mono text-xs overflow-hidden h-full flex-1 min-h-0">
             {/* Hidden Mirror for Exact Word-Wrap Height Measurement */}
             {wordWrap && (
               <div
@@ -471,7 +528,7 @@ export function LatexViewer({
 
         {/* Live Document Preview Pane (Overleaf-Style Compiled PDF) */}
         {(viewMode === 'preview' || viewMode === 'split') && (
-          <div className="p-3 bg-muted/20 overflow-hidden h-155 flex flex-col">
+          <div className="p-3 bg-muted/20 overflow-hidden h-full flex-1 min-h-0 flex flex-col">
             <CompiledPdfPreview
               jobId={jobId}
               selectedTemplate={selectedTemplate}

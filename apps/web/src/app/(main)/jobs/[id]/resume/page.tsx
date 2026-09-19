@@ -195,7 +195,7 @@ export default function ResumeAuditPage() {
               />
             </TabsContent>
 
-            <TabsContent value="latex">
+            <TabsContent value="latex" className="mt-0 outline-none">
               {latexLoading ? (
                 <div className="p-8 text-center text-xs text-muted-foreground">
                   Loading LaTeX source from Cloudflare R2...
