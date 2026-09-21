@@ -1,7 +1,16 @@
 'use client';
 
 import { calculateMatchScore } from '@praman/schemas';
-import { AlertCircle, ArrowUpDown, Filter, PlusCircle, RefreshCw, Search } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowUpDown,
+  Filter,
+  LayoutGrid,
+  List,
+  PlusCircle,
+  RefreshCw,
+  Search,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Suspense, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,7 +19,9 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
+import { cn } from '@/lib/utils';
 import { JobCard, JobsEmptyState } from './_components/JobCard';
+import { JobsKanbanBoard } from './_components/JobsKanbanBoard';
 
 const STATUS_TABS = [
   { key: 'ALL', label: 'All Jobs' },
@@ -51,6 +62,10 @@ function JobsListContent() {
   const { data: jds = [], isLoading: loading, isFetching, error: fetchError, refetch } = useJobs();
   const error = fetchError ? (fetchError as Error).message : null;
 
+  const [viewMode = 'list', setViewMode] = useUrlQueryParam<'list' | 'board'>('view', 'list', {
+    validValues: ['list', 'board'] as const,
+  });
+
   const [statusFilter, setStatusFilter] = useUrlTab({
     paramName: 'status',
     defaultValue: 'ALL',
@@ -71,11 +86,14 @@ function JobsListContent() {
   const filteredAndSortedJds = useMemo(() => {
     return jds
       .filter((jd) => {
-        const matchesStatus = statusFilter === 'ALL' || (jd.status || 'SAVED') === statusFilter;
+        const matchesStatus =
+          viewMode === 'board' || statusFilter === 'ALL' || (jd.status || 'SAVED') === statusFilter;
         const title = jd.structured?.jobTitle?.toLowerCase() || '';
+        const location = jd.structured?.locationOrWorkMode?.toLowerCase() || '';
         const text = jd.rawText?.toLowerCase() || '';
         const query = searchQuery.trim().toLowerCase();
-        const matchesSearch = !query || title.includes(query) || text.includes(query);
+        const matchesSearch =
+          !query || title.includes(query) || location.includes(query) || text.includes(query);
         return matchesStatus && matchesSearch;
       })
       .sort((a, b) => {
@@ -91,7 +109,7 @@ function JobsListContent() {
         // default: newest
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
-  }, [jds, statusFilter, sortBy, searchQuery]);
+  }, [jds, statusFilter, sortBy, searchQuery, viewMode]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -140,44 +158,54 @@ function JobsListContent() {
         </div>
       </div>
 
-      {/* Filter & Sort Controls */}
+      {/* Filter, Sort & View Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        {/* Status Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-          {STATUS_TABS.map((tab) => {
-            const count = statusCounts[tab.key] || 0;
-            const isActive = statusFilter === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setStatusFilter(tab.key)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                  isActive
-                    ? 'bg-foreground text-background shadow-xs'
-                    : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border/60'
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isActive ? 'bg-background/20 text-background' : 'bg-muted text-muted-foreground'
+        {/* Status Tabs (List View) or Pipeline Helper (Board View) */}
+        {viewMode === 'list' ? (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+            {STATUS_TABS.map((tab) => {
+              const count = statusCounts[tab.key] || 0;
+              const isActive = statusFilter === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.key)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                    isActive
+                      ? 'bg-foreground text-background shadow-xs'
+                      : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border/60'
                   }`}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                      isActive
+                        ? 'bg-background/20 text-background'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">Kanban View</span>
+            <span className="text-muted-foreground/40">•</span>
+            <span>Drag cards between columns or use the card menu to advance stages</span>
+          </div>
+        )}
 
-        {/* Search & Sort */}
+        {/* Search, Sort & View Switcher */}
         <div className="flex items-center gap-2.5">
           <div className="relative flex-1 md:w-56">
             <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search jobs..."
+              placeholder="Search jobs or companies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand-cyan"
@@ -205,6 +233,40 @@ function JobsListContent() {
                 Lowest Match
               </option>
             </select>
+          </div>
+
+          {/* View Mode Toggle: List vs Board */}
+          <div className="flex items-center bg-card border border-border rounded-lg p-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              aria-label="List view"
+              className={cn(
+                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer',
+                viewMode === 'list'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              title="List View"
+            >
+              <List className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">List</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('board')}
+              aria-label="Board view"
+              className={cn(
+                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer',
+                viewMode === 'board'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              title="Kanban Board View"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Board</span>
+            </button>
           </div>
         </div>
       </div>
@@ -271,6 +333,8 @@ function JobsListContent() {
             Clear Filters
           </Button>
         </div>
+      ) : viewMode === 'board' ? (
+        <JobsKanbanBoard jobs={filteredAndSortedJds} />
       ) : (
         <div className="space-y-4">
           {filteredAndSortedJds.map((jd) => (

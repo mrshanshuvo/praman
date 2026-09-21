@@ -1,6 +1,6 @@
+import fs from 'node:fs';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import type { ResumeData } from '@praman/schemas';
-import fs from 'node:fs';
 import puppeteer, { type Browser } from 'puppeteer-core';
 
 const CATEGORY_MAP: Record<string, string> = {

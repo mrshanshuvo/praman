@@ -13,11 +13,12 @@ import {
   Maximize2,
   Minimize2,
   Palette,
+  RefreshCw,
   RotateCcw,
   Save,
   WrapText,
 } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -213,6 +214,17 @@ export function LatexViewer({
     };
   }, [isFullscreen]);
 
+  // Global keyboard shortcuts (Escape exits fullscreen)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [isFullscreen]);
+
   useEffect(() => {
     setCode(latex);
   }, [latex]);
@@ -259,7 +271,7 @@ export function LatexViewer({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       await updateLatexMutation.mutateAsync({
         latex: code,
@@ -271,7 +283,7 @@ export function LatexViewer({
     } catch (err) {
       console.error('Failed to save LaTeX to R2:', err);
     }
-  };
+  }, [code, selectedTemplate, updateLatexMutation]);
 
   const handleReset = () => {
     setCode(latex);
@@ -313,6 +325,27 @@ export function LatexViewer({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Ctrl+S / Cmd+S: Save and sync to Cloudflare R2
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      handleSave();
+      return;
+    }
+
+    // Ctrl+Enter / Cmd+Enter: Recompile live PDF preview
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      setRecompileKey((k) => k + 1);
+      return;
+    }
+
+    // Escape: Exit fullscreen mode
+    if (e.key === 'Escape' && isFullscreen) {
+      e.preventDefault();
+      setIsFullscreen(false);
+      return;
+    }
+
     if (e.key === 'Tab') {
       e.preventDefault();
       const textarea = textareaRef.current;
@@ -458,14 +491,32 @@ export function LatexViewer({
                 size="sm"
                 onClick={handleSave}
                 disabled={updateLatexMutation.isPending}
-                className="h-8 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm gap-1"
+                className="h-8 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm gap-1.5 cursor-pointer"
+                title="Save & Sync to Cloudflare R2 (Ctrl+S)"
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>
-                  {updateLatexMutation.isPending ? 'Saving to R2...' : 'Save & Sync to R2'}
-                </span>
+                <span>{updateLatexMutation.isPending ? 'Saving to R2...' : 'Save & Sync'}</span>
+                <kbd className="hidden sm:inline-flex items-center text-[10px] font-mono font-medium bg-black/20 text-white/90 px-1 py-0.2 rounded border border-white/20">
+                  Ctrl+S
+                </kbd>
               </Button>
             </>
+          )}
+
+          {(viewMode === 'split' || viewMode === 'preview') && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRecompileKey((k) => k + 1)}
+              className="h-8 text-xs border-border bg-background hover:bg-muted gap-1.5 cursor-pointer text-foreground"
+              title="Recompile PDF Preview (Ctrl+Enter)"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-brand-cyan" />
+              <span className="hidden sm:inline">Recompile</span>
+              <kbd className="hidden md:inline-flex items-center text-[10px] font-mono text-muted-foreground bg-muted px-1 py-0.2 rounded border border-border">
+                Ctrl+↵
+              </kbd>
+            </Button>
           )}
 
           <Button
