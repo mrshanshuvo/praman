@@ -16,7 +16,6 @@ import {
   RefreshCw,
   Send,
   Share2,
-  ShieldCheck,
   Sparkles,
   WrapText,
 } from 'lucide-react';
