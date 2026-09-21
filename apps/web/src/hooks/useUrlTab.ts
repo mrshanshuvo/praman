@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UpdateUrlOptions {
   key: string;
@@ -186,11 +186,17 @@ export interface UseUrlQueryParamOptions<T extends string = string> {
    * Optional whitelist of valid values to prevent invalid inputs
    */
   validValues?: readonly T[];
+  /**
+   * Optional debounce delay in milliseconds for URL updates (e.g. 250ms for search inputs).
+   * React state updates immediately so inputs remain responsive, while URL writes are debounced.
+   */
+  debounceMs?: number;
 }
 
 /**
  * Reusable hook to synchronize a single URL query param (?key=value) with React state.
- * Supports typed defaults, clean URLs, hash preservation, and multi-component synchronization.
+ * Supports typed defaults, clean URLs, hash preservation, multi-component synchronization,
+ * and optional debouncing for high-frequency inputs.
  */
 export function useUrlQueryParam<T extends string>(
   key: string,
@@ -207,8 +213,9 @@ export function useUrlQueryParam<T extends string>(
   defaultValue?: T,
   options: UseUrlQueryParamOptions<T> = {},
 ): [T | undefined, (value: T | undefined | ((prev: T | undefined) => T | undefined)) => void] {
-  const { omitDefault = true, history = 'replace', validValues } = options;
+  const { omitDefault = true, history = 'replace', validValues, debounceMs = 0 } = options;
   const searchParams = useSearchParams();
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getValidValue = useCallback(
     (val: string | null): T | undefined => {
@@ -235,19 +242,39 @@ export function useUrlQueryParam<T extends string>(
             : newValueOrFn;
         const valid = resolved !== undefined ? getValidValue(resolved) : defaultValue;
 
-        updateBrowserUrl({
-          key,
-          value: valid,
-          defaultValue,
-          omitDefault,
-          history,
-        });
+        if (debounceMs > 0) {
+          if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+          debounceTimerRef.current = setTimeout(() => {
+            updateBrowserUrl({
+              key,
+              value: valid,
+              defaultValue,
+              omitDefault,
+              history,
+            });
+          }, debounceMs);
+        } else {
+          updateBrowserUrl({
+            key,
+            value: valid,
+            defaultValue,
+            omitDefault,
+            history,
+          });
+        }
 
         return valid;
       });
     },
-    [key, defaultValue, omitDefault, history, getValidValue],
+    [key, defaultValue, omitDefault, history, debounceMs, getValidValue],
   );
+
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
 
   // Sync state when URL searchParams change via Next.js navigation
   useEffect(() => {

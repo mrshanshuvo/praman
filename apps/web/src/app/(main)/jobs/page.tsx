@@ -57,7 +57,7 @@ function JobsListContent() {
     validValues: VALID_STATUSES,
   });
   const [sortBy, setSortBy] = useUrlQueryParam<string>('sort', 'newest');
-  const [searchQuery, setSearchQuery] = useUrlQueryParam<string>('q', '');
+  const [searchQuery, setSearchQuery] = useUrlQueryParam<string>('q', '', { debounceMs: 250 });
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { ALL: jds.length };
