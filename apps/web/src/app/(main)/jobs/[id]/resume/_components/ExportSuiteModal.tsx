@@ -239,7 +239,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
 
             <Badge
               variant="outline"
-              className="text-[11px] font-mono border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan flex items-center gap-1"
+              className="text-xs font-mono border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan flex items-center gap-1"
             >
               <Palette className="w-3 h-3" />
               <span>Style: {templateInfo.name}</span>
@@ -258,7 +258,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan font-mono"
+                  className="text-2xs bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan font-mono"
                 >
                   1-CLICK PDF
                 </Badge>
@@ -285,7 +285,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
               <button
                 type="button"
                 onClick={handlePrintPdf}
-                className="w-full text-center text-[11px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center justify-center gap-1 pt-0.5"
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground cursor-pointer flex items-center justify-center gap-1 pt-0.5"
               >
                 <Printer className="w-3 h-3" />
                 <span>Print via Browser dialog</span>
@@ -303,7 +303,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-brand-pink/10 border-brand-pink/30 text-brand-pink font-mono"
+                  className="text-2xs bg-brand-pink/10 border-brand-pink/30 text-brand-pink font-mono"
                 >
                   1-CLICK IDE
                 </Badge>
@@ -333,7 +333,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-muted border-border text-muted-foreground font-mono"
+                  className="text-2xs bg-muted border-border text-muted-foreground font-mono"
                 >
                   {templateInfo.name}
                 </Badge>
@@ -373,12 +373,12 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Archive className="w-4 h-4 text-amber-500" />
+                  <Archive className="w-4 h-4 text-warning" />
                   <h4 className="text-sm font-semibold text-foreground">Complete Archive (.zip)</h4>
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-amber-500/10 border-amber-500/30 text-amber-500 font-mono"
+                  className="text-2xs bg-warning/10 border-warning/30 text-warning font-mono"
                 >
                   FULL BUNDLE
                 </Badge>
@@ -396,7 +396,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
               className="w-full text-xs border-border gap-1.5 bg-card hover:bg-muted cursor-pointer"
             >
               <Download
-                className={`w-3.5 h-3.5 text-amber-500 ${isDownloadingZip ? 'animate-spin' : ''}`}
+                className={`w-3.5 h-3.5 text-warning ${isDownloadingZip ? 'animate-spin' : ''}`}
               />
               <span>
                 {isDownloadingZip ? 'Packaging 3 PDFs & Ledger...' : 'Download .zip Package'}
@@ -409,12 +409,12 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-emerald-400" />
+                  <FileText className="w-4 h-4 text-success" />
                   <h4 className="text-sm font-semibold text-foreground">ATS Plain Text (.txt)</h4>
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-mono"
+                  className="text-2xs bg-success/10 border-success/30 text-success font-mono"
                 >
                   ASCII TEXT
                 </Badge>
@@ -442,7 +442,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 title="Copy Plain Text"
               >
                 {copiedFormat === 'txt' ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3.5 h-3.5 text-success" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
                 )}
@@ -455,12 +455,12 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-brand-purple dark:text-purple-400" />
+                  <FileText className="w-4 h-4 text-status-neutral" />
                   <h4 className="text-sm font-semibold text-foreground">Markdown Resume (.md)</h4>
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-purple-500/10 border-purple-500/30 text-purple-400 font-mono"
+                  className="text-2xs bg-status-neutral/10 border-status-neutral/30 text-status-neutral font-mono"
                 >
                   GFM MARKDOWN
                 </Badge>
@@ -488,7 +488,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 title="Copy Markdown"
               >
                 {copiedFormat === 'md' ? (
-                  <Check className="w-3.5 h-3.5 text-purple-400" />
+                  <Check className="w-3.5 h-3.5 text-status-neutral" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
                 )}
@@ -508,7 +508,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-cyan-500/10 border-cyan-500/30 text-cyan-400 font-mono"
+                  className="text-2xs bg-cyan-500/10 border-cyan-500/30 text-cyan-400 font-mono"
                 >
                   STANDARDIZED ATS TAXONOMY
                 </Badge>
@@ -540,12 +540,12 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
                 {copiedFormat === 'ats_json' ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="text-cyan-400 font-mono text-[11px]">Copied</span>
+                    <span className="text-cyan-400 font-mono text-xs">Copied</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span className="font-mono text-[11px]">Copy JSON</span>
+                    <span className="font-mono text-xs">Copy JSON</span>
                   </>
                 )}
               </Button>

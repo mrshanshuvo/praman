@@ -139,7 +139,7 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
 
           <Badge
             variant="outline"
-            className="hidden sm:inline-flex text-[10px] font-mono border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan"
+            className="hidden sm:inline-flex text-2xs font-mono border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan"
           >
             A4 1-PAGE DENSITY
           </Badge>

@@ -34,7 +34,7 @@ export default function ErrorBoundary({
             An unexpected error was encountered while processing your truth-verified pipeline data.
           </p>
           {error.digest && (
-            <p className="text-[11px] font-mono text-muted-foreground/60 bg-muted/40 py-1 px-2 rounded-md inline-block">
+            <p className="text-xs font-mono text-muted-foreground/60 bg-muted/40 py-1 px-2 rounded-md inline-block">
               Digest: {error.digest}
             </p>
           )}

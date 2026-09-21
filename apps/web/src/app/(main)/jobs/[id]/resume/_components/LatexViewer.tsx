@@ -39,14 +39,14 @@ export const TEMPLATES = [
     id: 'classic-academic',
     name: 'Classic Academic',
     badge: 'Formal & Research',
-    color: 'text-amber-500 border-amber-500/30 bg-amber-500/10',
+    color: 'text-warning border-warning/30 bg-warning/10',
     description: 'Traditional Computer Modern serif, small-caps section titles, academic rules.',
   },
   {
     id: 'compact-executive',
     name: 'Compact Executive',
     badge: '1-Page Senior',
-    color: 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10',
+    color: 'text-success border-success/30 bg-success/10',
     description: 'Condensed high-density layout with 0.5cm margins and bold leadership styling.',
   },
 ];
@@ -388,10 +388,10 @@ export function LatexViewer({
 
           <Badge
             variant="outline"
-            className={`text-[11px] font-mono font-semibold px-2 py-0.5 ${
+            className={`text-xs font-mono font-semibold px-2 py-0.5 ${
               isDirty
-                ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                ? 'bg-warning/15 text-warning border-warning/30'
+                : 'bg-success/15 text-success border-success/30'
             }`}
           >
             {isDirty ? 'Unsaved Edits' : 'Synced with R2'}
@@ -491,12 +491,12 @@ export function LatexViewer({
                 size="sm"
                 onClick={handleSave}
                 disabled={updateLatexMutation.isPending}
-                className="h-8 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm gap-1.5 cursor-pointer"
+                className="h-8 text-xs font-semibold bg-success hover:bg-success/90 text-success-foreground shadow-sm gap-1.5 cursor-pointer"
                 title="Save & Sync to Cloudflare R2 (Ctrl+S)"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{updateLatexMutation.isPending ? 'Saving to R2...' : 'Save & Sync'}</span>
-                <kbd className="hidden sm:inline-flex items-center text-[10px] font-mono font-medium bg-black/20 text-white/90 px-1 py-0.2 rounded border border-white/20">
+                <kbd className="hidden sm:inline-flex items-center text-2xs font-mono font-medium bg-black/20 text-white/90 px-1 py-0.2 rounded border border-white/20">
                   Ctrl+S
                 </kbd>
               </Button>
@@ -513,7 +513,7 @@ export function LatexViewer({
             >
               <RefreshCw className="w-3.5 h-3.5 text-brand-cyan" />
               <span className="hidden sm:inline">Recompile</span>
-              <kbd className="hidden md:inline-flex items-center text-[10px] font-mono text-muted-foreground bg-muted px-1 py-0.2 rounded border border-border">
+              <kbd className="hidden md:inline-flex items-center text-2xs font-mono text-muted-foreground bg-muted px-1 py-0.2 rounded border border-border">
                 Ctrl+↵
               </kbd>
             </Button>
@@ -555,7 +555,7 @@ export function LatexViewer({
             className="h-8 text-xs font-medium border-border bg-background hover:bg-muted gap-1 text-foreground cursor-pointer"
             title="Open in Overleaf editor"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+            <ExternalLink className="w-3.5 h-3.5 text-success" />
             <span>Overleaf</span>
           </Button>
 
@@ -613,7 +613,7 @@ export function LatexViewer({
           </div>
         </div>
 
-        <span className="text-[11px] font-sans text-muted-foreground hidden md:inline">
+        <span className="text-xs font-sans text-muted-foreground hidden md:inline">
           {TEMPLATES.find((t) => t.id === (selectedTemplate || 'modern-developer'))?.description}
         </span>
       </div>

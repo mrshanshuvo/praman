@@ -206,7 +206,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
 
             <Badge
               variant="outline"
-              className="hidden sm:inline-flex text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-medium"
+              className="hidden sm:inline-flex text-xs px-2.5 py-0.5 rounded-full bg-success/10 text-success border-success/30 font-medium"
             >
               $0 Cost • 100% Offline
             </Badge>
@@ -283,7 +283,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
               </div>
 
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <ShieldCheckIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+                <ShieldCheckIcon className="w-4 h-4 text-success shrink-0" />
                 <span>
                   Runs completely on your local server. No data is sent to OpenAI or third-party
                   APIs.
@@ -335,7 +335,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
                       </span>
                       <Badge
                         variant="outline"
-                        className="text-[10px] bg-primary/10 text-primary border-primary/30"
+                        className="text-2xs bg-primary/10 text-primary border-primary/30"
                       >
                         Recommended
                       </Badge>
@@ -358,7 +358,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
                       <span className="text-sm font-semibold text-foreground">Replace Profile</span>
                       <Badge
                         variant="outline"
-                        className="text-[10px] bg-destructive/10 text-destructive border-destructive/30"
+                        className="text-2xs bg-destructive/10 text-destructive border-destructive/30"
                       >
                         Overwrite
                       </Badge>
@@ -422,7 +422,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
                             {exp.isCurrent && (
                               <Badge
                                 variant="outline"
-                                className="text-[10px] bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
+                                className="text-2xs bg-success/10 text-success border-success/30"
                               >
                                 Current
                               </Badge>
@@ -445,7 +445,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
                                 </li>
                               ))}
                               {exp.responsibilities.length > 3 && (
-                                <li className="text-[11px] text-muted-foreground italic">
+                                <li className="text-xs text-muted-foreground italic">
                                   +{exp.responsibilities.length - 3} more bullet points
                                 </li>
                               )}
@@ -457,7 +457,7 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
                               {exp.technologies.map((tech, tIdx) => (
                                 <span
                                   key={tIdx}
-                                  className="text-[10px] px-2 py-0.5 rounded-md bg-muted border border-border text-foreground/80"
+                                  className="text-2xs px-2 py-0.5 rounded-md bg-muted border border-border text-foreground/80"
                                 >
                                   {tech}
                                 </span>

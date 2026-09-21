@@ -43,7 +43,7 @@ export function FeatureHighlights() {
               >
                 <Icon className="w-5 h-5" />
               </div>
-              <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded-full bg-muted/60 border border-border text-muted-foreground">
+              <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-muted/60 border border-border text-muted-foreground">
                 {feature.badge}
               </span>
             </div>

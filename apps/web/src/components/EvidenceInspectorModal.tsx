@@ -62,10 +62,10 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
               <div
                 className={`p-2 rounded-xl border ${
                   isVerified
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                    ? 'bg-success/10 border-success/30 text-success'
                     : isFlagged
-                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                      : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      ? 'bg-warning/10 border-warning/30 text-warning'
+                      : 'bg-destructive/10 border-destructive/30 text-destructive'
                 }`}
               >
                 {evidence.type === 'experience' || evidence.type === 'bullet' ? (
@@ -92,10 +92,10 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
               variant="outline"
               className={`text-xs font-mono font-bold px-2.5 py-0.5 uppercase shrink-0 ${
                 isVerified
-                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                  ? 'bg-success/10 border-success/30 text-success'
                   : isFlagged
-                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
-                    : 'bg-rose-500/15 border-rose-500/30 text-rose-400'
+                    ? 'bg-warning/10 border-warning/30 text-warning'
+                    : 'bg-destructive/10 border-destructive/30 text-destructive'
               }`}
             >
               {evidence.validationStatus}
@@ -107,18 +107,18 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
         <div
           className={`p-3.5 rounded-xl border flex items-start gap-3 text-xs ${
             isVerified
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+              ? 'bg-success/10 border-success/20 text-success'
               : isFlagged
-                ? 'bg-amber-500/10 border-amber-500/20 text-amber-300'
-                : 'bg-rose-500/10 border-rose-500/20 text-rose-300'
+                ? 'bg-warning/10 border-warning/20 text-warning'
+                : 'bg-destructive/10 border-destructive/20 text-destructive'
           }`}
         >
           {isVerified ? (
-            <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 shrink-0 text-success mt-0.5" />
           ) : isFlagged ? (
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 shrink-0 text-warning mt-0.5" />
           ) : (
-            <ShieldAlert className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+            <ShieldAlert className="w-4 h-4 shrink-0 text-destructive mt-0.5" />
           )}
 
           <div className="space-y-1">
@@ -149,7 +149,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                 Generated Resume Claim
               </span>
               {evidence.sourceTitle && (
-                <span className="text-[11px] font-mono text-muted-foreground truncate max-w-37.5">
+                <span className="text-xs font-mono text-muted-foreground truncate max-w-37.5">
                   {evidence.sourceTitle}
                 </span>
               )}
@@ -160,7 +160,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
             </div>
 
             {evidence.flaggedNumbers && evidence.flaggedNumbers.length > 0 && (
-              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-mono bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+              <div className="flex items-center gap-1.5 text-xs text-warning font-mono bg-warning/10 p-2 rounded-lg border border-warning/20">
                 <Hash className="w-3.5 h-3.5 shrink-0" />
                 <span>Flagged Metrics: {evidence.flaggedNumbers.join(', ')}</span>
               </div>
@@ -174,7 +174,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                 Ground-Truth Profile Evidence
               </span>
               {evidence.sourceId && (
-                <span className="text-[11px] font-mono text-muted-foreground">
+                <span className="text-xs font-mono text-muted-foreground">
                   ID: {evidence.sourceId.slice(0, 8)}...
                 </span>
               )}
@@ -203,7 +203,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                 {evidence.candidateRecord.level && (
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Proficiency Level:</span>
-                    <Badge variant="outline" className="text-[11px] font-mono">
+                    <Badge variant="outline" className="text-xs font-mono">
                       {evidence.candidateRecord.level}
                     </Badge>
                   </div>
@@ -211,7 +211,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
 
                 {evidence.candidateRecord.evidence && (
                   <div className="space-y-1 pt-1">
-                    <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">
                       Skill Evidence:
                     </span>
                     <p className="text-muted-foreground leading-relaxed bg-muted/40 p-2.5 rounded-lg border border-border/60">
@@ -223,7 +223,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                 {/* Raw Achievements or Responsibilities */}
                 {evidence.candidateRecord.achievements?.length > 0 && (
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">
                       Raw Achievements:
                     </span>
                     <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
@@ -236,7 +236,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
 
                 {evidence.candidateRecord.responsibilities?.length > 0 && (
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">
                       Raw Responsibilities:
                     </span>
                     <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
@@ -249,7 +249,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
 
                 {evidence.candidateRecord.outcomes?.length > 0 && (
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">
                       Project Outcomes:
                     </span>
                     <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
@@ -265,7 +265,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                     {evidence.candidateRecord.technologies.map((t: string, i: number) => (
                       <span
                         key={i}
-                        className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground"
+                        className="px-1.5 py-0.5 rounded text-2xs font-mono bg-muted text-muted-foreground"
                       >
                         {t}
                       </span>

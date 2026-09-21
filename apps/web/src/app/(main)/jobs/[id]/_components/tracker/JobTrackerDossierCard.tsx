@@ -118,7 +118,7 @@ export const JobTrackerDossierCard: React.FC<JobTrackerDossierCardProps> = ({
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6">
         <div className="p-3.5 rounded-xl border border-border/70 bg-muted/20">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
             Applied Date
           </span>
           <span className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
@@ -128,7 +128,7 @@ export const JobTrackerDossierCard: React.FC<JobTrackerDossierCardProps> = ({
         </div>
 
         <div className="p-3.5 rounded-xl border border-border/70 bg-muted/20">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
             Target Comp
           </span>
           <span className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
@@ -138,7 +138,7 @@ export const JobTrackerDossierCard: React.FC<JobTrackerDossierCardProps> = ({
         </div>
 
         <div className="p-3.5 rounded-xl border border-border/70 bg-muted/20">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
             Recruiter / Contact
           </span>
           <span className="text-sm font-semibold text-foreground mt-1 truncate flex items-center gap-1.5">
@@ -148,7 +148,7 @@ export const JobTrackerDossierCard: React.FC<JobTrackerDossierCardProps> = ({
         </div>
 
         <div className="p-3.5 rounded-xl border border-border/70 bg-muted/20">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
             Application Portal
           </span>
           {tracker?.portalUrl ? (

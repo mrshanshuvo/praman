@@ -194,7 +194,7 @@ function JobDetailContent() {
             {jd?.tracker?.milestones && jd.tracker.milestones.length > 0 && (
               <Badge
                 variant="secondary"
-                className="text-[10px] px-1.5 py-0 h-4 font-mono font-bold ml-0.5"
+                className="text-2xs px-1.5 py-0 h-4 font-mono font-bold ml-0.5"
               >
                 {jd.tracker.milestones.length}
               </Badge>

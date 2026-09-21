@@ -51,7 +51,7 @@ export function UserNav() {
         title={user.email}
       >
         <Avatar size="sm" className="size-5 shrink-0">
-          <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-[10px] font-bold text-brand-dark uppercase">
+          <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-2xs font-bold text-brand-dark uppercase">
             {initials}
           </AvatarFallback>
         </Avatar>

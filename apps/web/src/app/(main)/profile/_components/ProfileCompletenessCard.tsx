@@ -143,8 +143,8 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
     if (percentage === 100)
       return {
         label: 'Complete & Ready',
-        color: 'text-emerald-500',
-        bg: 'bg-emerald-500/10 border-emerald-500/30',
+        color: 'text-success',
+        bg: 'bg-success/10 border-success/30',
       };
     if (percentage >= 80)
       return {
@@ -155,8 +155,8 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
     if (percentage >= 50)
       return {
         label: 'Good Progress',
-        color: 'text-amber-500',
-        bg: 'bg-amber-500/10 border-amber-500/30',
+        color: 'text-warning',
+        bg: 'bg-warning/10 border-warning/30',
       };
     return {
       label: 'Needs Information',
@@ -221,7 +221,7 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
               >
                 <Circle className="w-3 h-3 text-brand-pink shrink-0" />
                 <span>{item.label}</span>
-                <span className="text-[10px] text-muted-foreground group-hover:text-brand-cyan ml-0.5">
+                <span className="text-2xs text-muted-foreground group-hover:text-brand-cyan ml-0.5">
                   +{item.weight}%
                 </span>
               </button>
@@ -229,7 +229,7 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-2 text-xs text-emerald-500 font-medium">
+        <div className="flex items-center gap-2 text-xs text-success font-medium">
           <CheckCircle2 className="w-4 h-4" />
           <span>
             All core resume profile dimensions are fully populated. Ready for optimal match

@@ -217,7 +217,7 @@ export function MatchDiffInspector({
             </div>
             <div>
               <p className="text-xs font-semibold text-foreground">Candidate Skills Updated</p>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Skill levels have been updated. Re-run Stage 2 to recalculate alignment with the
                 latest profile.
               </p>
@@ -252,7 +252,7 @@ export function MatchDiffInspector({
               <h4 className="text-xs font-semibold text-foreground">
                 Match Diff & Evidence Inspector
               </h4>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Side-by-side verification between Target JD Requirements and Candidate Ground-Truth
               </p>
             </div>
@@ -324,14 +324,14 @@ export function MatchDiffInspector({
                 <Search className="w-4 h-4 text-brand-cyan" />
                 <h4 className="text-sm font-semibold text-foreground">Target JD Requirements</h4>
               </div>
-              <Badge variant="outline" className="text-[11px] font-mono border-border bg-muted/60">
+              <Badge variant="outline" className="text-xs font-mono border-border bg-muted/60">
                 {filteredSkills.length} Skills Analyzed
               </Badge>
             </div>
 
             {/* Skills Status Grid */}
             <div className="space-y-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Prerequisite Skills & Status
               </span>
               <div className="flex flex-wrap gap-1.5 max-h-72 overflow-y-auto pr-1">
@@ -342,7 +342,7 @@ export function MatchDiffInspector({
                   let statusBadge = (
                     <Badge
                       variant="outline"
-                      className="text-[10px] bg-muted/50 text-muted-foreground border-border"
+                      className="text-2xs bg-muted/50 text-muted-foreground border-border"
                     >
                       Untracked
                     </Badge>
@@ -353,7 +353,7 @@ export function MatchDiffInspector({
 
                   if (skill.status === 'strong') {
                     statusBadge = (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-brand-cyan">
+                      <span className="inline-flex items-center gap-1 text-2xs font-medium text-brand-cyan">
                         <CheckCircle2 className="w-2.5 h-2.5" /> Verified
                       </span>
                     );
@@ -362,16 +362,16 @@ export function MatchDiffInspector({
                       : 'border-brand-cyan/30 bg-brand-cyan/10 hover:border-brand-cyan/60';
                   } else if (skill.status === 'partial') {
                     statusBadge = (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-500 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 text-2xs font-medium text-success">
                         <Sparkles className="w-2.5 h-2.5" /> Partial
                       </span>
                     );
                     cardStyle = isSelected
-                      ? 'border-emerald-500 bg-emerald-500/25 shadow-xs'
-                      : 'border-emerald-500/30 bg-emerald-500/10 hover:border-emerald-500/60';
+                      ? 'border-success bg-success/25 shadow-xs'
+                      : 'border-success/30 bg-success/10 hover:border-success/60';
                   } else if (skill.status === 'missing') {
                     statusBadge = (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-brand-pink">
+                      <span className="inline-flex items-center gap-1 text-2xs font-medium text-brand-pink">
                         <XCircle className="w-2.5 h-2.5" /> Missing
                       </span>
                     );
@@ -393,7 +393,7 @@ export function MatchDiffInspector({
                         <span className="font-mono font-medium text-foreground truncate">
                           {skill.name}
                         </span>
-                        <span className="text-[10px] text-muted-foreground font-sans shrink-0">
+                        <span className="text-2xs text-muted-foreground font-sans shrink-0">
                           • {skill.type === 'required' ? 'Req' : 'Pref'}
                         </span>
                         {statusBadge}
@@ -411,7 +411,7 @@ export function MatchDiffInspector({
                           e.stopPropagation();
                           handleStartTune(skill.name, skill.type);
                         }}
-                        className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-card/60 hover:bg-muted border border-border/60 text-[10px] font-mono text-muted-foreground hover:text-foreground shrink-0 cursor-pointer transition-colors"
+                        className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-card/60 hover:bg-muted border border-border/60 text-2xs font-mono text-muted-foreground hover:text-foreground shrink-0 cursor-pointer transition-colors"
                       >
                         <SlidersHorizontal className="w-2.5 h-2.5 text-brand-cyan" />
                         <span className="hidden sm:inline">
@@ -427,7 +427,7 @@ export function MatchDiffInspector({
             {/* Responsibilities list if available */}
             {structured?.responsibilities && structured.responsibilities.length > 0 && (
               <div className="space-y-2 pt-2 border-t border-border">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Expected JD Responsibilities ({structured.responsibilities.length})
                 </span>
                 <ul className="space-y-1.5 text-xs text-muted-foreground">
@@ -475,17 +475,17 @@ export function MatchDiffInspector({
           <Card className="p-4 border-border bg-card/60 backdrop-blur-md space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                <Briefcase className="w-4 h-4 text-success" />
                 <h4 className="text-sm font-semibold text-foreground">Candidate Evidence Ledger</h4>
               </div>
-              <Badge variant="outline" className="text-[11px] font-mono border-border bg-muted/60">
+              <Badge variant="outline" className="text-xs font-mono border-border bg-muted/60">
                 Ground-Truth Verified
               </Badge>
             </div>
 
             {/* Linked Verified Experiences */}
             <div className="space-y-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Target-Aligned Experience Records ({relevantExperiences.length})
               </span>
 
@@ -511,7 +511,7 @@ export function MatchDiffInspector({
                         {exp.role}{' '}
                         <span className="text-muted-foreground font-normal">@ {exp.company}</span>
                       </h5>
-                      <span className="text-[10px] font-mono text-muted-foreground shrink-0">
+                      <span className="text-2xs font-mono text-muted-foreground shrink-0">
                         {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                       </span>
                     </div>
@@ -519,7 +519,7 @@ export function MatchDiffInspector({
                     <ul className="space-y-1 mb-2 text-xs text-muted-foreground">
                       {exp.bullets?.slice(0, 2).map((bullet: string, bIdx: number) => (
                         <li key={bIdx} className="leading-relaxed flex items-start gap-1.5">
-                          <span className="text-brand-cyan font-mono text-[10px] mt-0.5">▸</span>
+                          <span className="text-brand-cyan font-mono text-2xs mt-0.5">▸</span>
                           <span>{highlightBullet(bullet)}</span>
                         </li>
                       ))}
@@ -535,7 +535,7 @@ export function MatchDiffInspector({
                           <span
                             key={tIdx}
                             onClick={() => setSelectedSkill(isTechSelected ? null : tech)}
-                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded cursor-pointer transition-colors ${
+                            className={`text-2xs font-mono px-1.5 py-0.5 rounded cursor-pointer transition-colors ${
                               isTechSelected
                                 ? 'bg-brand-cyan text-brand-dark font-bold'
                                 : isTechMatched
@@ -556,7 +556,7 @@ export function MatchDiffInspector({
             {/* Linked Projects */}
             {relevantProjects.length > 0 && (
               <div className="space-y-2.5 pt-2 border-t border-border">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                   <FolderGit2 className="w-3.5 h-3.5 text-brand-cyan" />
                   <span>Aligned Portfolio Projects ({relevantProjects.length})</span>
                 </span>
@@ -568,14 +568,14 @@ export function MatchDiffInspector({
                   >
                     <div className="flex items-center justify-between">
                       <h5 className="text-xs font-semibold text-foreground">{proj.title}</h5>
-                      <span className="text-[10px] text-muted-foreground font-mono">
+                      <span className="text-2xs text-muted-foreground font-mono">
                         {proj.role}
                       </span>
                     </div>
                     <ul className="space-y-1 text-xs text-muted-foreground">
                       {proj.bullets?.slice(0, 1).map((b: string, i: number) => (
                         <li key={i} className="leading-relaxed flex items-start gap-1.5">
-                          <span className="text-emerald-500 font-mono text-[10px] mt-0.5">▸</span>
+                          <span className="text-success font-mono text-2xs mt-0.5">▸</span>
                           <span>{highlightBullet(b)}</span>
                         </li>
                       ))}
@@ -594,7 +594,7 @@ export function MatchDiffInspector({
                     Ground-Truth Boundaries: Do Not Claim
                   </h5>
                 </div>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   These JD requirements were identified as unverified or marked as NOT_LEARNED in
                   candidate profile. The resume generator is strictly forbidden from fabricating
                   claims for:

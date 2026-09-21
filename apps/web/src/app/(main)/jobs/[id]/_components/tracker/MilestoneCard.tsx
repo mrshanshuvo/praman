@@ -31,11 +31,11 @@ const MILESTONE_STATUSES: MilestoneStatus[] = [
 ];
 
 const STATUS_COLORS: Record<MilestoneStatus, string> = {
-  SCHEDULED: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
-  COMPLETED: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
-  PASSED: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
-  NEEDS_FOLLOW_UP: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
-  CANCELLED: 'bg-destructive/10 text-destructive border-destructive/30',
+  SCHEDULED:       'bg-info/10 text-info border-info/30',
+  COMPLETED:       'bg-success/10 text-success border-success/30',
+  PASSED:          'bg-success/10 text-success border-success/30',
+  NEEDS_FOLLOW_UP: 'bg-warning/10 text-warning border-warning/30',
+  CANCELLED:       'bg-destructive/10 text-destructive border-destructive/30',
 };
 
 export const MilestoneCard: React.FC<MilestoneCardProps> = ({
@@ -66,7 +66,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
             <h4 className="text-sm font-semibold text-foreground">{milestone.title}</h4>
             <Badge
               variant="outline"
-              className={`text-[10px] uppercase font-semibold ${STATUS_COLORS[milestone.status]}`}
+              className={`text-2xs uppercase font-semibold ${STATUS_COLORS[milestone.status]}`}
             >
               {milestone.status.replace('_', ' ')}
             </Badge>
@@ -100,7 +100,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 text-[11px] px-2 gap-1 border-border bg-card cursor-pointer"
+                  className="h-7 text-xs px-2 gap-1 border-border bg-card cursor-pointer"
                 >
                   <span>Status</span>
                   <ChevronDown className="w-3 h-3 text-muted-foreground" />
@@ -168,7 +168,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
         {isExpanded && (
           <div className="mt-3 space-y-2 pl-4 border-l-2 border-primary/20">
             {milestone.questionsAsked.length === 0 ? (
-              <p className="text-[11px] text-muted-foreground italic">
+              <p className="text-xs text-muted-foreground italic">
                 No interview questions logged yet. Record tricky questions asked during this round!
               </p>
             ) : (

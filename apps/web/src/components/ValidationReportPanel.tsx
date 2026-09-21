@@ -269,17 +269,17 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
                         {chk.skill}
                       </span>
                       {chk.candidateLevel && (
-                        <span className="text-[10px] font-mono text-muted-foreground shrink-0 bg-muted px-1.5 py-0.5 rounded border border-border/50 uppercase">
+                        <span className="text-2xs font-mono text-muted-foreground shrink-0 bg-muted px-1.5 py-0.5 rounded border border-border/50 uppercase">
                           {chk.candidateLevel}
                         </span>
                       )}
                     </div>
                     {chk.isAllowed ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
                         <CheckCircle2 className="w-3 h-3" /> Valid
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
                         <XCircle className="w-3 h-3" /> {chk.violation || 'Rejected'}
                       </span>
                     )}
@@ -336,7 +336,7 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
                     )}
                   >
                     <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                      <span className="font-semibold text-foreground uppercase tracking-wider text-[10px] px-1.5 py-0.5 rounded bg-muted border border-border shrink-0">
+                      <span className="font-semibold text-foreground uppercase tracking-wider text-2xs px-1.5 py-0.5 rounded bg-muted border border-border shrink-0">
                         {chk.field}
                       </span>
                       <span
@@ -349,11 +349,11 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
                       </span>
                     </div>
                     {chk.exists ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/20 px-2 py-0.5 rounded-full shrink-0">
                         <CheckCircle2 className="w-3 h-3" /> Found
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-pink bg-brand-pink/10 border border-brand-pink/20 px-2 py-0.5 rounded-full shrink-0">
                         <XCircle className="w-3 h-3" /> Missing
                       </span>
                     )}
@@ -401,7 +401,7 @@ export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
                   className={cn(
                     'p-2.5 rounded-lg border text-xs transition-all cursor-pointer select-text',
                     isSelected
-                      ? 'bg-amber-500/20 border-amber-500/60 ring-2 ring-amber-400/50 shadow-sm'
+                      ? 'bg-warning/10 border-warning/40 ring-2 ring-warning/40 shadow-sm'
                       : 'bg-card border-brand-pink/20 hover:border-brand-pink/40 hover:bg-card/80',
                   )}
                 >

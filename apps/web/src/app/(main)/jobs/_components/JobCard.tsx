@@ -20,23 +20,23 @@ import { useDeleteJob, useUpdateJobStatus } from '@/hooks/usePramanApi';
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   SAVED: {
     label: 'Saved',
-    className: 'bg-slate-500/10 text-slate-600 border-slate-500/30 dark:text-slate-400',
+    className: 'bg-muted text-muted-foreground border-border',
   },
   APPLIED: {
     label: 'Applied',
-    className: 'bg-blue-500/10 text-blue-600 border-blue-500/30 dark:text-blue-400',
+    className: 'bg-info/10 text-info border-info/30',
   },
   INTERVIEWING: {
     label: 'Interviewing',
-    className: 'bg-purple-500/10 text-purple-600 border-purple-500/30 dark:text-purple-400',
+    className: 'bg-status-neutral/10 text-status-neutral border-status-neutral/30',
   },
   OFFER: {
     label: 'Offer',
-    className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400',
+    className: 'bg-success/10 text-success border-success/30',
   },
   REJECTED: {
     label: 'Rejected',
-    className: 'bg-rose-500/10 text-rose-600 border-rose-500/30 dark:text-rose-400',
+    className: 'bg-destructive/10 text-destructive border-destructive/30',
   },
 };
 

@@ -105,7 +105,7 @@ export function AppSidebar() {
                   {item.badgeCount && item.badgeCount > 0 ? (
                     <Badge
                       variant="secondary"
-                      className="text-[10px] px-1.5 py-0 h-4 font-mono font-bold bg-brand-cyan/20 text-brand-cyan"
+                      className="text-2xs px-1.5 py-0 h-4 font-mono font-bold bg-brand-cyan/20 text-brand-cyan"
                     >
                       {item.badgeCount}
                     </Badge>
@@ -119,7 +119,7 @@ export function AppSidebar() {
         {/* Recent Applications in expanded mode */}
         {!isCollapsed && recentJobs.length > 0 && (
           <div className="pt-5 px-1 space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block px-2">
+            <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground block px-2">
               Recent Applications
             </span>
             <div className="space-y-1">
@@ -146,7 +146,7 @@ export function AppSidebar() {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 overflow-hidden">
             <Avatar size="sm" className="size-7 shrink-0">
-              <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-[11px] font-bold text-brand-dark uppercase">
+              <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-xs font-bold text-brand-dark uppercase">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -155,7 +155,7 @@ export function AppSidebar() {
                 <p className="text-xs font-semibold text-foreground truncate">
                   {user?.name || user?.email}
                 </p>
-                <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
+                <p className="text-2xs text-muted-foreground truncate">{user?.email}</p>
               </div>
             )}
           </div>

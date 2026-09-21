@@ -26,7 +26,7 @@ export default function GlobalError({
               A critical layout exception occurred. Please reload the workspace.
             </p>
             {error.digest && (
-              <p className="text-[11px] font-mono text-slate-500">Digest: {error.digest}</p>
+              <p className="text-xs font-mono text-slate-500">Digest: {error.digest}</p>
             )}
           </div>
 

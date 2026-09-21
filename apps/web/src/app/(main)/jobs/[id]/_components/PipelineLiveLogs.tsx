@@ -30,18 +30,18 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
                 Live Pipeline Execution Stream
               </h3>
               {isStreaming ? (
-                <span className="flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 px-2 py-0.5 rounded-full border border-brand-cyan/30 animate-pulse">
+                <span className="flex items-center gap-1 text-xs font-medium text-brand-cyan bg-brand-cyan/10 px-2 py-0.5 rounded-full border border-brand-cyan/30 animate-pulse">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Streaming SSE
                 </span>
               ) : logs.length > 0 ? (
                 logs.some((l) => l.status === 'failed') ? (
-                  <span className="flex items-center gap-1 text-[11px] font-medium text-destructive bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/30">
+                  <span className="flex items-center gap-1 text-xs font-medium text-destructive bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/30">
                     <XCircle className="w-3 h-3" />
                     Failed
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  <span className="flex items-center gap-1 text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-full border border-success/30">
                     <CheckCircle2 className="w-3 h-3" />
                     Completed
                   </span>
@@ -91,22 +91,22 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
 
             return (
               <div key={log.id} className="flex items-start gap-2.5">
-                <span className="text-[11px] text-muted-foreground shrink-0 select-none">
+                <span className="text-xs text-muted-foreground shrink-0 select-none">
                   {log.timestamp}
                 </span>
 
                 <span className="shrink-0 mt-0.5">
                   {isRunning && <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-cyan" />}
-                  {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+                  {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-success" />}
                   {isFailed && <XCircle className="w-3.5 h-3.5 text-destructive" />}
                 </span>
 
                 <span
-                  className={`font-semibold uppercase text-[10px] px-1.5 py-0.2 rounded shrink-0 ${
+                  className={`font-semibold uppercase text-2xs px-1.5 py-0.2 rounded shrink-0 ${
                     isRunning
                       ? 'bg-brand-cyan/20 text-brand-cyan'
                       : isCompleted
-                        ? 'bg-emerald-500/20 text-emerald-400'
+                        ? 'bg-success/20 text-success'
                         : 'bg-destructive/20 text-destructive'
                   }`}
                 >

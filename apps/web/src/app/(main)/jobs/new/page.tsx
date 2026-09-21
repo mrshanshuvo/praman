@@ -83,10 +83,10 @@ export default function NewJobPage() {
       </div>
 
       {duplicateInfo && (
-        <Card className="mb-6 p-5 border-amber-500/40 bg-amber-500/10 backdrop-blur-md">
+        <Card className="mb-6 p-5 border-warning/40 bg-warning/10 backdrop-blur-md">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-semibold text-foreground">
                   Duplicate Job Description Detected

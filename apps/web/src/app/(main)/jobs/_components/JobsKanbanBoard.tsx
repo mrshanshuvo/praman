@@ -24,40 +24,40 @@ export const KANBAN_COLUMNS = [
     key: 'SAVED',
     label: 'Saved',
     icon: BookmarkIcon,
-    accentColor: 'border-slate-500/40 text-slate-400 bg-slate-500/10',
-    headerBg: 'bg-slate-500/5',
+    accentColor: 'border-border text-muted-foreground bg-muted/50',
+    headerBg: 'bg-muted/30',
     emptyText: 'No saved jobs',
   },
   {
     key: 'APPLIED',
     label: 'Applied',
     icon: Briefcase,
-    accentColor: 'border-blue-500/40 text-blue-400 bg-blue-500/10',
-    headerBg: 'bg-blue-500/5',
+    accentColor: 'border-info/40 text-info bg-info/10',
+    headerBg: 'bg-info/5',
     emptyText: 'No applications submitted',
   },
   {
     key: 'INTERVIEWING',
     label: 'Interviewing',
     icon: UserCheck,
-    accentColor: 'border-purple-500/40 text-purple-400 bg-purple-500/10',
-    headerBg: 'bg-purple-500/5',
+    accentColor: 'border-status-neutral/40 text-status-neutral bg-status-neutral/10',
+    headerBg: 'bg-status-neutral/5',
     emptyText: 'No active interviews',
   },
   {
     key: 'OFFER',
     label: 'Offer',
     icon: Trophy,
-    accentColor: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
-    headerBg: 'bg-emerald-500/5',
+    accentColor: 'border-success/40 text-success bg-success/10',
+    headerBg: 'bg-success/5',
     emptyText: 'No offers yet',
   },
   {
     key: 'REJECTED',
     label: 'Archived',
     icon: Archive,
-    accentColor: 'border-rose-500/40 text-rose-400 bg-rose-500/10',
-    headerBg: 'bg-rose-500/5',
+    accentColor: 'border-destructive/40 text-destructive bg-destructive/10',
+    headerBg: 'bg-destructive/5',
     emptyText: 'No archived jobs',
   },
 ] as const;
@@ -193,7 +193,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                 </div>
                 <Badge
                   variant="outline"
-                  className="font-mono text-[10px] px-1.5 py-0 border-border bg-background/60 text-muted-foreground"
+                  className="font-mono text-2xs px-1.5 py-0 border-border bg-background/60 text-muted-foreground"
                 >
                   {colJobs.length}
                 </Badge>
@@ -203,8 +203,8 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
               <div className="flex-1 p-2.5 space-y-2.5 overflow-y-auto max-h-[calc(100vh-20rem)]">
                 {colJobs.length === 0 ? (
                   <div className="h-32 border border-dashed border-border/60 rounded-xl flex flex-col items-center justify-center p-3 text-center">
-                    <p className="text-[11px] text-muted-foreground">{col.emptyText}</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                    <p className="text-xs text-muted-foreground">{col.emptyText}</p>
+                    <p className="text-2xs text-muted-foreground/60 mt-0.5">
                       Drag jobs here to advance
                     </p>
                   </div>
@@ -240,7 +240,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                               {title}
                             </Link>
                             {structured.company && (
-                              <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">
                                 {structured.company}
                               </p>
                             )}
@@ -259,7 +259,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             )[0];
                           if (!upcoming) return null;
                           return (
-                            <div className="flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-400 font-medium">
+                            <div className="flex items-center gap-1.5 text-2xs px-2 py-0.5 rounded-md bg-status-neutral/10 border border-status-neutral/20 text-status-neutral font-medium">
                               <Calendar className="w-3 h-3 shrink-0" />
                               <span className="truncate">
                                 {upcoming.stage.replace('_', ' ')} ·{' '}
@@ -278,7 +278,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             <MatchScoreBadge analysis={analysis} variant="compact" />
                             {isValidated && (
                               <span
-                                className="text-[10px] font-mono px-1.5 py-0.2 rounded border bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30 font-bold"
+                                className="text-2xs font-mono px-1.5 py-0.2 rounded border bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30 font-bold"
                                 title="Resume is validated against candidate evidence"
                               >
                                 VALIDATED
@@ -288,7 +288,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                         )}
 
                         {/* Pipeline Stage Mini Badges */}
-                        <div className="flex items-center gap-1 text-[10px] font-mono pt-1">
+                        <div className="flex items-center gap-1 text-2xs font-mono pt-1">
                           <span
                             className={`px-1.5 py-0.2 rounded border ${
                               structured.jobTitle
@@ -340,7 +340,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                                 variant: 'outline',
                                 size: 'sm',
                                 className:
-                                  'h-7 text-[11px] px-2 border-border hover:border-brand-cyan hover:text-brand-cyan gap-1 text-foreground cursor-pointer flex-1',
+                                  'h-7 text-xs px-2 border-border hover:border-brand-cyan hover:text-brand-cyan gap-1 text-foreground cursor-pointer flex-1',
                               })}
                             >
                               <FileCode className="w-3 h-3 text-brand-cyan" />
@@ -353,7 +353,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                                 variant: 'outline',
                                 size: 'sm',
                                 className:
-                                  'h-7 text-[11px] px-2 border-border hover:border-foreground gap-1 text-foreground cursor-pointer flex-1',
+                                  'h-7 text-xs px-2 border-border hover:border-foreground gap-1 text-foreground cursor-pointer flex-1',
                               })}
                             >
                               <span>Pipeline</span>
@@ -367,7 +367,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             onChange={(e) => handleStatusSelect(jd.id, e.target.value)}
                             disabled={updateStatusMutation.isPending}
                             aria-label="Move application status"
-                            className="h-7 text-[10px] rounded border border-border bg-card px-1.5 text-foreground outline-none cursor-pointer hover:bg-muted/80"
+                            className="h-7 text-2xs rounded border border-border bg-card px-1.5 text-foreground outline-none cursor-pointer hover:bg-muted/80"
                           >
                             {KANBAN_COLUMNS.map((c) => (
                               <option key={c.key} value={c.key}>
@@ -379,7 +379,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                           <button
                             type="button"
                             onClick={(e) => handleDelete(e, jd.id, title)}
-                            className="w-7 h-7 rounded border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-rose-400 hover:border-rose-400/40 cursor-pointer transition-colors"
+                            className="w-7 h-7 rounded border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/40 cursor-pointer transition-colors"
                             title="Delete job"
                           >
                             <Trash2 className="w-3 h-3" />

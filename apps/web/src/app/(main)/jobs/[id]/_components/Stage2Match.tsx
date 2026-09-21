@@ -98,7 +98,7 @@ export function Stage2Match({
               </button>
             </div>
 
-            <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">
+            <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
               Audit Mode: Multi-Source Diff
             </span>
           </div>

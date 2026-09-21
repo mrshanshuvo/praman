@@ -62,8 +62,8 @@ const LEVEL_OPTIONS: {
     level: 'WORKING_KNOWLEDGE',
     title: 'Working Knowledge',
     badgeLabel: '0.5x Match',
-    colorClass: 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
-    borderClass: 'border-emerald-500 bg-emerald-500/15 ring-1 ring-emerald-500/40',
+    colorClass: 'text-success bg-success/10 border-success/30',
+    borderClass: 'border-success bg-success/15 ring-1 ring-success/40',
     icon: Sparkles,
     description: 'Capable practitioner with practical project experience or adjacent stack usage.',
     impact: '0.5x partial match weight. Positioned as supportive competence.',
@@ -72,8 +72,8 @@ const LEVEL_OPTIONS: {
     level: 'LEARNING',
     title: 'Learning',
     badgeLabel: 'Cautionary',
-    colorClass: 'text-amber-500 dark:text-amber-400 bg-amber-500/10 border-amber-500/30',
-    borderClass: 'border-amber-500 bg-amber-500/15 ring-1 ring-amber-500/40',
+    colorClass: 'text-warning bg-warning/10 border-warning/30',
+    borderClass: 'border-warning bg-warning/15 ring-1 ring-warning/40',
     icon: HelpCircle,
     description: 'Currently studying or developing foundational capability.',
     impact: 'Treated as growth area. AI prompt prevents overstating as mature competency.',
@@ -153,12 +153,12 @@ export function SkillClaimTuningDialog({
           <div className="flex items-center gap-2 mb-1">
             <Badge
               variant="outline"
-              className="text-[11px] font-mono border-brand-cyan/30 text-brand-cyan bg-brand-cyan/10"
+              className="text-xs font-mono border-brand-cyan/30 text-brand-cyan bg-brand-cyan/10"
             >
               Skill Claim Audit
             </Badge>
             {jdType && (
-              <Badge variant="outline" className="text-[11px] font-mono border-border bg-muted/50">
+              <Badge variant="outline" className="text-xs font-mono border-border bg-muted/50">
                 JD {jdType === 'required' ? 'Required' : 'Preferred'}
               </Badge>
             )}
@@ -174,7 +174,7 @@ export function SkillClaimTuningDialog({
 
         {/* 4-Tier Interactive Selector */}
         <div className="space-y-2 py-1">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Proficiency & Claim Boundary
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -201,16 +201,16 @@ export function SkillClaimTuningDialog({
                       </div>
                       <Badge
                         variant="outline"
-                        className={`text-[10px] font-mono px-1.5 py-0 ${opt.colorClass}`}
+                        className={`text-2xs font-mono px-1.5 py-0 ${opt.colorClass}`}
                       >
                         {opt.badgeLabel}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-muted-foreground leading-snug">
+                    <p className="text-xs text-muted-foreground leading-snug">
                       {opt.description}
                     </p>
                   </div>
-                  <div className="mt-2 pt-1.5 border-t border-border/40 text-[10px] font-mono text-muted-foreground">
+                  <div className="mt-2 pt-1.5 border-t border-border/40 text-2xs font-mono text-muted-foreground">
                     {opt.impact}
                   </div>
                 </button>
@@ -221,9 +221,9 @@ export function SkillClaimTuningDialog({
 
         {/* Evidence Field */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
             <span>Ground-Truth Evidence / Notes (Optional)</span>
-            <span className="text-[10px] font-normal text-muted-foreground">
+            <span className="text-2xs font-normal text-muted-foreground">
               e.g. projects, repos
             </span>
           </label>

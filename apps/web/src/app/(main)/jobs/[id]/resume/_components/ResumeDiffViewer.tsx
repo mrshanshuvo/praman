@@ -310,7 +310,7 @@ export function ResumeDiffViewer({
   if (sortedVersions.length <= 1) {
     return (
       <Card className="p-8 border-border bg-card/90 backdrop-blur-md text-center space-y-5">
-        <div className="mx-auto w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+        <div className="mx-auto w-12 h-12 rounded-2xl bg-warning/10 border border-warning/20 flex items-center justify-center text-warning">
           <GitCompare className="w-6 h-6" />
         </div>
         <div className="max-w-md mx-auto space-y-2">
@@ -354,7 +354,7 @@ export function ResumeDiffViewer({
                 <h3 className="text-sm font-semibold text-foreground">Iteration Diff Inspector</h3>
                 <Badge
                   variant="outline"
-                  className="text-[10px] font-mono px-2 py-0.5 border-brand-cyan/40 bg-brand-cyan/10 text-brand-cyan"
+                  className="text-2xs font-mono px-2 py-0.5 border-brand-cyan/40 bg-brand-cyan/10 text-brand-cyan"
                 >
                   {stats.totalChanges} changes detected
                 </Badge>
@@ -369,7 +369,7 @@ export function ResumeDiffViewer({
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {/* Base Version */}
             <div className="flex items-center gap-1.5 bg-muted/60 border border-border rounded-lg px-2.5 py-1.5">
-              <span className="text-muted-foreground font-medium text-[11px]">Base:</span>
+              <span className="text-muted-foreground font-medium text-xs">Base:</span>
               <select
                 value={baseVersion}
                 onChange={(e) => setBaseVersion(e.target.value)}
@@ -400,7 +400,7 @@ export function ResumeDiffViewer({
 
             {/* Target Version */}
             <div className="flex items-center gap-1.5 bg-brand-cyan/10 border border-brand-cyan/30 rounded-lg px-2.5 py-1.5">
-              <span className="text-brand-cyan font-medium text-[11px]">Target:</span>
+              <span className="text-brand-cyan font-medium text-xs">Target:</span>
               <select
                 value={targetVersion}
                 onChange={(e) => setTargetVersion(e.target.value)}
@@ -438,19 +438,19 @@ export function ResumeDiffViewer({
 
         {/* Change Statistics Pill Bar */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60 text-xs">
-          <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">
+          <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mr-1">
             Diff Summary:
           </span>
 
           {/* Skills Stats */}
           {stats.skillsAdded > 0 && (
-            <Badge className="bg-emerald-500/15 border-emerald-500/30 text-emerald-400 font-mono text-[11px] gap-1 px-2 py-0.5">
+            <Badge className="bg-success/15 border-success/30 text-success font-mono text-xs gap-1 px-2 py-0.5">
               <Plus className="w-3 h-3" />
               <span>{stats.skillsAdded} skills added</span>
             </Badge>
           )}
           {stats.skillsRemoved > 0 && (
-            <Badge className="bg-rose-500/15 border-rose-500/30 text-rose-400 font-mono text-[11px] gap-1 px-2 py-0.5">
+            <Badge className="bg-destructive/15 border-destructive/30 text-destructive font-mono text-xs gap-1 px-2 py-0.5">
               <Minus className="w-3 h-3" />
               <span>{stats.skillsRemoved} skills removed</span>
             </Badge>
@@ -458,19 +458,19 @@ export function ResumeDiffViewer({
 
           {/* Bullets Stats */}
           {stats.bulletsModified > 0 && (
-            <Badge className="bg-amber-500/15 border-amber-500/30 text-amber-400 font-mono text-[11px] gap-1 px-2 py-0.5">
+            <Badge className="bg-warning/15 border-warning/30 text-warning font-mono text-xs gap-1 px-2 py-0.5">
               <Sparkles className="w-3 h-3" />
               <span>{stats.bulletsModified} bullets refined</span>
             </Badge>
           )}
           {stats.bulletsAdded > 0 && (
-            <Badge className="bg-emerald-500/15 border-emerald-500/30 text-emerald-400 font-mono text-[11px] gap-1 px-2 py-0.5">
+            <Badge className="bg-success/15 border-success/30 text-success font-mono text-xs gap-1 px-2 py-0.5">
               <Plus className="w-3 h-3" />
               <span>{stats.bulletsAdded} bullets added</span>
             </Badge>
           )}
           {stats.bulletsRemoved > 0 && (
-            <Badge className="bg-rose-500/15 border-rose-500/30 text-rose-400 font-mono text-[11px] gap-1 px-2 py-0.5">
+            <Badge className="bg-destructive/15 border-destructive/30 text-destructive font-mono text-xs gap-1 px-2 py-0.5">
               <Minus className="w-3 h-3" />
               <span>{stats.bulletsRemoved} bullets removed</span>
             </Badge>
@@ -512,7 +512,7 @@ export function ResumeDiffViewer({
                   <Award className="w-4 h-4" />
                   <span>Technical Skills & Proficiency Diff</span>
                 </h4>
-                <span className="text-[11px] text-muted-foreground font-mono">
+                <span className="text-xs text-muted-foreground font-mono">
                   +{skillsDiff.added.length} / -{skillsDiff.removed.length}
                 </span>
               </div>
@@ -522,11 +522,11 @@ export function ResumeDiffViewer({
                 {skillsDiff.added.map((sk) => (
                   <Badge
                     key={`added-${sk}`}
-                    className="bg-emerald-500/15 border-emerald-500/40 text-emerald-400 font-mono text-xs px-2.5 py-1 gap-1.5 shadow-xs"
+                    className="bg-success/15 border-success/40 text-success font-mono text-xs px-2.5 py-1 gap-1.5 shadow-xs"
                   >
                     <Plus className="w-3 h-3 shrink-0" />
                     <span>{sk}</span>
-                    <span className="text-[9px] uppercase tracking-wider font-bold bg-emerald-500/20 px-1 rounded">
+                    <span className="text-2xs uppercase tracking-wider font-bold bg-success/20 px-1 rounded">
                       NEW
                     </span>
                   </Badge>
@@ -536,11 +536,11 @@ export function ResumeDiffViewer({
                 {skillsDiff.removed.map((sk) => (
                   <Badge
                     key={`removed-${sk}`}
-                    className="bg-rose-500/15 border-rose-500/40 text-rose-400 line-through font-mono text-xs px-2.5 py-1 gap-1.5 shadow-xs opacity-75"
+                    className="bg-destructive/15 border-destructive/40 text-destructive line-through font-mono text-xs px-2.5 py-1 gap-1.5 shadow-xs opacity-75"
                   >
                     <Minus className="w-3 h-3 shrink-0" />
                     <span>{sk}</span>
-                    <span className="text-[9px] uppercase tracking-wider font-bold bg-rose-500/20 px-1 rounded no-underline">
+                    <span className="text-2xs uppercase tracking-wider font-bold bg-destructive/20 px-1 rounded no-underline">
                       REMOVED
                     </span>
                   </Badge>
@@ -570,13 +570,13 @@ export function ResumeDiffViewer({
                   <span>Professional Summary Diff</span>
                 </h4>
                 {hasSummaryChanged ? (
-                  <Badge className="bg-amber-500/15 border-amber-500/30 text-amber-400 font-mono text-[10px] px-2 py-0.5">
+                  <Badge className="bg-warning/15 border-warning/30 text-warning font-mono text-2xs px-2 py-0.5">
                     MODIFIED
                   </Badge>
                 ) : (
                   <Badge
                     variant="outline"
-                    className="border-border text-muted-foreground text-[10px]"
+                    className="border-border text-muted-foreground text-2xs"
                   >
                     UNCHANGED
                   </Badge>
@@ -596,7 +596,7 @@ export function ResumeDiffViewer({
                 <Briefcase className="w-4 h-4" />
                 <span>Work Experience & Metric Diff</span>
               </h4>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 Green = Added / Enhanced • Red = Removed / Replaced
               </span>
             </div>
@@ -609,8 +609,8 @@ export function ResumeDiffViewer({
                   key={idx}
                   className={cn(
                     'p-5 border space-y-4 transition-all',
-                    exp.status === 'added' && 'border-emerald-500/40 bg-emerald-500/5',
-                    exp.status === 'removed' && 'border-rose-500/40 bg-rose-500/5 opacity-75',
+                    exp.status === 'added' && 'border-success/40 bg-success/5',
+                    exp.status === 'removed' && 'border-destructive/40 bg-destructive/5 opacity-75',
                     exp.status === 'modified' && 'border-border bg-card/80 backdrop-blur-md',
                     exp.status === 'unchanged' && 'border-border/70 bg-card/50',
                   )}
@@ -620,17 +620,17 @@ export function ResumeDiffViewer({
                       <div className="flex items-center gap-2">
                         <h5 className="text-sm font-bold text-foreground">{exp.role}</h5>
                         {exp.status === 'added' && (
-                          <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-mono">
+                          <Badge className="bg-success/20 text-success border-success/40 text-2xs font-mono">
                             + NEW ROLE
                           </Badge>
                         )}
                         {exp.status === 'removed' && (
-                          <Badge className="bg-rose-500/20 text-rose-400 border-rose-500/40 text-[10px] font-mono">
+                          <Badge className="bg-destructive/20 text-destructive border-destructive/40 text-2xs font-mono">
                             - REMOVED
                           </Badge>
                         )}
                         {exp.status === 'modified' && (
-                          <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/40 text-[10px] font-mono">
+                          <Badge className="bg-warning/20 text-warning border-warning/40 text-2xs font-mono">
                             MODIFIED
                           </Badge>
                         )}
@@ -650,9 +650,9 @@ export function ResumeDiffViewer({
                         return (
                           <div
                             key={bIdx}
-                            className="flex items-start gap-2.5 text-xs text-foreground/90 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30"
+                            className="flex items-start gap-2.5 text-xs text-foreground/90 p-2.5 rounded-lg bg-success/10 border border-success/30"
                           >
-                            <Plus className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                            <Plus className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
                             <span className="leading-relaxed">{bullet.currentText}</span>
                           </div>
                         );
@@ -662,9 +662,9 @@ export function ResumeDiffViewer({
                         return (
                           <div
                             key={bIdx}
-                            className="flex items-start gap-2.5 text-xs text-muted-foreground p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 line-through opacity-80"
+                            className="flex items-start gap-2.5 text-xs text-muted-foreground p-2.5 rounded-lg bg-destructive/10 border border-destructive/30 line-through opacity-80"
                           >
-                            <Minus className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                            <Minus className="w-3.5 h-3.5 text-destructive shrink-0 mt-0.5" />
                             <span className="leading-relaxed">{bullet.previousText}</span>
                           </div>
                         );
@@ -674,9 +674,9 @@ export function ResumeDiffViewer({
                         return (
                           <div
                             key={bIdx}
-                            className="flex items-start gap-2.5 text-xs text-foreground/90 p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/25"
+                            className="flex items-start gap-2.5 text-xs text-foreground/90 p-2.5 rounded-lg bg-warning/5 border border-warning/25"
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                            <Sparkles className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
                             <div className="leading-relaxed">
                               <DiffText parts={bullet.parts} />
                             </div>
@@ -719,8 +719,8 @@ export function ResumeDiffViewer({
                     key={idx}
                     className={cn(
                       'p-5 border space-y-4 transition-all',
-                      proj.status === 'added' && 'border-emerald-500/40 bg-emerald-500/5',
-                      proj.status === 'removed' && 'border-rose-500/40 bg-rose-500/5 opacity-75',
+                      proj.status === 'added' && 'border-success/40 bg-success/5',
+                      proj.status === 'removed' && 'border-destructive/40 bg-destructive/5 opacity-75',
                       proj.status === 'modified' && 'border-border bg-card/80 backdrop-blur-md',
                       proj.status === 'unchanged' && 'border-border/70 bg-card/50',
                     )}
@@ -730,17 +730,17 @@ export function ResumeDiffViewer({
                         <div className="flex items-center gap-2">
                           <h5 className="text-sm font-bold text-foreground">{proj.name}</h5>
                           {proj.status === 'added' && (
-                            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-mono">
+                            <Badge className="bg-success/20 text-success border-success/40 text-2xs font-mono">
                               + NEW
                             </Badge>
                           )}
                           {proj.status === 'removed' && (
-                            <Badge className="bg-rose-500/20 text-rose-400 border-rose-500/40 text-[10px] font-mono">
+                            <Badge className="bg-destructive/20 text-destructive border-destructive/40 text-2xs font-mono">
                               - REMOVED
                             </Badge>
                           )}
                           {proj.status === 'modified' && (
-                            <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/40 text-[10px] font-mono">
+                            <Badge className="bg-warning/20 text-warning border-warning/40 text-2xs font-mono">
                               MODIFIED
                             </Badge>
                           )}
@@ -762,7 +762,7 @@ export function ResumeDiffViewer({
                           {proj.techDiff.added.map((t) => (
                             <Badge
                               key={t}
-                              className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[10px] font-mono"
+                              className="bg-success/15 text-success border-success/30 text-2xs font-mono"
                             >
                               + {t}
                             </Badge>
@@ -770,7 +770,7 @@ export function ResumeDiffViewer({
                           {proj.techDiff.removed.map((t) => (
                             <Badge
                               key={t}
-                              className="bg-rose-500/15 text-rose-400 border-rose-500/30 line-through text-[10px] font-mono"
+                              className="bg-destructive/15 text-destructive border-destructive/30 line-through text-2xs font-mono"
                             >
                               - {t}
                             </Badge>
@@ -780,7 +780,7 @@ export function ResumeDiffViewer({
                               <Badge
                                 key={t}
                                 variant="outline"
-                                className="border-border text-muted-foreground text-[10px] font-mono"
+                                className="border-border text-muted-foreground text-2xs font-mono"
                               >
                                 {t}
                               </Badge>
@@ -797,9 +797,9 @@ export function ResumeDiffViewer({
                           return (
                             <div
                               key={bIdx}
-                              className="flex items-start gap-2 text-xs text-foreground/90 p-2 rounded bg-emerald-500/10 border border-emerald-500/30"
+                              className="flex items-start gap-2 text-xs text-foreground/90 p-2 rounded bg-success/10 border border-success/30"
                             >
-                              <Plus className="w-3 h-3 text-emerald-400 shrink-0 mt-0.5" />
+                              <Plus className="w-3 h-3 text-success shrink-0 mt-0.5" />
                               <span>{bullet.currentText}</span>
                             </div>
                           );
@@ -809,9 +809,9 @@ export function ResumeDiffViewer({
                           return (
                             <div
                               key={bIdx}
-                              className="flex items-start gap-2 text-xs text-muted-foreground p-2 rounded bg-rose-500/10 border border-rose-500/30 line-through opacity-80"
+                              className="flex items-start gap-2 text-xs text-muted-foreground p-2 rounded bg-destructive/10 border border-destructive/30 line-through opacity-80"
                             >
-                              <Minus className="w-3 h-3 text-rose-400 shrink-0 mt-0.5" />
+                              <Minus className="w-3 h-3 text-destructive shrink-0 mt-0.5" />
                               <span>{bullet.previousText}</span>
                             </div>
                           );
@@ -821,9 +821,9 @@ export function ResumeDiffViewer({
                           return (
                             <div
                               key={bIdx}
-                              className="flex items-start gap-2 text-xs text-foreground/90 p-2 rounded bg-amber-500/5 border border-amber-500/25"
+                              className="flex items-start gap-2 text-xs text-foreground/90 p-2 rounded bg-warning/5 border border-warning/25"
                             >
-                              <Sparkles className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
+                              <Sparkles className="w-3 h-3 text-warning shrink-0 mt-0.5" />
                               <div>
                                 <DiffText parts={bullet.parts} />
                               </div>
@@ -864,7 +864,7 @@ function DiffText({ parts }: { parts: WordDiffPart[] }) {
           return (
             <mark
               key={idx}
-              className="bg-emerald-500/25 text-emerald-300 dark:text-emerald-300 font-medium px-1 py-0.2 rounded mx-0.5 inline-block"
+              className="bg-success/25 text-success font-medium px-1 py-0.2 rounded mx-0.5 inline-block"
             >
               {part.value}
             </mark>
@@ -874,7 +874,7 @@ function DiffText({ parts }: { parts: WordDiffPart[] }) {
           return (
             <del
               key={idx}
-              className="bg-rose-500/25 text-rose-300 dark:text-rose-400 line-through px-1 py-0.2 rounded mx-0.5 inline-block opacity-80"
+              className="bg-destructive/25 text-destructive line-through px-1 py-0.2 rounded mx-0.5 inline-block opacity-80"
             >
               {part.value}
             </del>

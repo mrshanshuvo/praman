@@ -131,7 +131,7 @@ export const NotesJournal: React.FC<NotesJournalProps> = ({ jobId, notes }) => {
             variant={selectedTagFilter === 'ALL' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTagFilter('ALL')}
-            className="text-[11px] h-7 px-2.5 rounded-lg"
+            className="text-xs h-7 px-2.5 rounded-lg"
           >
             All ({notes.length})
           </Button>
@@ -144,7 +144,7 @@ export const NotesJournal: React.FC<NotesJournalProps> = ({ jobId, notes }) => {
                 variant={selectedTagFilter === t.tag ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedTagFilter(t.tag)}
-                className="text-[11px] h-7 px-2.5 rounded-lg"
+                className="text-xs h-7 px-2.5 rounded-lg"
               >
                 {t.label} ({count})
               </Button>

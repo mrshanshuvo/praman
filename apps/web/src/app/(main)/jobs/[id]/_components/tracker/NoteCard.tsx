@@ -27,11 +27,11 @@ export const NoteCard: React.FC<NoteCardProps> = ({ note, onTogglePin, onDelete 
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className={`text-[10px] uppercase font-semibold ${tagInfo.color}`}
+            className={`text-2xs uppercase font-semibold ${tagInfo.color}`}
           >
             {tagInfo.label}
           </Badge>
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-2xs text-muted-foreground">
             {new Date(note.createdAt).toLocaleDateString([], {
               month: 'short',
               day: 'numeric',

@@ -35,21 +35,21 @@ function getTierStyles(tier: MatchAlignmentTier) {
     case 'Strong':
       return {
         badge:
-          'bg-emerald-500/15 text-emerald-600 border-emerald-500/40 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/50',
-        stroke: 'stroke-emerald-500',
-        text: 'text-emerald-600 dark:text-emerald-400',
-        bg: 'bg-emerald-500/10',
-        border: 'border-emerald-500/30',
+          'bg-success/10 text-success border-success/30',
+        stroke: 'stroke-success',
+        text: 'text-success',
+        bg: 'bg-success/10',
+        border: 'border-success/30',
         ringColor: '#10b981',
       };
     case 'Moderate':
       return {
         badge:
-          'bg-amber-500/15 text-amber-600 border-amber-500/40 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/50',
-        stroke: 'stroke-amber-500',
-        text: 'text-amber-600 dark:text-amber-400',
-        bg: 'bg-amber-500/10',
-        border: 'border-amber-500/30',
+          'bg-warning/10 text-warning border-warning/30',
+        stroke: 'stroke-warning',
+        text: 'text-warning',
+        bg: 'bg-warning/10',
+        border: 'border-warning/30',
         ringColor: '#f59e0b',
       };
     default:
@@ -118,7 +118,7 @@ export function MatchScoreBadge({
                   {data.score}%
                 </span>
                 <span
-                  className={`text-[10px] font-semibold uppercase tracking-wider ${styles.text}`}
+                  className={`text-2xs font-semibold uppercase tracking-wider ${styles.text}`}
                 >
                   {data.label}
                 </span>
@@ -148,47 +148,47 @@ export function MatchScoreBadge({
           {showBreakdown && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full md:w-auto">
               <div className="p-2.5 rounded-lg border border-brand-cyan/30 bg-brand-cyan/5 flex flex-col items-center justify-center text-center">
-                <div className="flex items-center gap-1 text-[11px] text-brand-cyan font-medium">
+                <div className="flex items-center gap-1 text-xs text-brand-cyan font-medium">
                   <CheckCircle2 className="w-3 h-3" />
                   <span>Strong</span>
                 </div>
                 <span className="text-base font-bold font-mono text-foreground mt-0.5">
                   {data.breakdown.strongMatchesCount}
                 </span>
-                <span className="text-[10px] text-muted-foreground">1.0x weight</span>
+                <span className="text-2xs text-muted-foreground">1.0x weight</span>
               </div>
 
-              <div className="p-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 flex flex-col items-center justify-center text-center">
-                <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+              <div className="p-2.5 rounded-lg border border-success/30 bg-success/10 flex flex-col items-center justify-center text-center">
+                <div className="flex items-center gap-1 text-xs text-success font-medium">
                   <Sparkles className="w-3 h-3" />
                   <span>Partial</span>
                 </div>
                 <span className="text-base font-bold font-mono text-foreground mt-0.5">
                   {data.breakdown.partialMatchesCount}
                 </span>
-                <span className="text-[10px] text-muted-foreground">0.5x weight</span>
+                <span className="text-2xs text-muted-foreground">0.5x weight</span>
               </div>
 
-              <div className="p-2.5 rounded-lg border border-amber-500/30 bg-amber-500/5 flex flex-col items-center justify-center text-center">
-                <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+              <div className="p-2.5 rounded-lg border border-warning/30 bg-warning/10 flex flex-col items-center justify-center text-center">
+                <div className="flex items-center gap-1 text-xs text-warning font-medium">
                   <HelpCircle className="w-3 h-3" />
                   <span>Missing</span>
                 </div>
                 <span className="text-base font-bold font-mono text-foreground mt-0.5">
                   {data.breakdown.missingSkillsCount}
                 </span>
-                <span className="text-[10px] text-muted-foreground">0.0x weight</span>
+                <span className="text-2xs text-muted-foreground">0.0x weight</span>
               </div>
 
               <div className="p-2.5 rounded-lg border border-brand-pink/30 bg-brand-pink/5 flex flex-col items-center justify-center text-center">
-                <div className="flex items-center gap-1 text-[11px] text-brand-pink font-medium">
+                <div className="flex items-center gap-1 text-xs text-brand-pink font-medium">
                   <AlertTriangle className="w-3 h-3" />
                   <span>Deductions</span>
                 </div>
                 <span className="text-base font-bold font-mono text-brand-pink mt-0.5">
                   -{data.breakdown.gapDeductions}
                 </span>
-                <span className="text-[10px] text-muted-foreground">Gap penalty</span>
+                <span className="text-2xs text-muted-foreground">Gap penalty</span>
               </div>
             </div>
           )}
@@ -208,12 +208,12 @@ export function MatchScoreBadge({
             >
               <Target className="w-3.5 h-3.5" />
               <span>{data.score}%</span>
-              <span className="text-[10px] font-sans opacity-80">• {data.label}</span>
+              <span className="text-2xs font-sans opacity-80">• {data.label}</span>
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="text-xs p-2.5 space-y-1 max-w-xs">
             <p className="font-semibold text-foreground">Score Breakdown</p>
-            <div className="text-[11px] text-muted-foreground space-y-0.5 font-mono">
+            <div className="text-xs text-muted-foreground space-y-0.5 font-mono">
               <div>Strong matches: {data.breakdown.strongMatchesCount}</div>
               <div>Partial matches: {data.breakdown.partialMatchesCount}</div>
               <div>Missing skills: {data.breakdown.missingSkillsCount}</div>
@@ -236,7 +236,7 @@ export function MatchScoreBadge({
           >
             <Award className="w-3 h-3 shrink-0" />
             <span className="font-bold">{data.score}%</span>
-            <span className="font-sans text-[11px] opacity-90">{data.label}</span>
+            <span className="font-sans text-xs opacity-90">{data.label}</span>
           </Badge>
         </TooltipTrigger>
         <TooltipContent side="top" className="text-xs p-2.5 space-y-1.5 max-w-xs">
@@ -244,7 +244,7 @@ export function MatchScoreBadge({
             <span>Deterministic Match Score</span>
             <span className={styles.text}>{data.score}%</span>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-snug font-sans">
+          <p className="text-xs text-muted-foreground leading-snug font-sans">
             Strictly computed from Stage 2 analysis: {data.breakdown.strongMatchesCount} verified,{' '}
             {data.breakdown.partialMatchesCount} partial, {data.breakdown.missingSkillsCount}{' '}
             missing skills.

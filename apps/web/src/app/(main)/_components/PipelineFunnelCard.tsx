@@ -40,8 +40,8 @@ export const PipelineFunnelCard: React.FC<PipelineFunnelCardProps> = ({ jobs }) 
     {
       label: 'Applied',
       count: applied,
-      color: 'bg-blue-500/20 text-blue-400',
-      barColor: 'bg-blue-500',
+      color: 'bg-info/10 text-info',
+      barColor: 'bg-info',
     },
     {
       label: 'Interviewing',
@@ -52,8 +52,8 @@ export const PipelineFunnelCard: React.FC<PipelineFunnelCardProps> = ({ jobs }) 
     {
       label: 'Offer',
       count: offer,
-      color: 'bg-emerald-500/20 text-emerald-400',
-      barColor: 'bg-emerald-500',
+      color: 'bg-success/10 text-success',
+      barColor: 'bg-success',
     },
   ];
 
@@ -106,7 +106,7 @@ export const PipelineFunnelCard: React.FC<PipelineFunnelCardProps> = ({ jobs }) 
                 className="p-3 rounded-xl border border-border/70 bg-muted/20 space-y-1"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {stage.label}
                   </span>
                   <span
@@ -131,32 +131,32 @@ export const PipelineFunnelCard: React.FC<PipelineFunnelCardProps> = ({ jobs }) 
           {/* Conversion Metrics Summary */}
           <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border text-center">
             <div className="p-2.5 rounded-xl bg-muted/30 border border-border/70">
-              <span className="text-[11px] text-muted-foreground block">Application Rate</span>
+              <span className="text-xs text-muted-foreground block">Application Rate</span>
               <span className="text-base font-bold font-mono text-foreground mt-0.5 block">
                 {appliedRate}%
               </span>
-              <span className="text-[10px] text-muted-foreground/80">Saved → Applied</span>
+              <span className="text-2xs text-muted-foreground/80">Saved → Applied</span>
             </div>
 
             <div className="p-2.5 rounded-xl bg-muted/30 border border-border/70">
-              <span className="text-[11px] text-muted-foreground block">Interview Rate</span>
+              <span className="text-xs text-muted-foreground block">Interview Rate</span>
               <span className="text-base font-bold font-mono text-brand-cyan mt-0.5 block">
                 {interviewRate}%
               </span>
-              <span className="text-[10px] text-muted-foreground/80">Applied → Round</span>
+              <span className="text-2xs text-muted-foreground/80">Applied → Round</span>
             </div>
 
             <div className="p-2.5 rounded-xl bg-muted/30 border border-border/70">
-              <span className="text-[11px] text-muted-foreground block">Offer Conversion</span>
-              <span className="text-base font-bold font-mono text-emerald-400 mt-0.5 block">
+              <span className="text-xs text-muted-foreground block">Offer Conversion</span>
+              <span className="text-base font-bold font-mono text-success mt-0.5 block">
                 {offerRate}%
               </span>
-              <span className="text-[10px] text-muted-foreground/80">Rounds → Offer</span>
+              <span className="text-2xs text-muted-foreground/80">Rounds → Offer</span>
             </div>
           </div>
 
           {rejected > 0 && (
-            <p className="text-[11px] text-muted-foreground text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Archived / Rejected: <span className="font-mono font-semibold">{rejected}</span>{' '}
               position
               {rejected === 1 ? '' : 's'}

@@ -112,7 +112,7 @@ export function ResumeViewer({
               <h3 className="text-xs font-semibold text-brand-pink dark:text-brand-cyan uppercase tracking-wider">
                 Technical Skills & Proficiency
               </h3>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 Double-click to locate in audit panel • Click to inspect
               </span>
             </div>
@@ -166,14 +166,14 @@ export function ResumeViewer({
                     <Award className="w-3.5 h-3.5 text-brand-cyan shrink-0" />
                     <span className="text-foreground">{sk}</span>
                     {check?.candidateLevel && (
-                      <span className="text-[10px] px-1 py-0.2 rounded bg-background/80 text-muted-foreground border border-border">
+                      <span className="text-2xs px-1 py-0.2 rounded bg-background/80 text-muted-foreground border border-border">
                         {check.candidateLevel}
                       </span>
                     )}
                     {isAllowed ? (
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="w-3 h-3 text-success shrink-0" />
                     ) : (
-                      <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
+                      <AlertTriangle className="w-3 h-3 text-destructive shrink-0" />
                     )}
                   </button>
                 );
@@ -189,7 +189,7 @@ export function ResumeViewer({
               <h3 className="text-xs font-semibold text-brand-pink dark:text-brand-cyan uppercase tracking-wider">
                 Work Experience & Evidence Audits
               </h3>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 Double-click any bullet or header to jump to audit evidence
               </span>
             </div>
@@ -276,16 +276,16 @@ export function ResumeViewer({
                           className={cn(
                             'p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 select-text',
                             isBulletSelected
-                              ? 'bg-amber-500/20 border-amber-500 ring-2 ring-amber-400/60 shadow-md'
+                              ? 'bg-warning/20 border-warning ring-2 ring-warning/60 shadow-md'
                               : flagged
-                                ? 'bg-amber-500/10 border-amber-500/30'
+                                ? 'bg-warning/10 border-warning/30'
                                 : 'bg-card/40 border-border/60 hover:border-border hover:bg-muted/30',
                           )}
                         >
                           <div className="flex-1">
                             <span className="text-xs sm:text-sm">{b}</span>
                             {flagged && (
-                              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-mono mt-1">
+                              <div className="flex items-center gap-1.5 text-xs text-warning font-mono mt-1">
                                 <Hash className="w-3 h-3" />
                                 <span>Flagged: {flagged.flaggedNumbers.join(', ')}</span>
                               </div>
@@ -308,7 +308,7 @@ export function ResumeViewer({
                             }
                             className={`p-1.5 rounded-md border text-xs shrink-0 cursor-pointer transition-colors ${
                               flagged
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                                ? 'bg-warning/20 text-warning border-warning/40 hover:bg-warning/30'
                                 : 'bg-muted text-muted-foreground border-border hover:text-foreground hover:bg-muted/80'
                             }`}
                             title={
@@ -318,9 +318,9 @@ export function ResumeViewer({
                             }
                           >
                             {flagged ? (
-                              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                              <AlertTriangle className="w-3.5 h-3.5 text-warning" />
                             ) : (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                             )}
                           </button>
                         </li>
@@ -340,7 +340,7 @@ export function ResumeViewer({
               <h3 className="text-xs font-semibold text-brand-pink dark:text-brand-cyan uppercase tracking-wider">
                 Featured Projects & Evidence Audits
               </h3>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 Double-click any project or bullet to jump to audit evidence
               </span>
             </div>
@@ -423,16 +423,16 @@ export function ResumeViewer({
                           className={cn(
                             'p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 select-text',
                             isBulletSelected
-                              ? 'bg-amber-500/20 border-amber-500 ring-2 ring-amber-400/60 shadow-md'
+                              ? 'bg-warning/20 border-warning ring-2 ring-warning/60 shadow-md'
                               : flagged
-                                ? 'bg-amber-500/10 border-amber-500/30'
+                                ? 'bg-warning/10 border-warning/30'
                                 : 'bg-card/40 border-border/60 hover:border-border hover:bg-muted/30',
                           )}
                         >
                           <div className="flex-1">
                             <span className="text-xs sm:text-sm">{b}</span>
                             {flagged && (
-                              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-mono mt-1">
+                              <div className="flex items-center gap-1.5 text-xs text-warning font-mono mt-1">
                                 <Hash className="w-3 h-3" />
                                 <span>Flagged: {flagged.flaggedNumbers.join(', ')}</span>
                               </div>
@@ -455,15 +455,15 @@ export function ResumeViewer({
                             }
                             className={`p-1.5 rounded-md border text-xs shrink-0 cursor-pointer transition-colors ${
                               flagged
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                                ? 'bg-warning/20 text-warning border-warning/40 hover:bg-warning/30'
                                 : 'bg-muted text-muted-foreground border-border hover:text-foreground hover:bg-muted/80'
                             }`}
                             title="Inspect ground-truth evidence"
                           >
                             {flagged ? (
-                              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                              <AlertTriangle className="w-3.5 h-3.5 text-warning" />
                             ) : (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                             )}
                           </button>
                         </li>

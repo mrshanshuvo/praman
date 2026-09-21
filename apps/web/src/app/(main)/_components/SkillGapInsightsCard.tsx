@@ -73,7 +73,7 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
     <Card className="p-6 rounded-2xl border-border bg-card shadow-xs space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-status-neutral/10 text-status-neutral flex items-center justify-center">
             <Target className="w-4 h-4" />
           </div>
           <div>
@@ -87,7 +87,7 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
 
         {totalAnalyzedJobs > 0 && (
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/40 border border-border">
-            <span className="text-[11px] text-muted-foreground">Match Readiness:</span>
+            <span className="text-xs text-muted-foreground">Match Readiness:</span>
             <span className="text-xs font-mono font-bold text-brand-cyan">
               {marketReadinessScore}%
             </span>
@@ -126,13 +126,13 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
                     variant="outline"
                     className={`text-xs py-0.5 px-2.5 gap-1.5 ${
                       isPossessed
-                        ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+                        ? 'border-success/30 bg-success/10 text-success'
                         : 'border-border bg-muted/30 text-foreground/80'
                     }`}
                   >
-                    {isPossessed && <CheckCircle2 className="w-3 h-3 text-emerald-400" />}
+                    {isPossessed && <CheckCircle2 className="w-3 h-3 text-success" />}
                     <span>{skill}</span>
-                    <span className="text-[10px] font-mono text-muted-foreground">
+                    <span className="text-2xs font-mono text-muted-foreground">
                       ({count} JDs)
                     </span>
                   </Badge>
@@ -145,12 +145,12 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                <AlertCircle className="w-3.5 h-3.5 text-warning" />
                 <span>High-Impact Skill Gaps:</span>
               </span>
               <Link
                 href="/profile"
-                className="text-[11px] text-brand-cyan hover:underline flex items-center gap-0.5"
+                className="text-xs text-brand-cyan hover:underline flex items-center gap-0.5"
               >
                 <span>Update Profile Skills</span>
                 <ArrowUpRight className="w-3 h-3" />
@@ -158,7 +158,7 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
             </div>
 
             {topMissingSkills.length === 0 ? (
-              <p className="text-xs text-emerald-400 font-medium">
+              <p className="text-xs text-success font-medium">
                 🎉 No recurring skill gaps detected across your analyzed jobs!
               </p>
             ) : (
@@ -166,18 +166,18 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
                 {topMissingSkills.map(([skill, count]) => (
                   <div
                     key={skill}
-                    className="p-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-xl border border-warning/30 bg-warning/10 flex items-center justify-between text-xs"
                   >
                     <div className="space-y-0.5">
                       <span className="font-semibold text-foreground block">{skill}</span>
-                      <span className="text-[11px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         Missing in {count} of your target position{count === 1 ? '' : 's'}
                       </span>
                     </div>
 
                     <Link
                       href="/profile"
-                      className="px-2.5 py-1 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 font-semibold text-[11px] transition-colors shrink-0"
+                      className="px-2.5 py-1 rounded-lg border border-warning/30 bg-warning/10 text-warning hover:bg-warning/20 font-semibold text-xs transition-colors shrink-0"
                     >
                       Add Evidence
                     </Link>

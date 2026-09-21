@@ -240,7 +240,7 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
                   <span>{status || 'DRAFT'}</span>
-                  <span className="text-[10px] font-sans font-medium opacity-75">· Audit</span>
+                  <span className="text-2xs font-sans font-medium opacity-75">· Audit</span>
                 </button>
               ) : (
                 <Badge
@@ -259,7 +259,7 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
               {versions && versions.length > 1 ? (
                 <div className="flex items-center gap-1.5 bg-muted/60 px-2 py-0.5 rounded-lg border border-border">
                   <History className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-[11px] text-muted-foreground">Ver:</span>
+                  <span className="text-xs text-muted-foreground">Ver:</span>
                   <select
                     value={
                       selectedVersion ||
@@ -284,7 +284,7 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
                       variant="ghost"
                       size="sm"
                       onClick={onOpenDiff}
-                      className="h-6 px-1.5 text-[10px] font-medium text-amber-400 hover:text-amber-300 hover:bg-amber-500/15 gap-1 cursor-pointer ml-1 rounded border border-amber-500/25"
+                      className="h-6 px-1.5 text-2xs font-medium text-warning hover:text-warning/90 hover:bg-warning/15 gap-1 cursor-pointer ml-1 rounded border border-warning/25"
                       title="Compare versions diff"
                     >
                       <GitCompare className="w-3 h-3" />
@@ -409,7 +409,7 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
                   className="cursor-pointer"
                 >
                   <Archive
-                    className={`w-4 h-4 text-amber-500 ${isDownloadingZip ? 'animate-spin' : ''}`}
+                    className={`w-4 h-4 text-warning ${isDownloadingZip ? 'animate-spin' : ''}`}
                   />
                   <span>
                     {isDownloadingZip ? 'Packaging 3 PDFs...' : 'Complete Package (.zip)'}

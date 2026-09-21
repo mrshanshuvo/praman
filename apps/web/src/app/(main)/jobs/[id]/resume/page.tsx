@@ -153,10 +153,10 @@ export default function ResumeAuditPage() {
                 value="diff"
                 className="text-xs px-4 flex items-center gap-1.5 cursor-pointer"
               >
-                <GitCompare className="w-3.5 h-3.5 text-amber-400" />
+                <GitCompare className="w-3.5 h-3.5 text-warning" />
                 <span>Version Diff</span>
                 {versions && versions.length > 1 && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-2xs font-bold bg-warning/20 text-warning border border-warning/30">
                     {versions.length}
                   </span>
                 )}
@@ -190,7 +190,7 @@ export default function ResumeAuditPage() {
               {status && (
                 <span
                   className={cn(
-                    'text-[10px] font-mono px-1.5 py-0.2 rounded border uppercase font-bold',
+                    'text-2xs font-mono px-1.5 py-0.2 rounded border uppercase font-bold',
                     status === 'VALIDATED'
                       ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
                       : 'bg-muted border-border text-muted-foreground',
@@ -265,7 +265,7 @@ export default function ResumeAuditPage() {
                   {status && (
                     <span
                       className={cn(
-                        'text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-bold',
+                        'text-2xs font-mono px-2 py-0.5 rounded border uppercase font-bold',
                         status === 'VALIDATED'
                           ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
                           : 'bg-muted border-border text-muted-foreground',

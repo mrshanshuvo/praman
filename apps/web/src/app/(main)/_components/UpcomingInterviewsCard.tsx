@@ -47,7 +47,7 @@ export const UpcomingInterviewsCard: React.FC<UpcomingInterviewsCardProps> = ({ 
     <Card className="p-6 rounded-2xl border-border bg-card shadow-xs space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-status-info-subtle text-status-info flex items-center justify-center">
             <Clock className="w-4 h-4" />
           </div>
           <div>
@@ -87,12 +87,12 @@ export const UpcomingInterviewsCard: React.FC<UpcomingInterviewsCardProps> = ({ 
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-foreground">{jobTitle}</span>
                   <span className="text-muted-foreground">· {companyName}</span>
-                  <Badge variant="outline" className="text-[10px] uppercase font-mono">
+                  <Badge variant="outline" className="text-2xs uppercase font-mono">
                     R{milestone.roundNumber} {milestone.stage.replace('_', ' ')}
                   </Badge>
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-brand-cyan" />
                     {new Date(milestone.scheduledAt!).toLocaleString([], {

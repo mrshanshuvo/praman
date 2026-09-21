@@ -119,7 +119,7 @@ ${coverLetter.senderName}
             </h3>
             <Badge
               variant="outline"
-              className="text-[10px] font-mono border-brand-cyan/30 text-brand-cyan bg-brand-cyan/10"
+              className="text-2xs font-mono border-brand-cyan/30 text-brand-cyan bg-brand-cyan/10"
             >
               ON-DEMAND
             </Badge>
@@ -160,7 +160,7 @@ ${coverLetter.senderName}
                       type="button"
                       onClick={() => setCoverLetterViewMode('letter')}
                       className={cn(
-                        'px-2 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer',
+                        'px-2 py-0.5 rounded text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer',
                         coverLetterViewMode === 'letter'
                           ? 'bg-brand-cyan/15 text-brand-cyan font-semibold'
                           : 'text-muted-foreground hover:text-foreground',
@@ -173,7 +173,7 @@ ${coverLetter.senderName}
                       type="button"
                       onClick={() => setCoverLetterViewMode('split')}
                       className={cn(
-                        'px-2 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer',
+                        'px-2 py-0.5 rounded text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer',
                         coverLetterViewMode === 'split'
                           ? 'bg-brand-cyan/15 text-brand-cyan font-semibold'
                           : 'text-muted-foreground hover:text-foreground',
@@ -186,7 +186,7 @@ ${coverLetter.senderName}
                       type="button"
                       onClick={() => setCoverLetterViewMode('latex')}
                       className={cn(
-                        'px-2 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer',
+                        'px-2 py-0.5 rounded text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer',
                         coverLetterViewMode === 'latex'
                           ? 'bg-brand-cyan/15 text-brand-cyan font-semibold'
                           : 'text-muted-foreground hover:text-foreground',
@@ -202,7 +202,7 @@ ${coverLetter.senderName}
                       type="button"
                       onClick={() => setCoverLetterWrap((w) => !w)}
                       className={cn(
-                        'px-2 py-0.5 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 cursor-pointer',
+                        'px-2 py-0.5 rounded text-xs font-medium border transition-colors flex items-center gap-1 cursor-pointer',
                         coverLetterWrap
                           ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan font-semibold'
                           : 'bg-background border-border text-muted-foreground hover:text-foreground',
@@ -216,7 +216,7 @@ ${coverLetter.senderName}
 
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-mono text-emerald-500 border-emerald-500/30 bg-emerald-500/10"
+                    className="text-2xs font-mono text-success border-success/30 bg-success/10"
                   >
                     Ready
                   </Badge>
@@ -254,22 +254,22 @@ ${coverLetter.senderName}
                 {outreach?.coverLetterValidation &&
                   (outreach.coverLetterValidation.violations?.length > 0 ||
                     outreach.coverLetterValidation.numberFlags?.length > 0) && (
-                    <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs space-y-1.5">
+                    <div className="p-3 rounded-lg border border-warning/30 bg-warning/10 text-warning text-xs space-y-1.5">
                       <div className="flex items-center gap-1.5 font-semibold">
-                        <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                        <AlertTriangle className="w-4 h-4 shrink-0 text-warning" />
                         <span>Audit Discrepancies Detected</span>
                       </div>
                       {outreach.coverLetterValidation.violations?.map((v: string, i: number) => (
-                        <p key={i} className="text-[11px] text-amber-200/90 pl-5">
+                        <p key={i} className="text-xs text-warning/90 pl-5">
                           • {v}
                         </p>
                       ))}
                       {outreach.coverLetterValidation.numberFlags?.map((f: any, i: number) => (
                         <div
                           key={i}
-                          className="text-[11px] text-amber-200/90 pl-5 flex items-center gap-1"
+                          className="text-xs text-warning/90 pl-5 flex items-center gap-1"
                         >
-                          <Hash className="w-3 h-3 text-amber-400 shrink-0" />
+                          <Hash className="w-3 h-3 text-warning shrink-0" />
                           <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
                         </div>
                       ))}
@@ -281,7 +281,7 @@ ${coverLetter.senderName}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Left Pane: Letterhead Paper Sheet */}
                     <div className="p-4 rounded-lg border border-border/80 bg-background/90 shadow-sm space-y-3 text-xs text-foreground font-sans leading-relaxed max-h-120 overflow-y-auto">
-                      <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-[11px] space-y-0.5">
+                      <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-xs space-y-0.5">
                         <div>
                           <strong className="text-foreground">To:</strong>{' '}
                           {coverLetter.recipientName}
@@ -339,7 +339,7 @@ ${coverLetter.senderName}
                   </div>
                 ) : (
                   <div className="p-4 rounded-lg border border-border/80 bg-muted/20 space-y-3 text-xs text-foreground font-sans leading-relaxed max-h-96 overflow-y-auto">
-                    <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-[11px] space-y-0.5">
+                    <div className="border-b border-border/60 pb-2 text-muted-foreground font-mono text-xs space-y-0.5">
                       <div>
                         <strong className="text-foreground">To:</strong> {coverLetter.recipientName}
                       </div>
@@ -444,7 +444,7 @@ ${coverLetter.senderName}
                     onClick={handleOpenOverleaf}
                     className="text-xs border-border gap-1 bg-card hover:bg-muted cursor-pointer"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-emerald-500" />
+                    <ExternalLink className="w-3.5 h-3.5 text-success" />
                     <span>Overleaf</span>
                   </Button>
 
@@ -481,7 +481,7 @@ ${coverLetter.senderName}
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-foreground">Recruiter Outreach Email</h4>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Short, punchy 3-paragraph message for LinkedIn or direct hiring outreach
                   </p>
                 </div>
@@ -490,7 +490,7 @@ ${coverLetter.senderName}
               {recruiterEmail && (
                 <Badge
                   variant="outline"
-                  className="text-[10px] font-mono text-emerald-500 border-emerald-500/30 bg-emerald-500/10"
+                  className="text-2xs font-mono text-success border-success/30 bg-success/10"
                 >
                   Ready
                 </Badge>
@@ -527,7 +527,7 @@ ${coverLetter.senderName}
                 {/* Subject Line Pill */}
                 <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/40 border border-border">
                   <div className="flex items-center gap-2 truncate">
-                    <span className="text-[11px] font-mono font-bold text-muted-foreground uppercase">
+                    <span className="text-xs font-mono font-bold text-muted-foreground uppercase">
                       Subject:
                     </span>
                     <span className="text-xs font-semibold text-foreground truncate">
@@ -538,7 +538,7 @@ ${coverLetter.senderName}
                     size="sm"
                     variant="ghost"
                     onClick={() => handleCopy(recruiterEmail.subject, 'subj')}
-                    className="h-7 px-2 text-[11px] border border-border/60 bg-card hover:bg-muted gap-1"
+                    className="h-7 px-2 text-xs border border-border/60 bg-card hover:bg-muted gap-1"
                   >
                     {copiedSection === 'subj' ? (
                       <>
