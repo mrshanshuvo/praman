@@ -1,10 +1,11 @@
 'use client';
 
 import { AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import { Suspense } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useCandidateProfile, useProfileMutations } from '@/hooks/usePramanApi';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { CertificationsTab, EducationTab } from './_components/EducationCertsTabs';
 import { ExperiencesTab } from './_components/ExperiencesTab';
 import { PersonalTab } from './_components/PersonalTab';
@@ -16,7 +17,16 @@ import { ProjectsTab } from './_components/ProjectsTab';
 import { SkillsTab } from './_components/SkillsTab';
 import { useProfileActions } from './_components/useProfileActions';
 
-export default function ProfilePage() {
+const VALID_PROFILE_TABS: ProfileTabId[] = [
+  'personal',
+  'experiences',
+  'projects',
+  'skills',
+  'education',
+  'certifications',
+];
+
+function ProfileContent() {
   const {
     data: profile,
     isLoading: loading,
@@ -26,7 +36,11 @@ export default function ProfilePage() {
   } = useCandidateProfile();
   const muts = useProfileMutations();
   const actions = useProfileActions(muts);
-  const [activeTab, setActiveTab] = useState<ProfileTabId>('personal');
+
+  const [activeTab, setActiveTab] = useUrlTab<ProfileTabId>({
+    defaultValue: 'personal',
+    validValues: VALID_PROFILE_TABS,
+  });
 
   if (loading) return <ProfileSkeleton />;
 
@@ -122,5 +136,13 @@ export default function ProfilePage() {
       {activeTab === 'education' && <EducationTab educations={educations} />}
       {activeTab === 'certifications' && <CertificationsTab certifications={certifications} />}
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfileSkeleton />}>
+      <ProfileContent />
+    </Suspense>
   );
 }

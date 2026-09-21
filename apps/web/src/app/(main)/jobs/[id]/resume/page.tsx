@@ -24,20 +24,27 @@ import {
   useResumeVersions,
   useRunStage,
 } from '@/hooks/usePramanApi';
+import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
 import { LatexViewer } from './_components/LatexViewer';
 import { OutreachTab } from './_components/OutreachTab';
 import { ResumeAuditHeader } from './_components/ResumeAuditHeader';
 import { ResumeDiffViewer } from './_components/ResumeDiffViewer';
 import { ResumeViewer } from './_components/ResumeViewer';
 
+const VALID_TABS = ['latex', 'diff', 'outreach', 'preview'] as const;
+
 export default function ResumeAuditPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
-  const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
+  const [activeTab, setActiveTab] = useUrlTab({
+    defaultValue: 'latex',
+    validValues: VALID_TABS,
+  });
+  const [selectedVersion, setSelectedVersion] = useUrlQueryParam<string>('version');
+  const [selectedTemplate = 'modern-developer', setSelectedTemplate] =
+    useUrlQueryParam<string>('template', 'modern-developer');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('latex');
 
   const { data: jd } = useJob(id);
   const { data: versions } = useResumeVersions(id);
