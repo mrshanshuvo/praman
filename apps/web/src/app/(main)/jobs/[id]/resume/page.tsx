@@ -1,15 +1,7 @@
 'use client';
 
 import { cn } from 'cn';
-import {
-  ArrowLeft,
-  FileCode,
-  GitCompare,
-  Mail,
-  PanelRightClose,
-  PanelRightOpen,
-  ShieldCheck,
-} from 'lucide-react';
+import { ArrowLeft, FileCode, GitCompare, Mail, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -278,7 +270,8 @@ export default function ResumeAuditPage() {
                   )}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                  Automated truth-preservation report auditing claims against confirmed candidate profile records.
+                  Automated truth-preservation report auditing claims against confirmed candidate
+                  profile records.
                 </DialogDescription>
               </div>
             </div>
