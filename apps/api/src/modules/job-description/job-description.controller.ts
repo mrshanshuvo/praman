@@ -12,7 +12,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateJobDescriptionDtoSchema, UpdateJobStatusDtoSchema } from '@praman/schemas';
+import {
+  CreateJobDescriptionDtoSchema,
+  PaginationQuerySchema,
+  UpdateJobStatusDtoSchema,
+} from '@praman/schemas';
 import type { Response } from 'express';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { MatchService } from '../match/match.service.js';
@@ -46,10 +50,12 @@ export class JobDescriptionController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all job descriptions for current user' })
-  @ApiResponse({ status: 200, description: 'List of job descriptions' })
-  async listJds(@CurrentUser() user?: AuthUser) {
-    return this.jdService.getAllJds(user?.id);
+  @ApiOperation({ summary: 'List all job descriptions for current user (supports pagination)' })
+  @ApiResponse({ status: 200, description: 'List of job descriptions or paginated response' })
+  async listJds(@Query() query: unknown, @CurrentUser() user?: AuthUser) {
+    const parse = PaginationQuerySchema.safeParse(query);
+    const pagination = parse.success ? parse.data : undefined;
+    return this.jdService.getAllJds(user?.id, pagination);
   }
 
   @Get(':id')

@@ -4,6 +4,8 @@ import { calculateMatchScore } from '@praman/schemas';
 import {
   AlertCircle,
   ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
   Filter,
   LayoutGrid,
   List,
@@ -59,7 +61,13 @@ function JobsListSkeleton() {
 }
 
 function JobsListContent() {
-  const { data: jds = [], isLoading: loading, isFetching, error: fetchError, refetch } = useJobs();
+  const {
+    data: jds = [],
+    isLoading: loading,
+    isFetching,
+    error: fetchError,
+    refetch,
+  } = useJobs({ all: true });
   const error = fetchError ? (fetchError as Error).message : null;
 
   const [viewMode = 'list', setViewMode] = useUrlQueryParam<'list' | 'board'>('view', 'list', {
@@ -73,6 +81,13 @@ function JobsListContent() {
   });
   const [sortBy, setSortBy] = useUrlQueryParam<string>('sort', 'newest');
   const [searchQuery, setSearchQuery] = useUrlQueryParam<string>('q', '', { debounceMs: 250 });
+  const [pageStr = '1', setPageStr] = useUrlQueryParam<string>('page', '1');
+  const [limitStr = '10', setLimitStr] = useUrlQueryParam<string>('limit', '10');
+
+  const currentPage = Math.max(1, Number.parseInt(pageStr, 10) || 1);
+  const pageSize = Math.max(1, Number.parseInt(limitStr, 10) || 10);
+  const setCurrentPage = (p: number) => setPageStr(String(p));
+  const setPageSize = (l: number) => setLimitStr(String(l));
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { ALL: jds.length };
@@ -110,6 +125,16 @@ function JobsListContent() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
   }, [jds, statusFilter, sortBy, searchQuery, viewMode]);
+
+  const totalItems = filteredAndSortedJds.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const validPage = Math.min(Math.max(1, Number(currentPage) || 1), totalPages);
+
+  const paginatedJds = useMemo(() => {
+    if (viewMode === 'board') return filteredAndSortedJds;
+    const startIndex = (validPage - 1) * pageSize;
+    return filteredAndSortedJds.slice(startIndex, startIndex + pageSize);
+  }, [filteredAndSortedJds, validPage, pageSize, viewMode]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -170,7 +195,10 @@ function JobsListContent() {
                 <button
                   key={tab.key}
                   type="button"
-                  onClick={() => setStatusFilter(tab.key)}
+                  onClick={() => {
+                    setStatusFilter(tab.key);
+                    setCurrentPage(1);
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                     isActive
                       ? 'bg-foreground text-background shadow-xs'
@@ -207,7 +235,10 @@ function JobsListContent() {
               type="text"
               placeholder="Search jobs or companies..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand-cyan"
             />
           </div>
@@ -327,6 +358,7 @@ function JobsListContent() {
             onClick={() => {
               setStatusFilter('ALL');
               setSearchQuery('');
+              setCurrentPage(1);
             }}
             className="mt-3 text-xs text-brand-cyan"
           >
@@ -336,10 +368,73 @@ function JobsListContent() {
       ) : viewMode === 'board' ? (
         <JobsKanbanBoard jobs={filteredAndSortedJds} />
       ) : (
-        <div className="space-y-4">
-          {filteredAndSortedJds.map((jd) => (
-            <JobCard key={jd.id} jd={jd} />
-          ))}
+        <div className="space-y-6">
+          <div className="space-y-4">
+            {paginatedJds.map((jd) => (
+              <JobCard key={jd.id} jd={jd} />
+            ))}
+          </div>
+
+          {/* List View Pagination Bar */}
+          {totalItems > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border mt-6">
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span>
+                  Showing{' '}
+                  <strong className="text-foreground">{(validPage - 1) * pageSize + 1}</strong> to{' '}
+                  <strong className="text-foreground">
+                    {Math.min(validPage * pageSize, totalItems)}
+                  </strong>{' '}
+                  of <strong className="text-foreground">{totalItems}</strong> jobs
+                </span>
+                <span className="text-border">|</span>
+                <div className="flex items-center gap-1.5">
+                  <span>Show:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    aria-label="Jobs per page"
+                    className="bg-card border border-border rounded px-1.5 py-0.5 text-xs text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-brand-cyan"
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(1, validPage - 1))}
+                  disabled={validPage <= 1}
+                  className="h-8 px-2.5 text-xs border-border bg-card hover:bg-muted text-foreground cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+                  <span>Previous</span>
+                </Button>
+
+                <span className="text-xs px-2 text-muted-foreground font-mono">
+                  Page {validPage} of {totalPages}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalPages, validPage + 1))}
+                  disabled={validPage >= totalPages}
+                  className="h-8 px-2.5 text-xs border-border bg-card hover:bg-muted text-foreground cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

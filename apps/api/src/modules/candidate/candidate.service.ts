@@ -26,10 +26,7 @@ export class CandidateService {
     }
 
     if (!user) {
-      const allUsers = await this.prisma.client.orm.public.User.all();
-      if (allUsers.length > 0) {
-        user = allUsers[0];
-      }
+      user = await this.prisma.client.orm.public.User.first();
     }
 
     if (!user) {

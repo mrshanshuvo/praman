@@ -160,7 +160,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
 
   return (
     <div className="w-full overflow-x-auto pb-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 min-w-[1020px]">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 min-w-255">
         {KANBAN_COLUMNS.map((col) => {
           const colJobs = jobs.filter((jd) => (jd.status || 'SAVED') === col.key);
           const isDragTarget = dragOverColumn === col.key;
@@ -172,7 +172,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
               onDragOver={(e) => handleDragOver(e, col.key)}
               onDragLeave={(e) => handleDragLeave(e, col.key)}
               onDrop={(e) => handleDrop(e, col.key)}
-              className={`flex flex-col rounded-2xl border transition-all duration-200 min-h-[500px] ${
+              className={`flex flex-col rounded-2xl border transition-all duration-200 min-h-125 ${
                 isDragTarget
                   ? 'border-brand-cyan bg-brand-cyan/10 ring-2 ring-brand-cyan/20'
                   : 'border-border/80 bg-card/40'

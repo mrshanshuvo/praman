@@ -2,6 +2,7 @@ export * from './candidate';
 export * from './job-description';
 export * from './match';
 export * from './outreach';
+export * from './pagination';
 export * from './resume';
 export * from './strategy';
 

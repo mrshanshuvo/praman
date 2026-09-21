@@ -1,5 +1,10 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { type ApplicationStatus, type StructuredJd, StructuredJdSchema } from '@praman/schemas';
+import {
+  type ApplicationStatus,
+  type PaginationQueryDto,
+  type StructuredJd,
+  StructuredJdSchema,
+} from '@praman/schemas';
 import { PrismaService } from '../../core/database/prisma.service.js';
 import { AiService } from '../ai/ai.service.js';
 import { JD_ANALYZER_SYSTEM_PROMPT_V1 } from '../ai/prompts/jd-analyzer.v1.js';
@@ -70,19 +75,70 @@ export class JobDescriptionService {
     return jd;
   }
 
-  async getAllJds(targetUserId?: string) {
+  async getAllJds(targetUserId?: string, query?: PaginationQueryDto) {
     let userId = targetUserId;
     if (!userId) {
       const user = await this.candidateService.getDefaultUser();
       userId = user.id;
     }
-    const jds = await this.prisma.client.orm.public.JobDescription.where({
-      userId,
-    })
-      .include('analysis')
-      .all();
 
-    return jds;
+    const whereClause: Record<string, any> = { userId };
+    if (query?.status && query.status !== 'ALL') {
+      whereClause.status = query.status;
+    }
+
+    // Fast count of total matched records
+    const totalCount = (
+      await this.prisma.client.orm.public.JobDescription.where(whereClause).select('id').all()
+    ).length;
+
+    const isExplicitAll = query?.all === true;
+    const isExplicitPaginated = Boolean(query && (query.page != null || query.limit != null));
+    const page = Math.max(1, query?.page || 1);
+    const limit = Math.min(100, Math.max(1, query?.limit || 20));
+
+    let jdsQuery =
+      this.prisma.client.orm.public.JobDescription.where(whereClause).include('analysis');
+
+    if (isExplicitPaginated && !isExplicitAll) {
+      const offset = (page - 1) * limit;
+      jdsQuery = jdsQuery.limit(limit).offset(offset);
+    }
+
+    let jds = await jdsQuery.all();
+
+    // Default chronological ordering if requested
+    jds = jds.sort((a: any, b: any) => {
+      if (query?.sortBy === 'oldest') {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    // Truncate heavy rawText for list and board cards (preserves preview snippet while slimming payload >95%)
+    const items = jds.map((jd: any) => ({
+      ...jd,
+      rawText: jd.rawText ? jd.rawText.slice(0, 250) : '',
+    }));
+
+    // If no query parameters provided at all, return raw array for legacy callers
+    if (!query) {
+      return items;
+    }
+
+    const totalPages = isExplicitAll ? 1 : Math.max(1, Math.ceil(totalCount / limit));
+
+    return {
+      items,
+      meta: {
+        total: totalCount,
+        page: isExplicitAll ? 1 : page,
+        limit: isExplicitAll ? totalCount : limit,
+        totalPages,
+        hasNextPage: isExplicitAll ? false : page < totalPages,
+        hasPrevPage: isExplicitAll ? false : page > 1,
+      },
+    };
   }
 
   async getJdById(id: string) {

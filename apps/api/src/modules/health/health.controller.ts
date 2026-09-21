@@ -37,7 +37,7 @@ export class HealthController {
       async () => {
         const indicator = this.indicatorService.check('database');
         try {
-          await this.prisma.client.orm.public.User.all();
+          await this.prisma.client.orm.public.User.first();
           return indicator.up();
         } catch {
           return indicator.down({ message: 'Database ping failed' });

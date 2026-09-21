@@ -248,7 +248,16 @@ export class ResumeService {
       resumeStrategyId: strategy.id,
     }).all();
 
-    return resumes.sort((a: any, b: any) => (b.version || 1) - (a.version || 1));
+    return resumes
+      .sort((a: any, b: any) => (b.version || 1) - (a.version || 1))
+      .slice(0, 30)
+      .map((r: any) => ({
+        id: r.id,
+        version: r.version,
+        isLatest: Boolean(r.isLatest),
+        status: r.status,
+        createdAt: r.createdAt,
+      }));
   }
 
   async getLatexSource(
