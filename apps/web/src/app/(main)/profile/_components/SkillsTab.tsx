@@ -74,7 +74,7 @@ export function SkillsTab({ skills, onAdd, onUpdate, onDelete }: SkillsTabProps)
         <div>
           <h3 className="text-base font-semibold text-foreground">Skills & Competencies</h3>
           <p className="text-xs text-muted-foreground">
-            Categorized skill levels enforced strictly during anti-hallucination validation.
+            Categorized skills and proficiency levels used for resume generation.
           </p>
         </div>
         <Button

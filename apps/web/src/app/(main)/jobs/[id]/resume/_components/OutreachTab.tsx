@@ -28,6 +28,7 @@ import {
   useGenerateRecruiterEmail,
   useJobOutreach,
 } from '@/hooks/usePramanApi';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { triggerFileDownload } from '@/lib/zip';
 
 interface OutreachTabProps {
@@ -35,15 +36,19 @@ interface OutreachTabProps {
   candidateName?: string;
 }
 
+const VALID_LETTER_VIEWS = ['letter', 'split', 'latex'] as const;
+
 export function OutreachTab({ jobId, candidateName = 'Candidate' }: OutreachTabProps) {
   const { data: outreach } = useJobOutreach(jobId);
   const generateCoverLetterMutation = useGenerateCoverLetter(jobId);
   const generateEmailMutation = useGenerateRecruiterEmail(jobId);
 
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
-  const [coverLetterViewMode, setCoverLetterViewMode] = useState<'letter' | 'split' | 'latex'>(
-    'letter',
-  );
+  const [coverLetterViewMode, setCoverLetterViewMode] = useUrlTab<'letter' | 'split' | 'latex'>({
+    paramName: 'letterView',
+    defaultValue: 'letter',
+    validValues: VALID_LETTER_VIEWS,
+  });
   const [coverLetterWrap, setCoverLetterWrap] = useState(true);
 
   const handleCopy = (text: string, sectionId: string) => {
@@ -254,22 +259,22 @@ ${coverLetter.senderName}
                         <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
                         <span>Audit Discrepancies Detected</span>
                       </div>
-                        {outreach.coverLetterValidation.violations?.map((v: string, i: number) => (
-                          <p key={i} className="text-[11px] text-amber-200/90 pl-5">
-                            • {v}
-                          </p>
-                        ))}
-                        {outreach.coverLetterValidation.numberFlags?.map((f: any, i: number) => (
-                          <div
-                            key={i}
-                            className="text-[11px] text-amber-200/90 pl-5 flex items-center gap-1"
-                          >
-                            <Hash className="w-3 h-3 text-amber-400 shrink-0" />
-                            <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                      {outreach.coverLetterValidation.violations?.map((v: string, i: number) => (
+                        <p key={i} className="text-[11px] text-amber-200/90 pl-5">
+                          • {v}
+                        </p>
+                      ))}
+                      {outreach.coverLetterValidation.numberFlags?.map((f: any, i: number) => (
+                        <div
+                          key={i}
+                          className="text-[11px] text-amber-200/90 pl-5 flex items-center gap-1"
+                        >
+                          <Hash className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                 {/* Cover Letter Content Body: Formatted / Split / LaTeX */}
                 {coverLetterViewMode === 'split' ? (

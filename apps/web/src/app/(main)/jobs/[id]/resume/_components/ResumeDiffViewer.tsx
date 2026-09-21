@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobResume } from '@/hooks/usePramanApi';
+import { useUrlQueryParam } from '@/hooks/useUrlTab';
 import {
   type BulletDiffItem,
   diffBullets,
@@ -70,8 +71,14 @@ export function ResumeDiffViewer({
     return sortedVersions[0]?.version?.toString() || '1';
   }, [sortedVersions, defaultTarget]);
 
-  const [baseVersion, setBaseVersion] = useState<string>(defaultBase);
-  const [targetVersion, setTargetVersion] = useState<string>(defaultTarget);
+  const [baseVersionParam, setBaseVersionParam] = useUrlQueryParam<string>('diffBase');
+  const [targetVersionParam, setTargetVersionParam] = useUrlQueryParam<string>('diffTarget');
+
+  const baseVersion = baseVersionParam || defaultBase;
+  const targetVersion = targetVersionParam || defaultTarget;
+
+  const setBaseVersion = (v: string) => setBaseVersionParam(v);
+  const setTargetVersion = (v: string) => setTargetVersionParam(v);
   const [changesOnly, setChangesOnly] = useState<boolean>(false);
 
   // Fetch base and target versions

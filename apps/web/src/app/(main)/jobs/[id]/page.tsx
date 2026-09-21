@@ -1,14 +1,15 @@
 'use client';
 
 import { AlertCircle } from 'lucide-react';
-import { useParams, usePathname, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { type PipelineStage, PipelineStepper } from '@/components/PipelineStepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePipelineStream } from '@/hooks/usePipelineStream';
 import { useJob, useRunStage } from '@/hooks/usePramanApi';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { JobDetailHeader } from './_components/JobDetailHeader';
 import { PipelineLiveLogs } from './_components/PipelineLiveLogs';
 import { Stage1Structured } from './_components/Stage1Structured';
@@ -18,33 +19,38 @@ import { Stage4Resume } from './_components/Stage4Resume';
 
 const VALID_STAGES: PipelineStage[] = ['structured', 'match', 'strategy', 'resume'];
 
-export default function JobDetailPage() {
+function JobDetailSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <Skeleton className="h-24 w-full rounded-2xl bg-card border border-border" />
+      <Skeleton className="h-16 w-full rounded-2xl bg-card border border-border" />
+      <Skeleton className="h-96 w-full rounded-2xl bg-card border border-border" />
+    </div>
+  );
+}
+
+function JobDetailContent() {
   const params = useParams();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
   const id = params.id as string;
 
-  const stageFromUrl = searchParams.get('stage') as PipelineStage | null;
-  const initialStage = stageFromUrl && VALID_STAGES.includes(stageFromUrl) ? stageFromUrl : null;
+  const [activeTab, setActiveTab] = useUrlTab<PipelineStage>({
+    paramName: 'stage',
+    defaultValue: 'structured',
+    validValues: VALID_STAGES,
+  });
 
   const { data: jd, isLoading: loading, isFetching, error: fetchError, refetch } = useJob(id);
   const runStageMutation = useRunStage(id);
 
-  const [activeTab, setActiveTabState] = useState<PipelineStage>(initialStage || 'structured');
-  const [hasAutoAdvanced, setHasAutoAdvanced] = useState<boolean>(Boolean(initialStage));
+  const [hasAutoAdvanced, setHasAutoAdvanced] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const stage = urlParams.get('stage');
+      return Boolean(stage && VALID_STAGES.includes(stage as PipelineStage));
+    }
+    return false;
+  });
   const [manualActionError, setManualActionError] = useState<string | null>(null);
-
-  const setActiveTab = useCallback(
-    (stage: PipelineStage) => {
-      setActiveTabState(stage);
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('stage', stage);
-        window.history.replaceState(null, '', `${pathname}?${urlParams.toString()}`);
-      }
-    },
-    [pathname],
-  );
 
   // Auto-advance to highest completed stage on first load if no URL stage was provided
   useEffect(() => {
@@ -57,15 +63,10 @@ export default function JobDetailPage() {
       } else if (jd.analysis?.result) {
         highestStage = 'match';
       }
-      setActiveTabState(highestStage);
+      setActiveTab(highestStage);
       setHasAutoAdvanced(true);
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('stage', highestStage);
-        window.history.replaceState(null, '', `${pathname}?${urlParams.toString()}`);
-      }
     }
-  }, [jd, hasAutoAdvanced, pathname]);
+  }, [jd, hasAutoAdvanced, setActiveTab]);
 
   const {
     isStreaming,
@@ -194,5 +195,13 @@ export default function JobDetailPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function JobDetailPage() {
+  return (
+    <Suspense fallback={<JobDetailSkeleton />}>
+      <JobDetailContent />
+    </Suspense>
   );
 }

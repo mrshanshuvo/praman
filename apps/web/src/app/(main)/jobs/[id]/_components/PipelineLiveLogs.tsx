@@ -69,13 +69,17 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
       {isExpanded && (
         <div className="rounded-xl bg-background/80 border border-border/80 p-3.5 font-mono text-xs max-h-56 overflow-y-auto space-y-2">
           {logs.map((log, index) => {
-            const hasSubsequentCompletionOrAdvance = logs.slice(index + 1).some(
-              (l) =>
-                (l.stage === log.stage &&
-                  (l.status === 'completed' || l.status === 'complete' || l.status === 'failed')) ||
-                (l.status === 'complete' && l.stage === 'pipeline') ||
-                l.status === 'started',
-            );
+            const hasSubsequentCompletionOrAdvance = logs
+              .slice(index + 1)
+              .some(
+                (l) =>
+                  (l.stage === log.stage &&
+                    (l.status === 'completed' ||
+                      l.status === 'complete' ||
+                      l.status === 'failed')) ||
+                  (l.status === 'complete' && l.stage === 'pipeline') ||
+                  l.status === 'started',
+              );
 
             const isCompleted =
               log.status === 'completed' ||

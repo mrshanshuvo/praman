@@ -42,8 +42,10 @@ export default function ResumeAuditPage() {
     validValues: VALID_TABS,
   });
   const [selectedVersion, setSelectedVersion] = useUrlQueryParam<string>('version');
-  const [selectedTemplate = 'modern-developer', setSelectedTemplate] =
-    useUrlQueryParam<string>('template', 'modern-developer');
+  const [selectedTemplate = 'modern-developer', setSelectedTemplate] = useUrlQueryParam<string>(
+    'template',
+    'modern-developer',
+  );
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   const { data: jd } = useJob(id);
@@ -181,7 +183,7 @@ export default function ResumeAuditPage() {
               size="sm"
               onClick={() => setIsAuditModalOpen(true)}
               className="h-8.5 text-xs border-border bg-card hover:bg-muted gap-1.5 cursor-pointer font-medium shadow-xs transition-colors"
-              title="Open Truth-Preservation Evidence Audit Report modal"
+              title="Open Verification Audit Report"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-brand-cyan" />
               <span>Evidence Audit</span>
@@ -201,35 +203,32 @@ export default function ResumeAuditPage() {
           </div>
 
           {/* Tab 1: Resume Studio (LaTeX & Live PDF Preview with SyncTeX) */}
-          <TabsContent value="latex" className="mt-0 outline-none">
+          <TabsContent value="latex" className="m-0 focus-visible:outline-none">
             {latexLoading ? (
-              <div className="p-8 text-center text-xs text-muted-foreground">
-                Loading LaTeX source from Cloudflare R2...
+              <div className="p-12 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-brand-cyan border-t-transparent rounded-full animate-spin" />
+                <span>Loading LaTeX source...</span>
               </div>
-            ) : latex ? (
+            ) : (
               <LatexViewer
                 jobId={id}
-                latex={latex}
+                latex={latex || ''}
                 selectedTemplate={selectedTemplate}
                 onSelectTemplate={setSelectedTemplate}
                 downloadUrl={downloadUrl}
-                candidateName={resume.personal?.name}
+                candidateName={resume?.personal?.name || 'resume'}
                 resumeData={resume}
                 version={selectedVersion}
               />
-            ) : (
-              <div className="p-8 text-center text-xs text-muted-foreground">
-                LaTeX source not yet generated for this resume.
-              </div>
             )}
           </TabsContent>
 
           {/* Tab 2: Visual Version Diff Viewer */}
-          <TabsContent value="diff" className="mt-0 outline-none">
+          <TabsContent value="diff" className="m-0 focus-visible:outline-none">
             <ResumeDiffViewer
               jobId={id}
               currentResume={resume}
-              currentVersion={resumeData?.version || selectedVersion}
+              currentVersion={selectedVersion}
               versions={versions}
               onRegenerate={handleRegenerate}
               isRegenerating={runStageMutation.isPending}
@@ -237,12 +236,12 @@ export default function ResumeAuditPage() {
           </TabsContent>
 
           {/* Tab 3: Cover Letter & Outreach Studio */}
-          <TabsContent value="outreach" className="mt-0 outline-none">
-            <OutreachTab jobId={id} candidateName={resume.personal?.name} />
+          <TabsContent value="outreach" className="m-0 focus-visible:outline-none">
+            <OutreachTab jobId={id} candidateName={resume?.personal?.name || 'Candidate'} />
           </TabsContent>
 
           {/* Tab 4: Raw Profile Evidence (Optional Inspector) */}
-          <TabsContent value="preview" className="mt-0 outline-none">
+          <TabsContent value="preview" className="m-0 focus-visible:outline-none">
             <ResumeViewer
               resume={resume}
               validationReport={report}
@@ -252,21 +251,21 @@ export default function ResumeAuditPage() {
         </Tabs>
       </div>
 
-      {/* On-Demand Evidence Cross-Check Audit Modal */}
+      {/* On-Demand Audit Modal */}
       <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col p-6 overflow-hidden">
+        <DialogContent className="max-w-4xl max-h-[88vh] flex flex-col p-6 gap-4">
           <DialogHeader className="pb-3 border-b border-border">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-brand-cyan/10 text-brand-cyan">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-brand-cyan/15 border border-brand-cyan/30 flex items-center justify-center text-brand-cyan shrink-0">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
                 <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <span>Praman Evidence Cross-Check Audit</span>
+                  <span>Resume Evidence Audit</span>
                   {status && (
                     <span
                       className={cn(
-                        'text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold',
+                        'text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-bold',
                         status === 'VALIDATED'
                           ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
                           : 'bg-muted border-border text-muted-foreground',
@@ -277,8 +276,8 @@ export default function ResumeAuditPage() {
                   )}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                  Automated truth-preservation report auditing claims against confirmed candidate
-                  profile records.
+                  Audit report verifying resume claims and skills against confirmed candidate
+                  profile facts.
                 </DialogDescription>
               </div>
             </div>

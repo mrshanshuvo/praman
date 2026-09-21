@@ -138,7 +138,8 @@ export function MatchScoreBadge({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
-                Calculated by comparing verified candidate skills against required job prerequisites.
+                Calculated by comparing verified candidate skills against required job
+                prerequisites.
               </p>
             </div>
           </div>

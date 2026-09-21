@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { CompiledPdfPreview } from './CompiledPdfPreview';
 import type { SheetSyncTarget } from './DocumentPreviewSheet';
 
@@ -71,7 +72,11 @@ export function LatexViewer({
   version,
 }: LatexViewerProps) {
   const [code, setCode] = useState(latex);
-  const [viewMode, setViewMode] = useState<'split' | 'code' | 'preview'>('code');
+  const [viewMode, setViewMode] = useUrlTab<'split' | 'code' | 'preview'>({
+    paramName: 'editorView',
+    defaultValue: 'code',
+    validValues: ['code', 'split', 'preview'] as const,
+  });
   const [copied, setCopied] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [wordWrap, setWordWrap] = useState(true);

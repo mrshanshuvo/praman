@@ -183,8 +183,8 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              The AI tailoring engine uses your profile facts to eliminate hallucinations in resumes
-              and outreach.
+              Your verified profile facts are used to generate tailored resumes and outreach
+              materials.
             </p>
           </div>
         </div>

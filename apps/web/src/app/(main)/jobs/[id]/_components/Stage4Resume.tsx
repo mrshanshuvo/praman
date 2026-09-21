@@ -8,6 +8,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
 import { useCandidateProfile } from '@/hooks/usePramanApi';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { ResumeViewer } from '../resume/_components/ResumeViewer';
 import { StageEmpty } from './StageEmpty';
 
@@ -23,6 +24,9 @@ interface Stage4ResumeProps {
   onRun: () => void;
 }
 
+const VALID_RESUME_VIEWS = ['structured', 'report', 'json'] as const;
+type ResumeSubView = (typeof VALID_RESUME_VIEWS)[number];
+
 export function Stage4Resume({
   jobId,
   resumeJson,
@@ -35,6 +39,11 @@ export function Stage4Resume({
   onRun,
 }: Stage4ResumeProps) {
   const { data: candidateProfile } = useCandidateProfile();
+  const [activeSubTab, setActiveSubTab] = useUrlTab<ResumeSubView>({
+    paramName: 'resumeView',
+    defaultValue: 'structured',
+    validValues: VALID_RESUME_VIEWS,
+  });
 
   return (
     <div className="space-y-4">
@@ -44,7 +53,7 @@ export function Stage4Resume({
             Stage 4: Generated Resume & Audit
           </h3>
           <p className="text-xs text-muted-foreground">
-            Truth-preserving resume generation with 2-layer deterministic validation.
+            Generated resume and claim verification audit.
           </p>
         </div>
 
@@ -91,7 +100,11 @@ export function Stage4Resume({
           onCta={hasStrategy ? onRun : undefined}
         />
       ) : (
-        <Tabs defaultValue="structured" className="w-full space-y-4">
+        <Tabs
+          value={activeSubTab}
+          onValueChange={(val) => setActiveSubTab(val as ResumeSubView)}
+          className="w-full space-y-4"
+        >
           <TabsList className="bg-muted/60 p-1 border border-border">
             <TabsTrigger value="structured" className="text-xs flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-brand-cyan" />

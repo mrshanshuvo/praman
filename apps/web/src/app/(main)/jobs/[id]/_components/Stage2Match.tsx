@@ -1,12 +1,12 @@
 'use client';
 
 import { Code2, FileText, Layers } from 'lucide-react';
-import { useState } from 'react';
 import { JsonCard } from '@/components/JsonCard';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { useCandidateProfile } from '@/hooks/usePramanApi';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { MatchDiffInspector } from './MatchDiffInspector';
 import { StageEmpty } from './StageEmpty';
 import { StageHeader } from './StageHeader';
@@ -27,13 +27,17 @@ export function Stage2Match({
   onRun,
 }: Stage2MatchProps) {
   const { data: candidateProfile } = useCandidateProfile();
-  const [activeView, setActiveView] = useState<'diff' | 'overview' | 'json'>('diff');
+  const [activeView, setActiveView] = useUrlTab<'diff' | 'overview' | 'json'>({
+    paramName: 'matchView',
+    defaultValue: 'diff',
+    validValues: ['diff', 'overview', 'json'],
+  });
 
   return (
     <div className="space-y-5">
       <StageHeader
         title="Stage 2: Candidate ↔ JD Match Analysis"
-        subtitle="Honest audit of confirmed candidate capabilities vs JD prerequisites."
+        subtitle="Candidate capabilities compared against job description requirements."
         runLabel="Run Stage 2"
         rerunLabel="Re-run Match"
         hasResult={!!analysis}

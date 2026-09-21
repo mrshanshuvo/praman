@@ -146,7 +146,7 @@ This archive contains your tailored, audited resume generated deterministically 
 - **resume.tex**: Raw LaTeX source code formatted in the "${templateInfo.name}" design.
 - **resume_ats.json**: Standardized ATS-ready canonical JSON resume.
 - **resume_evidence.json**: Raw ground-truth ledger data with verified source IDs.
-- **validation_report.json**: Two-layer verification audit report (zero hallucinations check).
+- **validation_report.json**: Claim verification audit report.
 - **resume.txt**: Clean ASCII text formatted for online application textareas.
 - **resume.md**: GitHub-flavored Markdown for documentation and online portals.
 

@@ -21,17 +21,20 @@ import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { SkillClaimTuningDialog } from './SkillClaimTuningDialog';
 
 interface MatchDiffInspectorProps {
-  analysis: Partial<MatchAnalysis>;
-  structured?: Partial<StructuredJd> | null;
+  analysis: MatchAnalysis;
+  structured?: StructuredJd;
   candidateProfile?: any;
   onRunStage?: () => void;
   isRunning?: boolean;
 }
 
 type FilterMode = 'all' | 'matches' | 'gaps';
+
+const VALID_FILTERS: readonly FilterMode[] = ['all', 'matches', 'gaps'];
 
 export function MatchDiffInspector({
   analysis,
@@ -40,7 +43,11 @@ export function MatchDiffInspector({
   onRunStage,
   isRunning = false,
 }: MatchDiffInspectorProps) {
-  const [filter, setFilter] = useState<FilterMode>('all');
+  const [filter, setFilter] = useUrlTab<FilterMode>({
+    paramName: 'matchFilter',
+    defaultValue: 'all',
+    validValues: VALID_FILTERS,
+  });
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [tuningSkill, setTuningSkill] = useState<{
     name: string;
@@ -209,10 +216,10 @@ export function MatchDiffInspector({
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-foreground">Ground-Truth Claims Modified!</p>
+              <p className="text-xs font-semibold text-foreground">Candidate Skills Updated</p>
               <p className="text-[11px] text-muted-foreground">
-                Candidate profile has updated skill levels. Re-run Stage 2 to re-calculate score and
-                update AI anti-hallucination boundaries.
+                Skill levels have been updated. Re-run Stage 2 to recalculate alignment with the
+                latest profile.
               </p>
             </div>
           </div>

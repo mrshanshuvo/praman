@@ -13,9 +13,10 @@ import {
   XCircle,
 } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { useUrlTab } from '@/hooks/useUrlTab';
 
 export interface EvidenceTarget {
   type: 'skill' | 'source' | 'bullet';
@@ -31,13 +32,19 @@ interface ValidationReportPanelProps {
   onSelectTarget?: (target: EvidenceTarget | null) => void;
 }
 
+const VALID_AUDIT_TABS = ['skills', 'sources', 'all'] as const;
+
 export const ValidationReportPanel: React.FC<ValidationReportPanelProps> = ({
   report,
   status = report?.status ?? 'DRAFT',
   activeTarget,
   onSelectTarget,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'skills' | 'sources' | 'all'>('skills');
+  const [activeSubTab, setActiveSubTab] = useUrlTab<'skills' | 'sources' | 'all'>({
+    paramName: 'auditTab',
+    defaultValue: 'skills',
+    validValues: VALID_AUDIT_TABS,
+  });
 
   // Auto-switch subtabs and scroll into view when an activeTarget is selected from resume
   useEffect(() => {

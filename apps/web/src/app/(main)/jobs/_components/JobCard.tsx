@@ -286,8 +286,8 @@ export function JobsEmptyState() {
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-1.5">No Job Descriptions Yet</h3>
         <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-sm">
-          Paste a job description you are considering applying for to run the 4-stage
-          truth-preserving AI pipeline.
+          Add a job description to analyze requirements, evaluate alignment, and generate tailored
+          resumes.
         </p>
         <Link
           href="/jobs/new"

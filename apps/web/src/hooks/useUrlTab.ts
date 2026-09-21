@@ -63,6 +63,14 @@ export function useUrlTab<T extends string>({
  */
 export function useUrlQueryParam<T extends string>(
   key: string,
+  defaultValue: T,
+): [T, (value: T) => void];
+export function useUrlQueryParam<T extends string>(
+  key: string,
+  defaultValue?: T,
+): [T | undefined, (value: T | undefined) => void];
+export function useUrlQueryParam<T extends string>(
+  key: string,
   defaultValue?: T,
 ): [T | undefined, (value: T | undefined) => void] {
   const searchParams = useSearchParams();

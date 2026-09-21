@@ -3,12 +3,13 @@
 import { calculateMatchScore } from '@praman/schemas';
 import { AlertCircle, ArrowUpDown, Filter, PlusCircle, RefreshCw, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
+import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
 import { JobCard, JobsEmptyState } from './_components/JobCard';
 
 const STATUS_TABS = [
@@ -18,7 +19,9 @@ const STATUS_TABS = [
   { key: 'INTERVIEWING', label: 'Interviewing' },
   { key: 'OFFER', label: 'Offer' },
   { key: 'REJECTED', label: 'Rejected' },
-];
+] as const;
+
+const VALID_STATUSES = STATUS_TABS.map((t) => t.key);
 
 function getJobMatchScore(jd: any): number {
   if (jd.analysis?.matchScore != null) {
@@ -30,13 +33,31 @@ function getJobMatchScore(jd: any): number {
   return -1;
 }
 
-export default function JobsListPage() {
+function JobsListSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <Skeleton className="h-14 w-72 bg-muted/60" />
+      <Skeleton className="h-10 w-full bg-muted/40" />
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-32 w-full rounded-2xl bg-card border border-border" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function JobsListContent() {
   const { data: jds = [], isLoading: loading, isFetching, error: fetchError, refetch } = useJobs();
   const error = fetchError ? (fetchError as Error).message : null;
 
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [sortBy, setSortBy] = useState('newest');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useUrlTab({
+    paramName: 'status',
+    defaultValue: 'ALL',
+    validValues: VALID_STATUSES,
+  });
+  const [sortBy, setSortBy] = useUrlQueryParam<string>('sort', 'newest');
+  const [searchQuery, setSearchQuery] = useUrlQueryParam<string>('q', '');
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { ALL: jds.length };
@@ -258,5 +279,13 @@ export default function JobsListPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function JobsListPage() {
+  return (
+    <Suspense fallback={<JobsListSkeleton />}>
+      <JobsListContent />
+    </Suspense>
   );
 }
