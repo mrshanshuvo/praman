@@ -1,7 +1,9 @@
 import type {
+  BatchImportProfileRequest,
   CandidateProfile,
   JobDescriptionRecord,
   PaginationMeta,
+  ParsedResumeData,
   ResumeRecord,
   ResumeVersionSummary,
 } from '@praman/schemas';
@@ -601,6 +603,25 @@ export function useProfileMutations() {
     onSuccess: invalidate,
   });
 
+  const parseResume = useMutation({
+    mutationFn: (data: { rawText: string }) =>
+      fetcher<ParsedResumeData>(`${API_URL}/candidate-profile/parse-resume`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+  });
+
+  const importProfile = useMutation({
+    mutationFn: (data: BatchImportProfileRequest) =>
+      fetcher<CandidateProfile>(`${API_URL}/candidate-profile/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidate,
+  });
+
   return {
     updatePersonal,
     addExperience,
@@ -618,5 +639,33 @@ export function useProfileMutations() {
     addCertification,
     updateCertification,
     deleteCertification,
+    parseResume,
+    importProfile,
   };
+}
+
+export function useParseResume() {
+  return useMutation({
+    mutationFn: (data: { rawText: string }) =>
+      fetcher<ParsedResumeData>(`${API_URL}/candidate-profile/parse-resume`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+  });
+}
+
+export function useImportProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: BatchImportProfileRequest) =>
+      fetcher<CandidateProfile>(`${API_URL}/candidate-profile/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['candidate-profile'] });
+    },
+  });
 }

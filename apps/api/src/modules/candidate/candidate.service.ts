@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type {
+  BatchImportProfileRequest,
   CandidatePersonal,
   CreateCertificationDto,
   CreateEducationDto,
@@ -340,5 +341,154 @@ export class CandidateService {
     }).first();
     if (!cert) throw new NotFoundException(`Certification with ID ${id} not found`);
     return this.prisma.client.orm.public.Certification.where({ id }).delete();
+  }
+
+  async batchImportProfile(payload: BatchImportProfileRequest, targetUserId?: string) {
+    const profile = await this.getProfile(targetUserId);
+    const { mode, data } = payload;
+
+    // 1. Personal details
+    if (data.personal && Object.keys(data.personal).length > 0) {
+      const existingPersonal = (profile.personal as Record<string, any>) || {};
+      const newPersonal = data.personal as Record<string, any>;
+
+      const mergedPersonal =
+        mode === 'replace'
+          ? {
+              name: newPersonal.name || existingPersonal.name || 'Candidate',
+              title: newPersonal.title || existingPersonal.title || '',
+              summary: newPersonal.summary || existingPersonal.summary || '',
+              location: newPersonal.location || existingPersonal.location || '',
+              languages: newPersonal.languages ?? existingPersonal.languages ?? [],
+              contact: {
+                ...(newPersonal.contact || {}),
+              },
+              links: {
+                ...(newPersonal.links || {}),
+              },
+            }
+          : {
+              ...existingPersonal,
+              ...Object.fromEntries(
+                Object.entries(newPersonal).filter(([_, v]) => v != null && v !== ''),
+              ),
+              contact: {
+                ...(existingPersonal.contact || {}),
+                ...(newPersonal.contact || {}),
+              },
+              links: {
+                ...(existingPersonal.links || {}),
+                ...(newPersonal.links || {}),
+              },
+            };
+
+      await this.prisma.client.orm.public.CandidateProfile.where({
+        id: profile.id,
+      }).update({ personal: mergedPersonal as any });
+    }
+
+    // 2. Sub-entities removal for replace mode
+    if (mode === 'replace') {
+      await this.prisma.client.orm.public.Experience.where({
+        candidateProfileId: profile.id,
+      }).deleteAll();
+      await this.prisma.client.orm.public.Education.where({
+        candidateProfileId: profile.id,
+      }).deleteAll();
+      await this.prisma.client.orm.public.Skill.where({
+        candidateProfileId: profile.id,
+      }).deleteAll();
+      await this.prisma.client.orm.public.Project.where({
+        candidateProfileId: profile.id,
+      }).deleteAll();
+      await this.prisma.client.orm.public.Certification.where({
+        candidateProfileId: profile.id,
+      }).deleteAll();
+    }
+
+    // Insert Experiences
+    if (data.experiences && data.experiences.length > 0) {
+      for (const exp of data.experiences) {
+        await this.prisma.client.orm.public.Experience.create({
+          candidateProfileId: profile.id,
+          company: exp.company,
+          title: exp.title,
+          startDate: exp.startDate ?? null,
+          endDate: exp.endDate ?? null,
+          isCurrent: exp.isCurrent ?? false,
+          responsibilities: exp.responsibilities ?? [],
+          technologies: exp.technologies ?? [],
+          achievements: exp.achievements ?? [],
+        });
+      }
+    }
+
+    // Insert Educations
+    if (data.educations && data.educations.length > 0) {
+      for (const edu of data.educations) {
+        await this.prisma.client.orm.public.Education.create({
+          candidateProfileId: profile.id,
+          institution: edu.institution,
+          degree: edu.degree,
+          field: edu.field ?? null,
+          startDate: edu.startDate ?? null,
+          endDate: edu.endDate ?? null,
+          details: edu.details ?? null,
+        });
+      }
+    }
+
+    // Insert Skills
+    if (data.skills && data.skills.length > 0) {
+      let existingSkillNames = new Set<string>();
+      if (mode === 'merge') {
+        const existingSkills = await this.prisma.client.orm.public.Skill.where({
+          candidateProfileId: profile.id,
+        }).all();
+        existingSkillNames = new Set(existingSkills.map((s) => s.name.toLowerCase().trim()));
+      }
+
+      for (const sk of data.skills) {
+        if (mode === 'merge' && existingSkillNames.has(sk.name.toLowerCase().trim())) {
+          continue;
+        }
+        await this.prisma.client.orm.public.Skill.create({
+          candidateProfileId: profile.id,
+          name: sk.name,
+          level: sk.level || 'Intermediate',
+          evidence: sk.evidence ?? null,
+        });
+        existingSkillNames.add(sk.name.toLowerCase().trim());
+      }
+    }
+
+    // Insert Projects
+    if (data.projects && data.projects.length > 0) {
+      for (const proj of data.projects) {
+        await this.prisma.client.orm.public.Project.create({
+          candidateProfileId: profile.id,
+          name: proj.name,
+          description: proj.description,
+          role: proj.role ?? null,
+          technologies: proj.technologies ?? [],
+          outcomes: proj.outcomes ?? [],
+          link: proj.link ?? null,
+        });
+      }
+    }
+
+    // Insert Certifications
+    if (data.certifications && data.certifications.length > 0) {
+      for (const cert of data.certifications) {
+        await this.prisma.client.orm.public.Certification.create({
+          candidateProfileId: profile.id,
+          name: cert.name,
+          issuer: cert.issuer ?? null,
+          date: cert.date ?? null,
+        });
+      }
+    }
+
+    return this.getProfile(targetUserId);
   }
 }

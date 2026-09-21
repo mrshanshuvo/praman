@@ -11,21 +11,49 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  BatchImportProfileRequestSchema,
   CreateCertificationDtoSchema,
   CreateEducationDtoSchema,
   CreateExperienceDtoSchema,
   CreateProjectDtoSchema,
   CreateSkillDtoSchema,
+  ParseResumeRequestSchema,
   UpdateCandidatePersonalSchema,
 } from '@praman/schemas';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { CandidateService } from './candidate.service.js';
+import { ResumeParserService } from './resume-parser.service.js';
 
 @ApiTags('Candidates')
 @ApiBearerAuth()
 @Controller('candidate-profile')
 export class CandidateController {
-  constructor(private readonly candidateService: CandidateService) {}
+  constructor(
+    private readonly candidateService: CandidateService,
+    private readonly resumeParserService: ResumeParserService,
+  ) {}
+
+  @Post('parse-resume')
+  @ApiOperation({ summary: 'Parse raw resume text heuristically offline' })
+  @ApiResponse({ status: 200, description: 'Parsed resume data returned' })
+  async parseResume(@Body() body: unknown) {
+    const parse = ParseResumeRequestSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.resumeParserService.parse(parse.data.rawText);
+  }
+
+  @Post('import')
+  @ApiOperation({ summary: 'Batch import parsed resume into candidate profile' })
+  @ApiResponse({ status: 200, description: 'Profile imported successfully' })
+  async importProfile(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
+    const parse = BatchImportProfileRequestSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.candidateService.batchImportProfile(parse.data, user?.id);
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get current user candidate profile' })

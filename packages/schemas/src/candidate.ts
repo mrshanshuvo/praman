@@ -104,3 +104,29 @@ export type CreateEducationDto = z.infer<typeof CreateEducationDtoSchema>;
 
 export const CreateCertificationDtoSchema = CertificationSchema.omit({ id: true });
 export type CreateCertificationDto = z.infer<typeof CreateCertificationDtoSchema>;
+
+export const ParseResumeRequestSchema = z.object({
+  rawText: z.string().min(20, 'Resume text must be at least 20 characters'),
+});
+export type ParseResumeRequest = z.infer<typeof ParseResumeRequestSchema>;
+
+export const ParsedResumeDataSchema = z.object({
+  personal: CandidatePersonalSchema.partial(),
+  experiences: z.array(CreateExperienceDtoSchema).default([]),
+  educations: z.array(CreateEducationDtoSchema).default([]),
+  skills: z.array(CreateSkillDtoSchema).default([]),
+  projects: z.array(CreateProjectDtoSchema).default([]),
+  certifications: z.array(CreateCertificationDtoSchema).default([]),
+  meta: z.object({
+    detectedSections: z.array(z.string()).default([]),
+    characterCount: z.number().default(0),
+    parsingTimeMs: z.number().default(0),
+  }),
+});
+export type ParsedResumeData = z.infer<typeof ParsedResumeDataSchema>;
+
+export const BatchImportProfileRequestSchema = z.object({
+  mode: z.enum(['merge', 'replace']).default('merge'),
+  data: ParsedResumeDataSchema,
+});
+export type BatchImportProfileRequest = z.infer<typeof BatchImportProfileRequestSchema>;

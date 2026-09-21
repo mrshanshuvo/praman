@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Edit2, Globe, Mail, MapPin, Phone, RefreshCw } from 'lucide-react';
+import { Check, Edit2, Globe, Mail, MapPin, Phone, RefreshCw, Sparkles } from 'lucide-react';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ResumeImportModal } from './ResumeImportModal';
 
 interface ProfileHeaderCardProps {
   personal: any;
@@ -30,6 +31,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   onUpdatePersonal,
 }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [form, setForm] = useState({
@@ -133,6 +135,16 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setIsImportOpen(true)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1.5 shadow-xs font-medium"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Import Resume</span>
+            </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -290,6 +302,12 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </form>
         </DialogContent>
       </Dialog>
+
+      <ResumeImportModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onSuccess={onRefresh}
+      />
     </>
   );
 };
