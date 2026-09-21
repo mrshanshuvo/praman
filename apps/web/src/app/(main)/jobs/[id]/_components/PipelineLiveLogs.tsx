@@ -29,12 +29,24 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
               <h3 className="text-sm font-semibold text-foreground tracking-tight">
                 Live Pipeline Execution Stream
               </h3>
-              {isStreaming && (
+              {isStreaming ? (
                 <span className="flex items-center gap-1 text-[11px] font-medium text-brand-cyan bg-brand-cyan/10 px-2 py-0.5 rounded-full border border-brand-cyan/30 animate-pulse">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Streaming SSE
                 </span>
-              )}
+              ) : logs.length > 0 ? (
+                logs.some((l) => l.status === 'failed') ? (
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-destructive bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/30">
+                    <XCircle className="w-3 h-3" />
+                    Failed
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Completed
+                  </span>
+                )
+              ) : null}
             </div>
             {latestLog && !isExpanded && (
               <p className="text-xs text-muted-foreground truncate max-w-md sm:max-w-xl mt-0.5 font-mono">
@@ -56,10 +68,22 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
 
       {isExpanded && (
         <div className="rounded-xl bg-background/80 border border-border/80 p-3.5 font-mono text-xs max-h-56 overflow-y-auto space-y-2">
-          {logs.map((log) => {
-            const isCompleted = log.status === 'completed' || log.status === 'complete';
+          {logs.map((log, index) => {
+            const hasSubsequentCompletionOrAdvance = logs.slice(index + 1).some(
+              (l) =>
+                (l.stage === log.stage &&
+                  (l.status === 'completed' || l.status === 'complete' || l.status === 'failed')) ||
+                (l.status === 'complete' && l.stage === 'pipeline') ||
+                l.status === 'started',
+            );
+
+            const isCompleted =
+              log.status === 'completed' ||
+              log.status === 'complete' ||
+              (log.status === 'started' && (!isStreaming || hasSubsequentCompletionOrAdvance));
             const isFailed = log.status === 'failed';
-            const isRunning = log.status === 'started';
+            const isRunning =
+              log.status === 'started' && isStreaming && !hasSubsequentCompletionOrAdvance;
 
             return (
               <div key={log.id} className="flex items-start gap-2.5">

@@ -120,17 +120,36 @@ export function usePipelineStream(jobId: string, options?: UsePipelineStreamOpti
           try {
             const event: PipelineStreamEvent = JSON.parse(jsonString);
 
-            // Append log entry
-            setLiveLogs((prev) => [
-              ...prev,
-              {
-                id: `${Date.now()}-${Math.random()}`,
-                stage: event.stage,
-                status: event.status,
-                message: event.message,
-                timestamp: event.timestamp || new Date().toLocaleTimeString(),
-              },
-            ]);
+            // Append log entry and resolve prior started logs
+            setLiveLogs((prev) => {
+              const updated = prev.map((item) => {
+                if (item.status === 'started') {
+                  if (event.status === 'completed' || event.status === 'complete') {
+                    if (event.stage === 'pipeline' || item.stage === event.stage) {
+                      return { ...item, status: 'completed' };
+                    }
+                  } else if (event.status === 'failed') {
+                    if (event.stage === 'pipeline' || item.stage === event.stage) {
+                      return { ...item, status: 'failed' };
+                    }
+                  } else if (event.status === 'started' && item.stage !== event.stage) {
+                    return { ...item, status: 'completed' };
+                  }
+                }
+                return item;
+              });
+
+              return [
+                ...updated,
+                {
+                  id: `${Date.now()}-${Math.random()}`,
+                  stage: event.stage,
+                  status: event.status,
+                  message: event.message,
+                  timestamp: event.timestamp || new Date().toLocaleTimeString(),
+                },
+              ];
+            });
 
             // Handle Stage Transitions
             if (event.stage === 'match') {
