@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/profile');
+      router.replace('/dashboard');
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password);
-      router.push('/profile');
+      router.push('/dashboard');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Login failed';
       setError(message);
