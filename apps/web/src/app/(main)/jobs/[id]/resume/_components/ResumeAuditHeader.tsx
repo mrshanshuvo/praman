@@ -303,10 +303,6 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
 
               {matchAnalysis && <MatchScoreBadge analysis={matchAnalysis} variant="pill" />}
             </div>
-            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-              Tailored and truth-preserved against verified candidate records with zero
-              hallucinations.
-            </p>
           </div>
         </div>
 

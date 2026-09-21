@@ -131,7 +131,7 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
             </p>
             <p className="text-muted-foreground leading-relaxed">
               {isVerified
-                ? 'This claim was verified against confirmed records in your candidate profile with zero detected hallucinations.'
+                ? 'This claim is verified against your candidate profile records.'
                 : isFlagged
                   ? evidence.flagReason ||
                     'Numbers or metrics in this claim differ from raw candidate profile text. Inspect raw source below.'

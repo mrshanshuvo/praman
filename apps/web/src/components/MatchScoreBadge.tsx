@@ -138,8 +138,7 @@ export function MatchScoreBadge({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
-                Auditable mathematical score derived directly from candidate evidence vs. JD
-                prerequisites, free from AI percentage hallucinations.
+                Calculated by comparing verified candidate skills against required job prerequisites.
               </p>
             </div>
           </div>

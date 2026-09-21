@@ -145,9 +145,6 @@ ${coverLetter.senderName}
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-foreground">Tailored Cover Letter</h4>
-                  <p className="text-[11px] text-muted-foreground">
-                    Grounded in verified experience & anti-hallucination boundaries
-                  </p>
                 </div>
               </div>
 
@@ -250,23 +247,14 @@ ${coverLetter.senderName}
               </div>
             ) : (
               <div className="space-y-3 mt-3">
-                {/* Anti-Hallucination Validation Status */}
-                {outreach?.coverLetterValidation && (
-                  <div>
-                    {outreach.coverLetterValidation.violations?.length === 0 &&
-                    outreach.coverLetterValidation.numberFlags?.length === 0 ? (
-                      <div className="flex items-center gap-2 p-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs">
-                        <ShieldCheck className="w-4 h-4 shrink-0" />
-                        <span>
-                          Truth-Preserved: Zero discrepancies or unconfirmed claims detected.
-                        </span>
+                {outreach?.coverLetterValidation &&
+                  (outreach.coverLetterValidation.violations?.length > 0 ||
+                    outreach.coverLetterValidation.numberFlags?.length > 0) && (
+                    <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-semibold">
+                        <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                        <span>Audit Discrepancies Detected</span>
                       </div>
-                    ) : (
-                      <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs space-y-1.5">
-                        <div className="flex items-center gap-1.5 font-semibold">
-                          <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
-                          <span>Audit Discrepancies Detected</span>
-                        </div>
                         {outreach.coverLetterValidation.violations?.map((v: string, i: number) => (
                           <p key={i} className="text-[11px] text-amber-200/90 pl-5">
                             • {v}
@@ -283,8 +271,6 @@ ${coverLetter.senderName}
                         ))}
                       </div>
                     )}
-                  </div>
-                )}
 
                 {/* Cover Letter Content Body: Formatted / Split / LaTeX */}
                 {coverLetterViewMode === 'split' ? (
