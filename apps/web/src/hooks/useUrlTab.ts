@@ -3,12 +3,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-/**
- * Custom cross-instance event dispatched whenever URL search parameters are mutated programmatically.
- * Ensures sibling components and multiple hook instances on the same page remain synchronized in 0ms.
- */
-const URL_CHANGE_EVENT = 'praman:url-change';
-
 interface UpdateUrlOptions {
   key: string;
   value?: string | null;
@@ -20,9 +14,9 @@ interface UpdateUrlOptions {
 /**
  * Shared central URL mutation engine that:
  * 1. Preserves existing search params and URL hash (#anchor).
- * 2. Deduplicates no-op updates (does not push/replace if URL has not changed).
+ * 2. Deduplicates no-op updates (does not push/replace if URL search has not changed).
  * 3. Removes default or empty values when omitDefault is true.
- * 4. Dispatches both custom event and PopStateEvent so all hook instances and Next.js router stay in sync.
+ * 4. Dispatches PopStateEvent so all hook instances and Next.js router stay in sync.
  */
 function updateBrowserUrl({
   key,
@@ -63,14 +57,11 @@ function updateBrowserUrl({
     window.history.replaceState(null, '', nextUrl);
   }
 
-  // Notify intra-page hook instances synchronously
-  window.dispatchEvent(new CustomEvent(URL_CHANGE_EVENT, { detail: { key, value } }));
-
-  // Dispatch PopStateEvent so Next.js App Router internal router updates its searchParams tree
+  // Dispatch PopStateEvent so Next.js App Router and all hook instances update in sync
   try {
     window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
   } catch {
-    // Fallback for non-standard test runners
+    window.dispatchEvent(new Event('popstate'));
   }
 }
 
@@ -165,21 +156,17 @@ export function useUrlTab<T extends string>({
     setActiveTabState(valid);
   }, [searchParams, paramName, getValidTab]);
 
-  // Sync state on browser Back / Forward (popstate) and intra-page programmatic events
+  // Sync state on browser Back / Forward (popstate) and programmatic updates
   useEffect(() => {
-    const handleUrlSync = () => {
+    const handlePopState = () => {
       if (typeof window !== 'undefined') {
         const currentParams = new URLSearchParams(window.location.search);
         setActiveTabState(getValidTab(currentParams.get(paramName)));
       }
     };
 
-    window.addEventListener('popstate', handleUrlSync);
-    window.addEventListener(URL_CHANGE_EVENT, handleUrlSync);
-    return () => {
-      window.removeEventListener('popstate', handleUrlSync);
-      window.removeEventListener(URL_CHANGE_EVENT, handleUrlSync);
-    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [paramName, getValidTab]);
 
   return [activeTab, setTab];
@@ -268,9 +255,9 @@ export function useUrlQueryParam<T extends string>(
     setValueState(getValidValue(fromUrl));
   }, [searchParams, key, getValidValue]);
 
-  // Sync state on browser Back / Forward (popstate) and intra-page programmatic events
+  // Sync state on browser Back / Forward (popstate) and programmatic updates
   useEffect(() => {
-    const handleUrlSync = () => {
+    const handlePopState = () => {
       if (typeof window !== 'undefined') {
         const currentParams = new URLSearchParams(window.location.search);
         const fromUrl = currentParams.get(key);
@@ -278,12 +265,8 @@ export function useUrlQueryParam<T extends string>(
       }
     };
 
-    window.addEventListener('popstate', handleUrlSync);
-    window.addEventListener(URL_CHANGE_EVENT, handleUrlSync);
-    return () => {
-      window.removeEventListener('popstate', handleUrlSync);
-      window.removeEventListener(URL_CHANGE_EVENT, handleUrlSync);
-    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [key, getValidValue]);
 
   return [value, setValue];
