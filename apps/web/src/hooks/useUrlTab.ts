@@ -51,11 +51,11 @@ function updateBrowserUrl({
   const query = params.toString();
   const pathname = window.location.pathname;
   const hash = window.location.hash || '';
+  const nextSearch = query ? `?${query}` : '';
   const nextUrl = (query ? `${pathname}?${query}` : pathname) + hash;
-  const currentFull = pathname + currentSearch + hash;
 
-  // No-op guard: skip history manipulation if the URL has not actually changed
-  if (currentFull === nextUrl) return;
+  // No-op guard: skip history manipulation if the search parameters have not changed
+  if (currentSearch === nextSearch) return;
 
   if (history === 'push') {
     window.history.pushState(null, '', nextUrl);
@@ -120,7 +120,7 @@ export function useUrlTab<T extends string>({
   validValues,
   omitDefault = true,
   history = 'replace',
-}: UseUrlTabOptions<T>): [T, (tab: T) => void] {
+}: UseUrlTabOptions<T>): [T, (tab: T | ((prev: T) => T)) => void] {
   const searchParams = useSearchParams();
 
   const getValidTab = useCallback(
@@ -138,16 +138,21 @@ export function useUrlTab<T extends string>({
   );
 
   const setTab = useCallback(
-    (newTab: T) => {
-      const valid = getValidTab(newTab);
-      setActiveTabState(valid);
+    (newTabOrFn: T | ((prev: T) => T)) => {
+      setActiveTabState((prev) => {
+        const resolved =
+          typeof newTabOrFn === 'function' ? (newTabOrFn as (prev: T) => T)(prev) : newTabOrFn;
+        const valid = getValidTab(resolved);
 
-      updateBrowserUrl({
-        key: paramName,
-        value: valid,
-        defaultValue,
-        omitDefault,
-        history,
+        updateBrowserUrl({
+          key: paramName,
+          value: valid,
+          defaultValue,
+          omitDefault,
+          history,
+        });
+
+        return valid;
       });
     },
     [paramName, defaultValue, omitDefault, history, getValidTab],
@@ -204,17 +209,17 @@ export function useUrlQueryParam<T extends string>(
   key: string,
   defaultValue: T,
   options?: UseUrlQueryParamOptions<T>,
-): [T, (value: T | undefined) => void];
+): [T, (value: T | undefined | ((prev: T) => T | undefined)) => void];
 export function useUrlQueryParam<T extends string>(
   key: string,
   defaultValue?: T,
   options?: UseUrlQueryParamOptions<T>,
-): [T | undefined, (value: T | undefined) => void];
+): [T | undefined, (value: T | undefined | ((prev: T | undefined) => T | undefined)) => void];
 export function useUrlQueryParam<T extends string>(
   key: string,
   defaultValue?: T,
   options: UseUrlQueryParamOptions<T> = {},
-): [T | undefined, (value: T | undefined) => void] {
+): [T | undefined, (value: T | undefined | ((prev: T | undefined) => T | undefined)) => void] {
   const { omitDefault = true, history = 'replace', validValues } = options;
   const searchParams = useSearchParams();
 
@@ -235,16 +240,23 @@ export function useUrlQueryParam<T extends string>(
   });
 
   const setValue = useCallback(
-    (newValue: T | undefined) => {
-      const valid = newValue !== undefined ? getValidValue(newValue) : defaultValue;
-      setValueState(valid);
+    (newValueOrFn: (T | undefined) | ((prev: T | undefined) => T | undefined)) => {
+      setValueState((prev) => {
+        const resolved =
+          typeof newValueOrFn === 'function'
+            ? (newValueOrFn as (prev: T | undefined) => T | undefined)(prev)
+            : newValueOrFn;
+        const valid = resolved !== undefined ? getValidValue(resolved) : defaultValue;
 
-      updateBrowserUrl({
-        key,
-        value: valid,
-        defaultValue,
-        omitDefault,
-        history,
+        updateBrowserUrl({
+          key,
+          value: valid,
+          defaultValue,
+          omitDefault,
+          history,
+        });
+
+        return valid;
       });
     },
     [key, defaultValue, omitDefault, history, getValidValue],
