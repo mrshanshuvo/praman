@@ -326,7 +326,7 @@ ${coverLetter.senderName}
                         className={cn(
                           'tab-size-2',
                           coverLetterWrap
-                            ? 'whitespace-pre-wrap break-words'
+                            ? 'whitespace-pre-wrap wrap-break-word'
                             : 'whitespace-pre overflow-x-auto',
                         )}
                       >
@@ -340,7 +340,7 @@ ${coverLetter.senderName}
                       className={cn(
                         'tab-size-2',
                         coverLetterWrap
-                          ? 'whitespace-pre-wrap break-words'
+                          ? 'whitespace-pre-wrap wrap-break-word'
                           : 'whitespace-pre overflow-x-auto',
                       )}
                     >

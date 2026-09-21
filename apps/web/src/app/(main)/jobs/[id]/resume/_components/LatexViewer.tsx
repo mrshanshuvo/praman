@@ -84,6 +84,7 @@ export function LatexViewer({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
+  const syncCountRef = useRef(0);
 
   const lines = code.split('\n');
 
@@ -124,7 +125,7 @@ export function LatexViewer({
       section: detectedSection,
       text: currentLine,
       percentage,
-      timestamp: Date.now(),
+      timestamp: ++syncCountRef.current,
     });
   };
 
