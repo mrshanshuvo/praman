@@ -34,8 +34,7 @@ function getTierStyles(tier: MatchAlignmentTier) {
       };
     case 'Strong':
       return {
-        badge:
-          'bg-success/10 text-success border-success/30',
+        badge: 'bg-success/10 text-success border-success/30',
         stroke: 'stroke-success',
         text: 'text-success',
         bg: 'bg-success/10',
@@ -44,8 +43,7 @@ function getTierStyles(tier: MatchAlignmentTier) {
       };
     case 'Moderate':
       return {
-        badge:
-          'bg-warning/10 text-warning border-warning/30',
+        badge: 'bg-warning/10 text-warning border-warning/30',
         stroke: 'stroke-warning',
         text: 'text-warning',
         bg: 'bg-warning/10',
@@ -117,9 +115,7 @@ export function MatchScoreBadge({
                 <span className="text-2xl font-black font-mono tracking-tight text-foreground">
                   {data.score}%
                 </span>
-                <span
-                  className={`text-2xs font-semibold uppercase tracking-wider ${styles.text}`}
-                >
+                <span className={`text-2xs font-semibold uppercase tracking-wider ${styles.text}`}>
                   {data.label}
                 </span>
               </div>

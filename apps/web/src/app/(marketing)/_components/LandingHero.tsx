@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
 
 export function LandingHero() {
   return (
@@ -24,9 +24,8 @@ export function LandingHero() {
           Stop letting AI hallucinate your career accomplishments.
         </h1>
         <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Praman parses job descriptions, cross-audits candidate facts, and
-          crafts tailored, ATS-compliant resumes backed by strict source-ID
-          evidence validation.
+          Praman parses job descriptions, cross-audits candidate facts, and crafts tailored,
+          ATS-compliant resumes backed by strict source-ID evidence validation.
         </p>
       </div>
 
@@ -35,9 +34,9 @@ export function LandingHero() {
         <Link
           href="/register"
           className={buttonVariants({
-            size: "lg",
+            size: 'lg',
             className:
-              "bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-bold text-sm h-11 px-6 rounded-xl shadow-md transition cursor-pointer",
+              'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-bold text-sm h-11 px-6 rounded-xl shadow-md transition cursor-pointer',
           })}
         >
           <span>Get Started Free</span>
@@ -47,10 +46,10 @@ export function LandingHero() {
         <a
           href="#pipeline"
           className={buttonVariants({
-            variant: "outline",
-            size: "lg",
+            variant: 'outline',
+            size: 'lg',
             className:
-              "border-border hover:bg-muted font-semibold text-sm h-11 px-6 rounded-xl transition cursor-pointer",
+              'border-border hover:bg-muted font-semibold text-sm h-11 px-6 rounded-xl transition cursor-pointer',
           })}
         >
           <span>See How It Works</span>
@@ -63,9 +62,7 @@ export function LandingHero() {
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-success" />
-              <span className="text-xs font-bold text-foreground">
-                Anti-Hallucination Proof
-              </span>
+              <span className="text-xs font-bold text-foreground">Anti-Hallucination Proof</span>
             </div>
             <Badge
               variant="outline"
@@ -81,8 +78,7 @@ export function LandingHero() {
                 Target JD Requirement
               </span>
               <p className="text-foreground/90 font-medium mt-0.5">
-                &ldquo;Experience building event-driven architectures with Kafka
-                and Go.&rdquo;
+                &ldquo;Experience building event-driven architectures with Kafka and Go.&rdquo;
               </p>
             </div>
 
@@ -92,8 +88,8 @@ export function LandingHero() {
                 <span className="font-mono">Ref: Experience #3 (Zensoft)</span>
               </div>
               <p className="text-foreground/90 mt-1 leading-relaxed">
-                &ldquo;Architected event-driven streaming pipeline in Go using
-                Kafka, reducing message latency by 35%.&rdquo;
+                &ldquo;Architected event-driven streaming pipeline in Go using Kafka, reducing
+                message latency by 35%.&rdquo;
               </p>
             </div>
           </div>
@@ -103,9 +99,7 @@ export function LandingHero() {
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Zero fabricated skills or unverified metrics</span>
             </div>
-            <span className="font-mono text-2xs">
-              Deterministic Audit Passed
-            </span>
+            <span className="font-mono text-2xs">Deterministic Audit Passed</span>
           </div>
         </div>
       </div>

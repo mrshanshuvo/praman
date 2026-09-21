@@ -31,11 +31,11 @@ const MILESTONE_STATUSES: MilestoneStatus[] = [
 ];
 
 const STATUS_COLORS: Record<MilestoneStatus, string> = {
-  SCHEDULED:       'bg-info/10 text-info border-info/30',
-  COMPLETED:       'bg-success/10 text-success border-success/30',
-  PASSED:          'bg-success/10 text-success border-success/30',
+  SCHEDULED: 'bg-info/10 text-info border-info/30',
+  COMPLETED: 'bg-success/10 text-success border-success/30',
+  PASSED: 'bg-success/10 text-success border-success/30',
   NEEDS_FOLLOW_UP: 'bg-warning/10 text-warning border-warning/30',
-  CANCELLED:       'bg-destructive/10 text-destructive border-destructive/30',
+  CANCELLED: 'bg-destructive/10 text-destructive border-destructive/30',
 };
 
 export const MilestoneCard: React.FC<MilestoneCardProps> = ({

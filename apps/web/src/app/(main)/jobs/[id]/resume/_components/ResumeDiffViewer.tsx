@@ -574,10 +574,7 @@ export function ResumeDiffViewer({
                     MODIFIED
                   </Badge>
                 ) : (
-                  <Badge
-                    variant="outline"
-                    className="border-border text-muted-foreground text-2xs"
-                  >
+                  <Badge variant="outline" className="border-border text-muted-foreground text-2xs">
                     UNCHANGED
                   </Badge>
                 )}
@@ -720,7 +717,8 @@ export function ResumeDiffViewer({
                     className={cn(
                       'p-5 border space-y-4 transition-all',
                       proj.status === 'added' && 'border-success/40 bg-success/5',
-                      proj.status === 'removed' && 'border-destructive/40 bg-destructive/5 opacity-75',
+                      proj.status === 'removed' &&
+                        'border-destructive/40 bg-destructive/5 opacity-75',
                       proj.status === 'modified' && 'border-border bg-card/80 backdrop-blur-md',
                       proj.status === 'unchanged' && 'border-border/70 bg-card/50',
                     )}

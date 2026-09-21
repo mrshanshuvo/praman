@@ -568,9 +568,7 @@ export function MatchDiffInspector({
                   >
                     <div className="flex items-center justify-between">
                       <h5 className="text-xs font-semibold text-foreground">{proj.title}</h5>
-                      <span className="text-2xs text-muted-foreground font-mono">
-                        {proj.role}
-                      </span>
+                      <span className="text-2xs text-muted-foreground font-mono">{proj.role}</span>
                     </div>
                     <ul className="space-y-1 text-xs text-muted-foreground">
                       {proj.bullets?.slice(0, 1).map((b: string, i: number) => (

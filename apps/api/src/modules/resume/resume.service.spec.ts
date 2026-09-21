@@ -8,6 +8,7 @@ describe('ResumeService (Version History & User Scoping)', () => {
   let mockCandidateService: any;
   let mockValidationService: any;
   let mockLatexService: any;
+  let mockHtmlPdfService: any;
   let mockStorageService: any;
 
   let storedResumes: any[] = [];
@@ -115,6 +116,10 @@ describe('ResumeService (Version History & User Scoping)', () => {
       generateLatex: vi.fn().mockResolvedValue('\\documentclass{article}'),
     };
 
+    mockHtmlPdfService = {
+      generatePdf: vi.fn().mockResolvedValue(Buffer.from('mock pdf')),
+    };
+
     mockStorageService = {
       uploadFile: vi.fn().mockResolvedValue(true),
       getPresignedDownloadUrl: vi.fn().mockResolvedValue('https://download.url/test.pdf'),
@@ -126,6 +131,7 @@ describe('ResumeService (Version History & User Scoping)', () => {
       mockCandidateService,
       mockValidationService,
       mockLatexService,
+      mockHtmlPdfService,
       mockStorageService,
     );
   });

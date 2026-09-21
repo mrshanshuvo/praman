@@ -25,10 +25,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({ note, onTogglePin, onDelete 
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Badge
-            variant="outline"
-            className={`text-2xs uppercase font-semibold ${tagInfo.color}`}
-          >
+          <Badge variant="outline" className={`text-2xs uppercase font-semibold ${tagInfo.color}`}>
             {tagInfo.label}
           </Badge>
           <span className="text-2xs text-muted-foreground">

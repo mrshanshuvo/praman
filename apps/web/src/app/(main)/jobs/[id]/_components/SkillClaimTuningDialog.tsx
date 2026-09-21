@@ -206,9 +206,7 @@ export function SkillClaimTuningDialog({
                         {opt.badgeLabel}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground leading-snug">
-                      {opt.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground leading-snug">{opt.description}</p>
                   </div>
                   <div className="mt-2 pt-1.5 border-t border-border/40 text-2xs font-mono text-muted-foreground">
                     {opt.impact}
@@ -223,9 +221,7 @@ export function SkillClaimTuningDialog({
         <div className="space-y-1.5">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
             <span>Ground-Truth Evidence / Notes (Optional)</span>
-            <span className="text-2xs font-normal text-muted-foreground">
-              e.g. projects, repos
-            </span>
+            <span className="text-2xs font-normal text-muted-foreground">e.g. projects, repos</span>
           </label>
           <Textarea
             value={evidence}

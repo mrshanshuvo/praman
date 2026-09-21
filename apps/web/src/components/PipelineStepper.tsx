@@ -77,8 +77,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
           } else if (isFailed) {
             badgeStyle = 'bg-destructive/20 text-destructive border border-destructive/40';
           } else if (isCompleted) {
-            badgeStyle =
-              'bg-success/10 text-success border border-success/30';
+            badgeStyle = 'bg-success/10 text-success border border-success/30';
           } else if (isCurrent) {
             badgeStyle =
               'bg-brand-pink text-brand-light font-bold ring-2 ring-brand-pink/40 dark:bg-brand-cyan dark:text-brand-dark dark:ring-brand-cyan/40';

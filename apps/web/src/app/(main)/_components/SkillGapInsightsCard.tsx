@@ -132,9 +132,7 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
                   >
                     {isPossessed && <CheckCircle2 className="w-3 h-3 text-success" />}
                     <span>{skill}</span>
-                    <span className="text-2xs font-mono text-muted-foreground">
-                      ({count} JDs)
-                    </span>
+                    <span className="text-2xs font-mono text-muted-foreground">({count} JDs)</span>
                   </Badge>
                 );
               })}

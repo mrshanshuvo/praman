@@ -60,18 +60,20 @@ export function StatsGrid({ profile, jobs = [] }: StatsGridProps) {
               <span className="block text-xl font-bold font-mono text-brand-cyan">
                 {skillsCount}
               </span>
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                Skills
-              </span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">Skills</span>
             </div>
             <div className="p-2.5 px-4 rounded-xl bg-muted/40 border border-border">
-              <span className="block text-xl font-bold font-mono text-status-success">{expCount}</span>
+              <span className="block text-xl font-bold font-mono text-status-success">
+                {expCount}
+              </span>
               <span className="text-xs text-muted-foreground uppercase tracking-wider">
                 Experience
               </span>
             </div>
             <div className="p-2.5 px-4 rounded-xl bg-muted/40 border border-border">
-              <span className="block text-xl font-bold font-mono text-status-neutral">{projCount}</span>
+              <span className="block text-xl font-bold font-mono text-status-neutral">
+                {projCount}
+              </span>
               <span className="text-xs text-muted-foreground uppercase tracking-wider">
                 Projects
               </span>
