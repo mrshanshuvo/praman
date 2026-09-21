@@ -15,7 +15,7 @@ export default function HomePage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       <HeroSection jdCount={jds.length} isAuthenticated={isAuthenticated} />
 
-      {isAuthenticated ? <StatsGrid profile={profile} /> : <FeatureHighlights />}
+      {isAuthenticated ? <StatsGrid profile={profile} jobs={jds} /> : <FeatureHighlights />}
 
       <PipelineArchitecture />
     </div>
