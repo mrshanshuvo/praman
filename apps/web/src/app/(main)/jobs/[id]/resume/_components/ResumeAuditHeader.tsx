@@ -37,6 +37,7 @@ import {
 } from '@/lib/plainTextResume';
 import { downloadZip, triggerFileDownload } from '@/lib/zip';
 import { ExportSuiteModal } from './ExportSuiteModal';
+import { cn } from 'cn';
 
 interface ResumeAuditHeaderProps {
   id: string;
@@ -56,6 +57,7 @@ interface ResumeAuditHeaderProps {
   currentVersion?: number;
   validationReport?: any;
   onOpenDiff?: () => void;
+  onOpenAudit?: () => void;
 }
 
 export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
@@ -76,6 +78,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   currentVersion,
   validationReport,
   onOpenDiff,
+  onOpenAudit,
 }) => {
   const [copied, setCopied] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -221,18 +224,36 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                Resume & Evidence Audit
+                Resume Studio
               </h1>
-              <Badge
-                variant="outline"
-                className={`text-xs font-mono font-bold px-2.5 py-0.5 uppercase ${
-                  isValidated
-                    ? 'bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan'
-                    : 'bg-brand-pink/10 border-brand-pink/30 text-brand-pink'
-                }`}
-              >
-                {status || 'DRAFT'}
-              </Badge>
+              {onOpenAudit ? (
+                <button
+                  type="button"
+                  onClick={onOpenAudit}
+                  className={cn(
+                    'text-xs font-mono font-bold px-2.5 py-1 uppercase rounded-lg border transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-xs',
+                    isValidated
+                      ? 'bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan hover:bg-brand-cyan/20'
+                      : 'bg-brand-pink/10 border-brand-pink/30 text-brand-pink hover:bg-brand-pink/20',
+                  )}
+                  title="Click to view full Evidence Audit Report modal"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                  <span>{status || 'DRAFT'}</span>
+                  <span className="text-[10px] font-sans font-medium opacity-75">· Audit</span>
+                </button>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className={`text-xs font-mono font-bold px-2.5 py-0.5 uppercase ${
+                    isValidated
+                      ? 'bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan'
+                      : 'bg-brand-pink/10 border-brand-pink/30 text-brand-pink'
+                  }`}
+                >
+                  {status || 'DRAFT'}
+                </Badge>
+              )}
 
               {/* Version Selector */}
               {versions && versions.length > 1 ? (
@@ -283,7 +304,7 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
               {matchAnalysis && <MatchScoreBadge analysis={matchAnalysis} variant="pill" />}
             </div>
             <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-              Audited against confirmed candidate profile records with zero hallucinations.
+              Tailored and truth-preserved against verified candidate records with zero hallucinations.
             </p>
           </div>
         </div>

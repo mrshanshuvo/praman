@@ -14,6 +14,13 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
@@ -37,8 +44,8 @@ export default function ResumeAuditPage() {
 
   const [selectedTemplate, setSelectedTemplate] = useState('modern-developer');
   const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
-  const [showAuditPanel, setShowAuditPanel] = useState(true);
-  const [activeTab, setActiveTab] = useState<string>('preview');
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('latex');
 
   const { data: jd } = useJob(id);
   const { data: versions } = useResumeVersions(id);
@@ -126,152 +133,162 @@ export default function ResumeAuditPage() {
         currentVersion={resumeData?.version}
         validationReport={report}
         onOpenDiff={() => setActiveTab('diff')}
+        onOpenAudit={() => setIsAuditModalOpen(true)}
       />
 
-      <div
-        className={cn(
-          'grid gap-6 transition-all duration-200',
-          showAuditPanel ? 'grid-cols-1 lg:grid-cols-12' : 'grid-cols-1',
-        )}
-      >
-        <div
-          className={cn(
-            'space-y-4 transition-all duration-200',
-            showAuditPanel ? 'lg:col-span-8' : 'w-full',
-          )}
-        >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <TabsList className="bg-muted/60 p-1 border border-border">
-                <TabsTrigger value="preview" className="text-xs px-4">
-                  Structured Resume & Evidence
-                </TabsTrigger>
-                <TabsTrigger value="latex" className="text-xs px-4 flex items-center gap-1.5">
-                  <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
-                  <span>LaTeX Code (.tex)</span>
-                </TabsTrigger>
-                <TabsTrigger value="outreach" className="text-xs px-4 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-brand-pink" />
-                  <span>Cover Letter & Outreach</span>
-                </TabsTrigger>
-                <TabsTrigger value="diff" className="text-xs px-4 flex items-center gap-1.5">
-                  <GitCompare className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Version Diff</span>
-                  {versions && versions.length > 1 && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                      {versions.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Collapsible Inspector Toggle */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAuditPanel((prev) => !prev)}
-                className={cn(
-                  'h-8.5 text-xs border-border bg-card hover:bg-muted gap-1.5 cursor-pointer font-medium shadow-xs transition-colors',
-                  showAuditPanel
-                    ? 'text-foreground'
-                    : 'text-brand-cyan border-brand-cyan/40 bg-brand-cyan/10 hover:bg-brand-cyan/15',
-                )}
-                title={
-                  showAuditPanel ? 'Collapse Evidence Audit panel' : 'Expand Evidence Audit panel'
-                }
+      {/* Main Full-Width Studio Canvas */}
+      <div className="w-full space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <TabsList className="bg-muted/60 p-1 border border-border">
+              <TabsTrigger
+                value="latex"
+                className="text-xs px-4 flex items-center gap-1.5 cursor-pointer"
               >
-                {showAuditPanel ? (
-                  <PanelRightClose className="w-3.5 h-3.5 text-muted-foreground" />
-                ) : (
-                  <PanelRightOpen className="w-3.5 h-3.5 text-brand-cyan" />
-                )}
-                <span>{showAuditPanel ? 'Hide Audit' : 'Show Audit'}</span>
-                {status && (
-                  <span
-                    className={cn(
-                      'text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold',
-                      status === 'VALIDATED'
-                        ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
-                        : 'bg-muted border-border text-muted-foreground',
-                    )}
-                  >
-                    {status}
+                <FileCode className="w-3.5 h-3.5 text-brand-cyan" />
+                <span>Resume Studio</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="diff"
+                className="text-xs px-4 flex items-center gap-1.5 cursor-pointer"
+              >
+                <GitCompare className="w-3.5 h-3.5 text-amber-400" />
+                <span>Version Diff</span>
+                {versions && versions.length > 1 && (
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    {versions.length}
                   </span>
                 )}
-              </Button>
-            </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="outreach"
+                className="text-xs px-4 flex items-center gap-1.5 cursor-pointer"
+              >
+                <Mail className="w-3.5 h-3.5 text-brand-pink" />
+                <span>Cover Letter & Outreach</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="preview"
+                className="text-xs px-4 flex items-center gap-1.5 cursor-pointer"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Raw Profile Data</span>
+              </TabsTrigger>
+            </TabsList>
 
-            <TabsContent value="preview">
-              <ResumeViewer
-                resume={resume}
-                validationReport={report}
-                candidateProfile={candidateProfile}
-              />
-            </TabsContent>
-
-            <TabsContent value="latex" className="mt-0 outline-none">
-              {latexLoading ? (
-                <div className="p-8 text-center text-xs text-muted-foreground">
-                  Loading LaTeX source from Cloudflare R2...
-                </div>
-              ) : latex ? (
-                <LatexViewer
-                  jobId={id}
-                  latex={latex}
-                  selectedTemplate={selectedTemplate}
-                  onSelectTemplate={setSelectedTemplate}
-                  downloadUrl={downloadUrl}
-                  candidateName={resume.personal?.name}
-                  resumeData={resume}
-                  version={selectedVersion}
-                />
-              ) : (
-                <div className="p-8 text-center text-xs text-muted-foreground">
-                  LaTeX source not yet generated for this resume.
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="outreach">
-              <OutreachTab jobId={id} candidateName={resume.personal?.name} />
-            </TabsContent>
-
-            <TabsContent value="diff" className="mt-0 outline-none">
-              <ResumeDiffViewer
-                jobId={id}
-                currentResume={resume}
-                currentVersion={resumeData?.version || selectedVersion}
-                versions={versions}
-                onRegenerate={handleRegenerate}
-                isRegenerating={runStageMutation.isPending}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {showAuditPanel && (
-          <div className="lg:col-span-4 space-y-4 animate-in fade-in duration-200">
-            <div className="sticky top-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-brand-cyan" />
-                  <span>Evidence Cross-Check Audit</span>
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowAuditPanel(false)}
-                  className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
-                  title="Collapse Audit Panel"
+            {/* On-Demand Audit Modal Trigger */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsAuditModalOpen(true)}
+              className="h-8.5 text-xs border-border bg-card hover:bg-muted gap-1.5 cursor-pointer font-medium shadow-xs transition-colors"
+              title="Open Truth-Preservation Evidence Audit Report modal"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-brand-cyan" />
+              <span>Evidence Audit</span>
+              {status && (
+                <span
+                  className={cn(
+                    'text-[10px] font-mono px-1.5 py-0.2 rounded border uppercase font-bold',
+                    status === 'VALIDATED'
+                      ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
+                      : 'bg-muted border-border text-muted-foreground',
+                  )}
                 >
-                  <PanelRightClose className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-              <ValidationReportPanel report={report} status={status} />
-            </div>
+                  {status}
+                </span>
+              )}
+            </Button>
           </div>
-        )}
+
+          {/* Tab 1: Resume Studio (LaTeX & Live PDF Preview with SyncTeX) */}
+          <TabsContent value="latex" className="mt-0 outline-none">
+            {latexLoading ? (
+              <div className="p-8 text-center text-xs text-muted-foreground">
+                Loading LaTeX source from Cloudflare R2...
+              </div>
+            ) : latex ? (
+              <LatexViewer
+                jobId={id}
+                latex={latex}
+                selectedTemplate={selectedTemplate}
+                onSelectTemplate={setSelectedTemplate}
+                downloadUrl={downloadUrl}
+                candidateName={resume.personal?.name}
+                resumeData={resume}
+                version={selectedVersion}
+              />
+            ) : (
+              <div className="p-8 text-center text-xs text-muted-foreground">
+                LaTeX source not yet generated for this resume.
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Tab 2: Visual Version Diff Viewer */}
+          <TabsContent value="diff" className="mt-0 outline-none">
+            <ResumeDiffViewer
+              jobId={id}
+              currentResume={resume}
+              currentVersion={resumeData?.version || selectedVersion}
+              versions={versions}
+              onRegenerate={handleRegenerate}
+              isRegenerating={runStageMutation.isPending}
+            />
+          </TabsContent>
+
+          {/* Tab 3: Cover Letter & Outreach Studio */}
+          <TabsContent value="outreach" className="mt-0 outline-none">
+            <OutreachTab jobId={id} candidateName={resume.personal?.name} />
+          </TabsContent>
+
+          {/* Tab 4: Raw Profile Evidence (Optional Inspector) */}
+          <TabsContent value="preview" className="mt-0 outline-none">
+            <ResumeViewer
+              resume={resume}
+              validationReport={report}
+              candidateProfile={candidateProfile}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
+
+      {/* On-Demand Evidence Cross-Check Audit Modal */}
+      <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col p-6 overflow-hidden">
+          <DialogHeader className="pb-3 border-b border-border">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-brand-cyan/10 text-brand-cyan">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+                  <span>Praman Evidence Cross-Check Audit</span>
+                  {status && (
+                    <span
+                      className={cn(
+                        'text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold',
+                        status === 'VALIDATED'
+                          ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
+                          : 'bg-muted border-border text-muted-foreground',
+                      )}
+                    >
+                      {status}
+                    </span>
+                  )}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  Automated truth-preservation report auditing claims against confirmed candidate profile records.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto py-3 pr-1">
+            <ValidationReportPanel report={report} status={status} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
