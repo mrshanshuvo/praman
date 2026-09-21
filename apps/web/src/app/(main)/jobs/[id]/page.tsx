@@ -1,21 +1,23 @@
 'use client';
 
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Layers, Sparkles } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { type PipelineStage, PipelineStepper } from '@/components/PipelineStepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePipelineStream } from '@/hooks/usePipelineStream';
 import { useJob, useRunStage } from '@/hooks/usePramanApi';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
 import { JobDetailHeader } from './_components/JobDetailHeader';
 import { PipelineLiveLogs } from './_components/PipelineLiveLogs';
 import { Stage1Structured } from './_components/Stage1Structured';
 import { Stage2Match } from './_components/Stage2Match';
 import { Stage3Strategy } from './_components/Stage3Strategy';
 import { Stage4Resume } from './_components/Stage4Resume';
+import { JobTrackerHub } from './_components/tracker';
 
 const VALID_STAGES: PipelineStage[] = ['structured', 'match', 'strategy', 'resume'];
 
@@ -38,6 +40,14 @@ function JobDetailContent() {
     defaultValue: 'structured',
     validValues: VALID_STAGES,
   });
+
+  const [viewMode = 'pipeline', setViewMode] = useUrlQueryParam<'pipeline' | 'tracker'>(
+    'view',
+    'pipeline',
+    {
+      validValues: ['pipeline', 'tracker'] as const,
+    },
+  );
 
   const { data: jd, isLoading: loading, isFetching, error: fetchError, refetch } = useJob(id);
   const runStageMutation = useRunStage(id);
@@ -150,50 +160,104 @@ function JobDetailContent() {
         </Alert>
       )}
 
-      <PipelineStepper
-        currentStage={activeTab}
-        completedStages={completedStages}
-        stageStatuses={stageStatuses}
-        onSelectStage={(stage) => setActiveTab(stage)}
-        isLoading={isAnyStageRunning}
-      />
+      {/* View Mode Toggle: AI Pipeline Studio vs Application & Interview Tracker */}
+      <div className="flex items-center justify-between gap-4 p-1.5 rounded-2xl bg-muted/40 border border-border">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          <Button
+            type="button"
+            variant={viewMode === 'pipeline' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('pipeline')}
+            className={`text-xs font-semibold gap-1.5 rounded-xl flex-1 sm:flex-initial transition-all ${
+              viewMode === 'pipeline'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span>AI Pipeline Studio</span>
+          </Button>
 
-      <PipelineLiveLogs logs={liveLogs} isStreaming={isStreaming} />
-
-      <div className="space-y-6">
-        {activeTab === 'structured' && <Stage1Structured structured={structured} />}
-        {activeTab === 'match' && (
-          <Stage2Match
-            analysis={analysis}
-            structured={structured}
-            isRunning={isStreaming || runStageMutation.isPending}
-            isDisabled={isAnyStageRunning}
-            onRun={() => runStage('match')}
-          />
-        )}
-        {activeTab === 'strategy' && (
-          <Stage3Strategy
-            strategy={strategy}
-            hasAnalysis={!!analysis}
-            isRunning={isStreaming || runStageMutation.isPending}
-            isDisabled={isAnyStageRunning}
-            onRun={() => runStage('strategy')}
-          />
-        )}
-        {activeTab === 'resume' && (
-          <Stage4Resume
-            jobId={id}
-            resumeJson={resumeJson}
-            validationReport={validationReport}
-            resumeStatus={resumeStatus}
-            resumeRecord={resumeRecord}
-            hasStrategy={!!strategy}
-            isRunning={isStreaming || runStageMutation.isPending}
-            isDisabled={isAnyStageRunning}
-            onRun={() => runStage('resume')}
-          />
-        )}
+          <Button
+            type="button"
+            variant={viewMode === 'tracker' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('tracker')}
+            className={`text-xs font-semibold gap-1.5 rounded-xl flex-1 sm:flex-initial transition-all ${
+              viewMode === 'tracker'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5 text-primary" />
+            <span>Interview Hub & Tracker</span>
+            {jd?.tracker?.milestones && jd.tracker.milestones.length > 0 && (
+              <Badge
+                variant="secondary"
+                className="text-[10px] px-1.5 py-0 h-4 font-mono font-bold ml-0.5"
+              >
+                {jd.tracker.milestones.length}
+              </Badge>
+            )}
+          </Button>
+        </div>
       </div>
+
+      {viewMode === 'tracker' ? (
+        <JobTrackerHub
+          jobId={id}
+          status={jd?.status || 'SAVED'}
+          tracker={jd?.tracker}
+          jobTitle={structured?.jobTitle}
+        />
+      ) : (
+        <>
+          <PipelineStepper
+            currentStage={activeTab}
+            completedStages={completedStages}
+            stageStatuses={stageStatuses}
+            onSelectStage={(stage) => setActiveTab(stage)}
+            isLoading={isAnyStageRunning}
+          />
+
+          <PipelineLiveLogs logs={liveLogs} isStreaming={isStreaming} />
+
+          <div className="space-y-6">
+            {activeTab === 'structured' && <Stage1Structured structured={structured} />}
+            {activeTab === 'match' && (
+              <Stage2Match
+                analysis={analysis}
+                structured={structured}
+                isRunning={isStreaming || runStageMutation.isPending}
+                isDisabled={isAnyStageRunning}
+                onRun={() => runStage('match')}
+              />
+            )}
+            {activeTab === 'strategy' && (
+              <Stage3Strategy
+                strategy={strategy}
+                hasAnalysis={!!analysis}
+                isRunning={isStreaming || runStageMutation.isPending}
+                isDisabled={isAnyStageRunning}
+                onRun={() => runStage('strategy')}
+              />
+            )}
+            {activeTab === 'resume' && (
+              <Stage4Resume
+                jobId={id}
+                resumeJson={resumeJson}
+                validationReport={validationReport}
+                resumeStatus={resumeStatus}
+                resumeRecord={resumeRecord}
+                hasStrategy={!!strategy}
+                isRunning={isStreaming || runStageMutation.isPending}
+                isDisabled={isAnyStageRunning}
+                onRun={() => runStage('resume')}
+              />
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

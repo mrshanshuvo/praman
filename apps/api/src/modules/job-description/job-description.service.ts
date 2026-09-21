@@ -1,10 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  type ApplicationStatus,
-  type PaginationQueryDto,
-  type StructuredJd,
-  StructuredJdSchema,
+import type {
+  ApplicationNote,
+  ApplicationStatus,
+  ApplicationTracker,
+  CreateMilestoneDto,
+  CreateNoteDto,
+  InterviewMilestone,
+  PaginationQueryDto,
+  StructuredJd,
+  UpdateApplicationTrackerDto,
 } from '@praman/schemas';
+import { StructuredJdSchema } from '@praman/schemas';
 import { PrismaService } from '../../core/database/prisma.service.js';
 import { AiService } from '../ai/ai.service.js';
 import { JD_ANALYZER_SYSTEM_PROMPT_V1 } from '../ai/prompts/jd-analyzer.v1.js';
@@ -242,5 +249,215 @@ export class JobDescriptionService {
     });
 
     return updated;
+  }
+
+  private ensureTracker(jd: any): ApplicationTracker {
+    const rawTracker = (jd.tracker as Partial<ApplicationTracker>) || {};
+    return {
+      appliedDate: rawTracker.appliedDate ?? null,
+      portalUrl: rawTracker.portalUrl ?? null,
+      targetSalary: rawTracker.targetSalary ?? null,
+      referralContact: rawTracker.referralContact ?? null,
+      recruiterName: rawTracker.recruiterName ?? null,
+      recruiterEmail: rawTracker.recruiterEmail ?? null,
+      recruiterPhone: rawTracker.recruiterPhone ?? null,
+      milestones: Array.isArray(rawTracker.milestones) ? rawTracker.milestones : [],
+      notes: Array.isArray(rawTracker.notes) ? rawTracker.notes : [],
+    };
+  }
+
+  async getTracker(id: string, targetUserId?: string): Promise<ApplicationTracker> {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+    return this.ensureTracker(jd);
+  }
+
+  async updateTrackerDossier(id: string, dto: UpdateApplicationTrackerDto, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const currentTracker = this.ensureTracker(jd);
+    const updatedTracker: ApplicationTracker = {
+      ...currentTracker,
+      ...Object.fromEntries(Object.entries(dto).filter(([_, v]) => v !== undefined)),
+    };
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update({
+      tracker: updatedTracker as any,
+    });
+
+    return updatedTracker;
+  }
+
+  async addMilestone(id: string, dto: CreateMilestoneDto, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const tracker = this.ensureTracker(jd);
+    const newMilestone: InterviewMilestone = {
+      id: randomUUID(),
+      roundNumber: dto.roundNumber ?? tracker.milestones.length + 1,
+      stage: dto.stage,
+      title: dto.title,
+      scheduledAt: dto.scheduledAt ?? null,
+      timezone: dto.timezone ?? null,
+      status: dto.status ?? 'SCHEDULED',
+      interviewer: dto.interviewer ?? null,
+      meetingLink: dto.meetingLink ?? null,
+      notes: dto.notes ?? null,
+      questionsAsked: dto.questionsAsked ?? [],
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedMilestones = [...tracker.milestones, newMilestone];
+    const updatedTracker: ApplicationTracker = {
+      ...tracker,
+      milestones: updatedMilestones,
+    };
+
+    const updatePayload: Record<string, any> = {
+      tracker: updatedTracker as any,
+    };
+    if (jd.status === 'SAVED' || jd.status === 'APPLIED') {
+      updatePayload.status = 'INTERVIEWING';
+    }
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update(updatePayload);
+
+    return newMilestone;
+  }
+
+  async updateMilestone(
+    id: string,
+    milestoneId: string,
+    dto: Partial<CreateMilestoneDto>,
+    targetUserId?: string,
+  ) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const tracker = this.ensureTracker(jd);
+    const index = tracker.milestones.findIndex((m) => m.id === milestoneId);
+    if (index === -1) {
+      throw new NotFoundException(`Milestone with ID ${milestoneId} not found`);
+    }
+
+    const existing = tracker.milestones[index];
+    const updatedMilestone: InterviewMilestone = {
+      ...existing,
+      ...Object.fromEntries(Object.entries(dto).filter(([_, v]) => v !== undefined)),
+    };
+
+    tracker.milestones[index] = updatedMilestone;
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update({
+      tracker: tracker as any,
+    });
+
+    return updatedMilestone;
+  }
+
+  async deleteMilestone(id: string, milestoneId: string, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const tracker = this.ensureTracker(jd);
+    const updatedMilestones = tracker.milestones.filter((m) => m.id !== milestoneId);
+
+    tracker.milestones = updatedMilestones;
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update({
+      tracker: tracker as any,
+    });
+
+    return { success: true, milestoneId };
+  }
+
+  async addNote(id: string, dto: CreateNoteDto, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const tracker = this.ensureTracker(jd);
+    const newNote: ApplicationNote = {
+      id: randomUUID(),
+      content: dto.content,
+      tag: dto.tag ?? 'GENERAL',
+      isPinned: dto.isPinned ?? false,
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedNotes = [newNote, ...tracker.notes];
+    tracker.notes = updatedNotes;
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update({
+      tracker: tracker as any,
+    });
+
+    return newNote;
+  }
+
+  async updateNote(id: string, noteId: string, dto: Partial<CreateNoteDto>, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const tracker = this.ensureTracker(jd);
+    const index = tracker.notes.findIndex((n) => n.id === noteId);
+    if (index === -1) {
+      throw new NotFoundException(`Note with ID ${noteId} not found`);
+    }
+
+    const existing = tracker.notes[index];
+    const updatedNote: ApplicationNote = {
+      ...existing,
+      ...Object.fromEntries(Object.entries(dto).filter(([_, v]) => v !== undefined)),
+    };
+
+    tracker.notes[index] = updatedNote;
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update({
+      tracker: tracker as any,
+    });
+
+    return updatedNote;
+  }
+
+  async deleteNote(id: string, noteId: string, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const tracker = this.ensureTracker(jd);
+    const updatedNotes = tracker.notes.filter((n) => n.id !== noteId);
+
+    tracker.notes = updatedNotes;
+
+    await this.prisma.client.orm.public.JobDescription.where({ id }).update({
+      tracker: tracker as any,
+    });
+
+    return { success: true, noteId };
   }
 }

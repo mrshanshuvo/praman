@@ -14,8 +14,13 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateJobDescriptionDtoSchema,
+  CreateMilestoneDtoSchema,
+  CreateNoteDtoSchema,
   PaginationQuerySchema,
+  UpdateApplicationTrackerDtoSchema,
   UpdateJobStatusDtoSchema,
+  UpdateMilestoneDtoSchema,
+  UpdateNoteDtoSchema,
 } from '@praman/schemas';
 import type { Response } from 'express';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
@@ -89,6 +94,112 @@ export class JobDescriptionController {
       throw new BadRequestException(parse.error.flatten());
     }
     return this.jdService.updateStatus(id, parse.data.status, user?.id);
+  }
+
+  // --- Tracker & Milestones Endpoints ---
+
+  @Get(':id/tracker')
+  @ApiOperation({ summary: 'Get application tracker, milestones, and notes for a job' })
+  @ApiResponse({ status: 200, description: 'Application tracker data' })
+  async getTracker(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.jdService.getTracker(id, user?.id);
+  }
+
+  @Patch(':id/tracker/dossier')
+  @ApiOperation({
+    summary: 'Update application dossier (applied date, salary, recruiter info, portal)',
+  })
+  @ApiResponse({ status: 200, description: 'Application tracker updated' })
+  async updateTrackerDossier(
+    @Param('id') id: string,
+    @Body() body: unknown,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const parse = UpdateApplicationTrackerDtoSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.jdService.updateTrackerDossier(id, parse.data, user?.id);
+  }
+
+  @Post(':id/milestones')
+  @ApiOperation({ summary: 'Add an interview milestone to job tracker' })
+  @ApiResponse({ status: 201, description: 'Interview milestone created' })
+  async addMilestone(
+    @Param('id') id: string,
+    @Body() body: unknown,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const parse = CreateMilestoneDtoSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.jdService.addMilestone(id, parse.data, user?.id);
+  }
+
+  @Patch(':id/milestones/:milestoneId')
+  @ApiOperation({ summary: 'Update an interview milestone (status, questions, date, notes)' })
+  @ApiResponse({ status: 200, description: 'Interview milestone updated' })
+  async updateMilestone(
+    @Param('id') id: string,
+    @Param('milestoneId') milestoneId: string,
+    @Body() body: unknown,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const parse = UpdateMilestoneDtoSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.jdService.updateMilestone(id, milestoneId, parse.data, user?.id);
+  }
+
+  @Delete(':id/milestones/:milestoneId')
+  @ApiOperation({ summary: 'Delete an interview milestone' })
+  @ApiResponse({ status: 200, description: 'Interview milestone deleted' })
+  async deleteMilestone(
+    @Param('id') id: string,
+    @Param('milestoneId') milestoneId: string,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.jdService.deleteMilestone(id, milestoneId, user?.id);
+  }
+
+  @Post(':id/notes')
+  @ApiOperation({ summary: 'Add a timestamped application note' })
+  @ApiResponse({ status: 201, description: 'Note added' })
+  async addNote(@Param('id') id: string, @Body() body: unknown, @CurrentUser() user?: AuthUser) {
+    const parse = CreateNoteDtoSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.jdService.addNote(id, parse.data, user?.id);
+  }
+
+  @Patch(':id/notes/:noteId')
+  @ApiOperation({ summary: 'Update or pin an application note' })
+  @ApiResponse({ status: 200, description: 'Note updated' })
+  async updateNote(
+    @Param('id') id: string,
+    @Param('noteId') noteId: string,
+    @Body() body: unknown,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    const parse = UpdateNoteDtoSchema.safeParse(body);
+    if (!parse.success) {
+      throw new BadRequestException(parse.error.flatten());
+    }
+    return this.jdService.updateNote(id, noteId, parse.data, user?.id);
+  }
+
+  @Delete(':id/notes/:noteId')
+  @ApiOperation({ summary: 'Delete an application note' })
+  @ApiResponse({ status: 200, description: 'Note deleted' })
+  async deleteNote(
+    @Param('id') id: string,
+    @Param('noteId') noteId: string,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.jdService.deleteNote(id, noteId, user?.id);
   }
 
   @Post(':id/match')

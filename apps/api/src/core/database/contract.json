@@ -805,6 +805,13 @@
                   "kind": "scalar"
                 }
               },
+              "tracker": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -870,6 +877,9 @@
                 },
                 "structured": {
                   "column": "structured"
+                },
+                "tracker": {
+                  "column": "tracker"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -1956,6 +1966,11 @@
                   "nativeType": "json",
                   "nullable": false
                 },
+                "tracker": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
@@ -2476,7 +2491,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "8573f2e3d8903e16497b027e130460559bdde7d702ca83161a0b1e16232fc141"
+    "storageHash": "32230c3f68e1ad5194c3f7bdbb302d1f549e69152c52c439fcbd5f3499593ba1"
   },
   "execution": {
     "executionHash": "0ef841f71a95bc453d5bb993a110e3634a6b437ab48383edd7e4d87f1374008c",

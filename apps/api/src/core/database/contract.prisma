@@ -106,6 +106,7 @@ model JobDescription {
   rawText    String
   structured Json
   status     ApplicationStatus    @default(SAVED)
+  tracker    Json?
   createdAt  TimestamptzString    @default(now())
   updatedAt  temporal.updatedAtString()
   analysis   CandidateJdAnalysis?

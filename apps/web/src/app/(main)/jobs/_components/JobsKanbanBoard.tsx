@@ -3,6 +3,7 @@
 import {
   Archive,
   Briefcase,
+  Calendar,
   ChevronRight,
   FileCode,
   GripVertical,
@@ -246,6 +247,30 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                           </div>
                           <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
                         </div>
+
+                        {/* Upcoming Interview Chip */}
+                        {(() => {
+                          const upcoming = jd.tracker?.milestones
+                            ?.filter((m: any) => m.status === 'SCHEDULED' && m.scheduledAt)
+                            ?.sort(
+                              (a: any, b: any) =>
+                                new Date(a.scheduledAt).getTime() -
+                                new Date(b.scheduledAt).getTime(),
+                            )[0];
+                          if (!upcoming) return null;
+                          return (
+                            <div className="flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-400 font-medium">
+                              <Calendar className="w-3 h-3 shrink-0" />
+                              <span className="truncate">
+                                {upcoming.stage.replace('_', ' ')} ·{' '}
+                                {new Date(upcoming.scheduledAt).toLocaleDateString([], {
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}
+                              </span>
+                            </div>
+                          );
+                        })()}
 
                         {/* Match Score Indicator */}
                         {analysis && (

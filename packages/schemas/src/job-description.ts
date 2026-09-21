@@ -68,6 +68,114 @@ export const UpdateJobStatusDtoSchema = z.object({
 });
 export type UpdateJobStatusDto = z.infer<typeof UpdateJobStatusDtoSchema>;
 
+export const InterviewStageEnum = z.enum([
+  'SCREENING',
+  'TECHNICAL',
+  'TAKE_HOME',
+  'SYSTEM_DESIGN',
+  'BEHAVIORAL',
+  'HIRING_MANAGER',
+  'FINAL_ROUND',
+  'OFFER',
+  'CUSTOM',
+]);
+export type InterviewStage = z.infer<typeof InterviewStageEnum>;
+
+export const MilestoneStatusEnum = z.enum([
+  'SCHEDULED',
+  'COMPLETED',
+  'PASSED',
+  'NEEDS_FOLLOW_UP',
+  'CANCELLED',
+]);
+export type MilestoneStatus = z.infer<typeof MilestoneStatusEnum>;
+
+export const InterviewMilestoneSchema = z.object({
+  id: z.string(),
+  roundNumber: z.number().default(1),
+  stage: InterviewStageEnum,
+  title: z.string().min(1, 'Milestone title is required'),
+  scheduledAt: z.string().nullable().optional(),
+  timezone: z.string().nullable().optional(),
+  status: MilestoneStatusEnum.default('SCHEDULED'),
+  interviewer: z.string().nullable().optional(),
+  meetingLink: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  questionsAsked: z.array(z.string()).default([]),
+  createdAt: z.string(),
+});
+export type InterviewMilestone = z.infer<typeof InterviewMilestoneSchema>;
+
+export const CreateMilestoneDtoSchema = z.object({
+  stage: InterviewStageEnum,
+  title: z.string().min(1, 'Milestone title is required'),
+  roundNumber: z.number().optional(),
+  scheduledAt: z.string().nullable().optional(),
+  timezone: z.string().nullable().optional(),
+  status: MilestoneStatusEnum.optional(),
+  interviewer: z.string().nullable().optional(),
+  meetingLink: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  questionsAsked: z.array(z.string()).optional(),
+});
+export type CreateMilestoneDto = z.infer<typeof CreateMilestoneDtoSchema>;
+
+export const UpdateMilestoneDtoSchema = CreateMilestoneDtoSchema.partial();
+export type UpdateMilestoneDto = z.infer<typeof UpdateMilestoneDtoSchema>;
+
+export const NoteTagEnum = z.enum([
+  'GENERAL',
+  'PREP',
+  'INTERVIEW_FEEDBACK',
+  'SALARY_BENEFITS',
+  'RECRUITER_INTEL',
+  'FOLLOW_UP',
+]);
+export type NoteTag = z.infer<typeof NoteTagEnum>;
+
+export const ApplicationNoteSchema = z.object({
+  id: z.string(),
+  content: z.string().min(1, 'Note content cannot be empty'),
+  tag: NoteTagEnum.default('GENERAL'),
+  isPinned: z.boolean().default(false),
+  createdAt: z.string(),
+});
+export type ApplicationNote = z.infer<typeof ApplicationNoteSchema>;
+
+export const CreateNoteDtoSchema = z.object({
+  content: z.string().min(1, 'Note content cannot be empty'),
+  tag: NoteTagEnum.default('GENERAL').optional(),
+  isPinned: z.boolean().default(false).optional(),
+});
+export type CreateNoteDto = z.infer<typeof CreateNoteDtoSchema>;
+
+export const UpdateNoteDtoSchema = CreateNoteDtoSchema.partial();
+export type UpdateNoteDto = z.infer<typeof UpdateNoteDtoSchema>;
+
+export const ApplicationTrackerSchema = z.object({
+  appliedDate: z.string().nullable().optional(),
+  portalUrl: z.string().nullable().optional(),
+  targetSalary: z.string().nullable().optional(),
+  referralContact: z.string().nullable().optional(),
+  recruiterName: z.string().nullable().optional(),
+  recruiterEmail: z.string().nullable().optional(),
+  recruiterPhone: z.string().nullable().optional(),
+  milestones: z.array(InterviewMilestoneSchema).default([]),
+  notes: z.array(ApplicationNoteSchema).default([]),
+});
+export type ApplicationTracker = z.infer<typeof ApplicationTrackerSchema>;
+
+export const UpdateApplicationTrackerDtoSchema = z.object({
+  appliedDate: z.string().nullable().optional(),
+  portalUrl: z.string().nullable().optional(),
+  targetSalary: z.string().nullable().optional(),
+  referralContact: z.string().nullable().optional(),
+  recruiterName: z.string().nullable().optional(),
+  recruiterEmail: z.string().nullable().optional(),
+  recruiterPhone: z.string().nullable().optional(),
+});
+export type UpdateApplicationTrackerDto = z.infer<typeof UpdateApplicationTrackerDtoSchema>;
+
 export interface CandidateJdAnalysisRecord {
   id: string;
   jobDescriptionId: string;
@@ -93,6 +201,7 @@ export interface JobDescriptionRecord {
   rawText: string;
   structured: StructuredJd;
   status: ApplicationStatus;
+  tracker?: ApplicationTracker | null;
   createdAt: string;
   updatedAt: string;
   analysis?: CandidateJdAnalysisRecord | null;
