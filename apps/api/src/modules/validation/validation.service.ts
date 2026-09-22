@@ -87,6 +87,12 @@ export class ValidationService {
 
         for (const bullet of exp.bullets || []) {
           this.checkNumbersInBullet(bullet, sourceText, `Experience (${exp.company})`, numberFlags);
+          this.checkQualitativeScopeClaims(
+            bullet,
+            candidateProfile,
+            `Experience (${exp.company})`,
+            violations,
+          );
         }
       }
     }
@@ -113,6 +119,12 @@ export class ValidationService {
 
         for (const bullet of proj.bullets || []) {
           this.checkNumbersInBullet(bullet, sourceText, `Project (${proj.name})`, numberFlags);
+          this.checkQualitativeScopeClaims(
+            bullet,
+            candidateProfile,
+            `Project (${proj.name})`,
+            violations,
+          );
         }
       }
     }
@@ -153,6 +165,9 @@ export class ValidationService {
     if (data.summary) {
       // Check for unconfirmed metrics or numbers in summary
       this.checkNumbersInBullet(data.summary, candidateFullSourceText, 'Summary', numberFlags);
+
+      // Check for unsubstantiated qualitative scope/leadership claims
+      this.checkQualitativeScopeClaims(data.summary, candidateProfile, 'Summary', violations);
 
       // Check for unlearned skills claimed in summary
       for (const sk of candidateProfile?.skills || []) {
@@ -344,6 +359,50 @@ export class ValidationService {
       }
     }
 
+    // 3. Seniority & Scope Integrity check
+    this.checkQualitativeScopeClaims(text, candidateProfile, contextLabel, violations);
+
     return { numberFlags, violations };
+  }
+
+  checkQualitativeScopeClaims(
+    text: string,
+    candidateProfile: any,
+    contextLabel: string,
+    outViolations: string[],
+  ): void {
+    if (!text) return;
+    const candidateFullSourceText =
+      this.buildCandidateFullSourceText(candidateProfile).toLowerCase();
+
+    // Check high-stakes seniority / leadership / management claims
+    const leadershipPatterns = [
+      /\b(?:led|managed|supervised|directed|spearheaded)\s+(?:a|an|the|our|multiple|several|distributed|\d+|cross-functional)?\s*(?:engineering\s+|technical\s+|software\s+|development\s+)?team\b/i,
+      /\bmentored\s+(?:junior\s+|mid-level\s+|new\s+|intern\s+)?(?:developers|engineers|peers|team)\b/i,
+      /\b(?:engineering\s+lead|engineering\s+manager|technical\s+lead|team\s+lead|chief\s+architect|head\s+of\s+engineering|director\s+of)\b/i,
+    ];
+
+    const candidateLeadershipPatterns = [
+      /\b(?:team\s+lead|tech\s+lead|technical\s+lead|lead\s+(?:engineer|developer|architect)|engineering\s+lead|engineering\s+manager|product\s+manager|project\s+manager|director|head\s+of)\b/i,
+      /\b(?:led|managed|supervised|directed|spearheaded)\s+(?:a|an|the|our|multiple|several|distributed|\d+|cross-functional)?\s*(?:engineering\s+|technical\s+|software\s+|development\s+)?team\b/i,
+      /\bmentored\s+(?:junior\s+|mid-level\s+|new\s+|intern\s+)?(?:developers|engineers|peers|team)\b/i,
+      /\b(?:leadership|supervision|team\s+management)\b/i,
+    ];
+
+    const hasProfileLeadershipEvidence = candidateLeadershipPatterns.some((pattern) =>
+      pattern.test(candidateFullSourceText),
+    );
+
+    if (!hasProfileLeadershipEvidence) {
+      for (const pattern of leadershipPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+          outViolations.push(
+            `Unsubstantiated qualitative claim in ${contextLabel.toLowerCase()}: Candidate profile contains no verified leadership or mentoring evidence, but text claims "${match[0]}".`,
+          );
+          break;
+        }
+      }
+    }
   }
 }

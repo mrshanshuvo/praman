@@ -4,7 +4,6 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const TOKEN_KEY = 'praman_auth_token';
-const REFRESH_TOKEN_KEY = 'praman_refresh_token';
 
 function setAuthCookie(authToken: string) {
   if (typeof document === 'undefined') return;
@@ -60,22 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
     removeAuthCookie();
     setToken(null);
     setUser(null);
   }, [token]);
 
   const refreshSession = useCallback(async (): Promise<string | null> => {
-    const storedRefreshToken =
-      typeof window !== 'undefined' ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
-
     try {
       const res = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
+        body: JSON.stringify({}),
       });
 
       if (!res.ok) {
@@ -84,14 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await res.json();
       const newAccessToken = data.accessToken;
-      const newRefreshToken = data.refreshToken;
       const authUser = data.user;
 
       localStorage.setItem(TOKEN_KEY, newAccessToken);
       setAuthCookie(newAccessToken);
-      if (newRefreshToken) {
-        localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
-      }
       setToken(newAccessToken);
       setUser(authUser);
       return newAccessToken;
@@ -113,23 +104,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(storedToken);
     setAuthCookie(storedToken);
 
+    // Fetch user profile from /auth/me
     fetch(`${API_URL}/auth/me`, {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },
+      credentials: 'include',
     })
       .then(async (res) => {
-        if (!res.ok) {
-          throw new Error('Session invalid');
+        if (res.ok) {
+          const u = await res.json();
+          setUser(u);
+        } else if (res.status === 401) {
+          // Access token might be expired, attempt transparent refresh
+          return refreshSession();
         }
-        return res.json() as Promise<AuthUser>;
       })
-      .then((userData) => {
-        setUser(userData);
-      })
-      .catch(async () => {
-        // Attempt silent refresh before logging out
-        await refreshSession();
+      .catch(() => {
+        // Network or offline error: keep local session
       })
       .finally(() => {
         setIsLoading(false);
@@ -151,13 +143,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = await res.json();
     const accessToken = data.accessToken;
-    const refreshToken = data.refreshToken;
     const authUser = data.user;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
-    if (refreshToken) {
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    }
     setAuthCookie(accessToken);
     setToken(accessToken);
     setUser(authUser);
@@ -178,13 +166,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = await res.json();
     const accessToken = data.accessToken;
-    const refreshToken = data.refreshToken;
     const authUser = data.user;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
-    if (refreshToken) {
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    }
     setAuthCookie(accessToken);
     setToken(accessToken);
     setUser(authUser);

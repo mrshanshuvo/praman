@@ -68,7 +68,10 @@ export class AuthController {
   ) {
     const result = await this.authService.register(dto);
     setRefreshTokenCookie(res, result.refreshToken);
-    return result;
+    return {
+      user: result.user,
+      accessToken: result.accessToken,
+    };
   }
 
   @Public()
@@ -83,7 +86,10 @@ export class AuthController {
   ) {
     const result = await this.authService.login(dto);
     setRefreshTokenCookie(res, result.refreshToken);
-    return result;
+    return {
+      user: result.user,
+      accessToken: result.accessToken,
+    };
   }
 
   @Public()
@@ -104,7 +110,10 @@ export class AuthController {
 
     const result = await this.authService.refresh(refreshToken);
     setRefreshTokenCookie(res, result.refreshToken);
-    return result;
+    return {
+      user: result.user,
+      accessToken: result.accessToken,
+    };
   }
 
   @Get('me')
@@ -116,14 +125,20 @@ export class AuthController {
     return this.authService.getMe(user.id);
   }
 
+  @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Log out current user and invalidate refresh session' })
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout(@CurrentUser() user: AuthUser, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @CurrentUser() user: AuthUser | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     clearRefreshTokenCookie(res);
-    return this.authService.logout(user.id);
+    if (user?.id) {
+      return this.authService.logout(user.id);
+    }
+    return { success: true, message: 'Successfully logged out' };
   }
 }

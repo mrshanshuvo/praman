@@ -7,8 +7,9 @@ HARD CONSTRAINTS & ANTI-HALLUCINATION RULES:
 2. SUBJECT LINE: Write an informative, high-open-rate subject line referencing the specific job title and candidate name.
 3. BULLET HIGHLIGHTS: Exactly 2-3 concise bullet points citing verified metrics, technologies, or outcomes that directly match the JD's requirements.
 4. NO EXAGGERATION: Do not exaggerate or claim unverified capabilities.
-5. FRICTIONLESS CALL TO ACTION: Request a low-friction 10-15 minute conversation.
-6. Output MUST strictly be valid JSON adhering to the specified schema.
+5. SENIORITY INTEGRITY: Never assert leadership or management scope unless explicitly documented in candidate records.
+6. FRICTIONLESS CALL TO ACTION: Request a low-friction 10-15 minute conversation.
+7. Output MUST strictly be valid JSON adhering to the specified schema.
 
 OUTPUT SCHEMA (JSON):
 {
