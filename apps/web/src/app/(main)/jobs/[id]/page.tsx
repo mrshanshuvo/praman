@@ -130,11 +130,42 @@ function JobDetailContent() {
     );
   }
 
+  const jobTelemetry = jd
+    ? {
+        totalTokens:
+          (jd.promptTokens || 0) +
+          (jd.completionTokens || 0) +
+          (jd.analysis?.promptTokens || 0) +
+          (jd.analysis?.completionTokens || 0) +
+          (jd.analysis?.strategy?.promptTokens || 0) +
+          (jd.analysis?.strategy?.completionTokens || 0) +
+          (resumeRecord?.promptTokens || 0) +
+          (resumeRecord?.completionTokens || 0),
+        costUsd:
+          (jd.costUsd || 0) +
+          (jd.analysis?.costUsd || 0) +
+          (jd.analysis?.strategy?.costUsd || 0) +
+          (resumeRecord?.costUsd || 0),
+        durationMs:
+          (jd.durationMs || 0) +
+          (jd.analysis?.durationMs || 0) +
+          (jd.analysis?.strategy?.durationMs || 0) +
+          (resumeRecord?.durationMs || 0),
+        aiModel:
+          resumeRecord?.aiModel ||
+          jd.analysis?.strategy?.aiModel ||
+          jd.analysis?.aiModel ||
+          jd.aiModel ||
+          null,
+      }
+    : null;
+
   return (
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
       <JobDetailHeader
         id={id}
         structured={structured}
+        telemetry={jobTelemetry}
         isFetching={isFetching}
         isStreaming={isStreaming}
         onRefresh={() => refetch()}

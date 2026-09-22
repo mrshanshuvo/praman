@@ -1,4 +1,5 @@
 export * from './ActionCenterCard';
+export * from './AiUsageCard';
 export * from './DashboardHeader';
 export * from './PipelineFunnelCard';
 export * from './QuickIngestModal';

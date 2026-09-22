@@ -33,6 +33,11 @@ export const queryKeys = {
         versionOrId || 'latest',
       ] as const,
     outreach: (id: string) => [...queryKeys.jobs.detail(id), 'outreach'] as const,
+    telemetry: (id: string) => [...queryKeys.jobs.detail(id), 'telemetry'] as const,
+  },
+  ai: {
+    all: ['ai'] as const,
+    usage: () => [...queryKeys.ai.all, 'usage'] as const,
   },
   candidate: {
     all: ['candidate'] as const,

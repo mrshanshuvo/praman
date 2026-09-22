@@ -1,3 +1,4 @@
+export * from './AiTelemetryInspector';
 export * from './JobDetailHeader';
 export * from './MatchDiffInspector';
 export * from './PipelineLiveLogs';

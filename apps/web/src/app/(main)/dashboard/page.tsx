@@ -5,6 +5,7 @@ import { useCandidateProfile, useJobs } from '@/hooks/usePramanApi';
 import { useAuth } from '@/providers/AuthProvider';
 import {
   ActionCenterCard,
+  AiUsageCard,
   DashboardHeader,
   PipelineFunnelCard,
   QuickIngestModal,
@@ -40,7 +41,10 @@ export default function DashboardPage() {
         <SkillGapInsightsCard jobs={jobs} profile={profile} />
       </div>
 
-      {/* 4. Real-Time Pipeline Activity Timeline */}
+      {/* 4. AI Cost & Token Observability */}
+      <AiUsageCard />
+
+      {/* 5. Real-Time Pipeline Activity Timeline */}
       <RecentActivityFeed jobs={jobs} />
 
       {/* Quick JD Ingest Modal */}

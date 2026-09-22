@@ -1,4 +1,9 @@
-import type { JobDescriptionRecord, PaginationMeta } from '@praman/schemas';
+import type {
+  JobDescriptionRecord,
+  JobTelemetrySummary,
+  PaginationMeta,
+  UserAiUsageSummary,
+} from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API_URL, fetcher } from '@/lib/api-client';
 import { type JobFilterParams, queryKeys } from '@/lib/query-keys';
@@ -142,5 +147,21 @@ export function useRunFullPipeline(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
     },
+  });
+}
+
+export function useJobTelemetry(id: string) {
+  return useQuery({
+    queryKey: queryKeys.jobs.telemetry(id),
+    queryFn: () => fetcher<JobTelemetrySummary>(`${API_URL}/job-descriptions/${id}/telemetry`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useUserAiUsage(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: queryKeys.ai.usage(),
+    queryFn: () => fetcher<UserAiUsageSummary>(`${API_URL}/job-descriptions/telemetry/usage`),
+    enabled: options?.enabled ?? true,
   });
 }

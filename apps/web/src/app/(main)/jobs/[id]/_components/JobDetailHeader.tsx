@@ -5,6 +5,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { AiTelemetryInspector } from './AiTelemetryInspector';
 
 interface JobDetailHeaderProps {
   id: string;
@@ -13,6 +14,12 @@ interface JobDetailHeaderProps {
     seniority?: string | null;
     locationOrWorkMode?: string | null;
     yearsOfExperience?: string | null;
+  } | null;
+  telemetry?: {
+    totalTokens?: number | null;
+    costUsd?: number | null;
+    durationMs?: number | null;
+    aiModel?: string | null;
   } | null;
   isFetching: boolean;
   isStreaming: boolean;
@@ -24,6 +31,7 @@ interface JobDetailHeaderProps {
 export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
   id,
   structured,
+  telemetry,
   isFetching,
   isStreaming,
   onRefresh,
@@ -33,14 +41,21 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
   return (
     <Card className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 border-border bg-card/80 backdrop-blur-md">
       <div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Badge
             variant="outline"
             className="text-xs font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground border-border"
           >
             JD #{id.slice(0, 8)}
           </Badge>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+          <AiTelemetryInspector
+            jobId={id}
+            defaultTokens={telemetry?.totalTokens}
+            defaultCost={telemetry?.costUsd}
+            defaultDuration={telemetry?.durationMs}
+            defaultModel={telemetry?.aiModel}
+          />
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight w-full sm:w-auto mt-1 sm:mt-0">
             {structured?.jobTitle || 'Target Job Role'}
           </h1>
         </div>
