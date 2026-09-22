@@ -179,7 +179,21 @@ export class AiService {
         }
       }
 
-      this.logger.error(`LLM call failed (${response.status}): ${errText}`);
+      // If the current model failed with any non-200 status (404 not found / token maxed, 503 outage, 400 invalid, etc.)
+      // and fallback models exist in the cascade, switch to the next model.
+      if (this.activeModelIndex + 1 < this.models.length) {
+        const previousModel = this.currentModel;
+        this.activeModelIndex++;
+        const nextModel = this.currentModel;
+        this.logger.warn(
+          `[Cascade] Model [${previousModel}] failed with status ${response.status} (${errText.slice(0, 120)}...). Auto-switching to fallback model [${nextModel}].`,
+        );
+        return this.callLlmWithRetry(params, 2);
+      }
+
+      this.logger.error(
+        `LLM call failed (${response.status}) on final model [${currentAttemptModel}]: ${errText}`,
+      );
       throw new Error(`LLM call failed with status ${response.status}: ${errText}`);
     }
 

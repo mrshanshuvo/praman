@@ -137,4 +137,53 @@ describe('AiService - Dynamic Model Fallback Cascade', () => {
     expect(firstCallPayload.model).toBe('model-primary');
     expect(secondCallPayload.model).toBe('model-primary');
   });
+
+  it('should immediately cascade to next model when a model returns 404 (not found / token maxed)', async () => {
+    process.env.OPENAI_API_KEY = 'mock-key';
+    process.env.AI_MODELS = 'model-not-found, model-fallback';
+    const service = new AiService();
+
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    // First call returns 404 (model does not exist or maxed out)
+    fetchSpy.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          error: {
+            message: 'The model `model-not-found` does not exist or you do not have access to it.',
+            code: 'model_not_found',
+          },
+        }),
+        { status: 404 },
+      ),
+    );
+
+    // Second call to model-fallback succeeds
+    fetchSpy.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({ result: 'success-after-404' }),
+              },
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const schema = z.object({ result: z.string() });
+    const output = await service.runStructuredCall({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+      outputSchema: schema,
+      schemaName: 'TestSchema',
+    });
+
+    expect(output).toEqual({ result: 'success-after-404' });
+    expect(service.currentModel).toBe('model-fallback');
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  });
 });
