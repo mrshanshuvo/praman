@@ -1,6 +1,6 @@
 'use client';
 
-import { Briefcase, Plus, User } from 'lucide-react';
+import { Briefcase, Plus, User, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthProvider';
@@ -8,9 +8,14 @@ import { useAuth } from '@/providers/AuthProvider';
 interface DashboardHeaderProps {
   totalJobs: number;
   candidateName?: string | null;
+  onOpenQuickIngest?: () => void;
 }
 
-export function DashboardHeader({ totalJobs, candidateName }: DashboardHeaderProps) {
+export function DashboardHeader({
+  totalJobs,
+  candidateName,
+  onOpenQuickIngest,
+}: DashboardHeaderProps) {
   const { user } = useAuth();
   const displayName = candidateName || user?.name || user?.email?.split('@')[0] || 'Candidate';
 
@@ -29,30 +34,49 @@ export function DashboardHeader({ totalJobs, candidateName }: DashboardHeaderPro
         </p>
       </div>
 
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center flex-wrap gap-2.5">
         <Link href="/jobs">
-          <Button variant="outline" size="sm" className="text-xs gap-1.5 border-border bg-card">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs gap-1.5 border-border bg-card cursor-pointer"
+          >
             <Briefcase className="w-3.5 h-3.5" />
             <span>Kanban Board</span>
           </Button>
         </Link>
 
         <Link href="/profile">
-          <Button variant="outline" size="sm" className="text-xs gap-1.5 border-border bg-card">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs gap-1.5 border-border bg-card cursor-pointer"
+          >
             <User className="w-3.5 h-3.5" />
             <span>Edit Profile</span>
           </Button>
         </Link>
 
-        <Link href="/jobs/new">
+        {onOpenQuickIngest ? (
           <Button
             size="sm"
-            className="text-xs gap-1.5 bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs"
+            onClick={onOpenQuickIngest}
+            className="text-xs gap-1.5 bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>New Application</span>
+            <Zap className="w-3.5 h-3.5" />
+            <span>Quick Ingest JD</span>
           </Button>
-        </Link>
+        ) : (
+          <Link href="/jobs/new">
+            <Button
+              size="sm"
+              className="text-xs gap-1.5 bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Application</span>
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
