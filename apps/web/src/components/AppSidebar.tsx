@@ -278,7 +278,7 @@ export function AppSidebar() {
 
       {/* Mobile Drawer Overlay */}
       {isMobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex">
+        <div className="md:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex">
           <div className="w-64 h-full animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>

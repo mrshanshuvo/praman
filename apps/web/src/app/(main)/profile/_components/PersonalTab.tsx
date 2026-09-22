@@ -196,7 +196,7 @@ export function PersonalTab({ personal = {}, onUpdate }: PersonalTabProps) {
                 type="submit"
                 size="sm"
                 disabled={isSaving}
-                className="bg-brand-pink hover:bg-brand-pink/90 text-white font-semibold gap-1.5 shadow-xs"
+                className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light font-semibold gap-1.5 shadow-xs"
               >
                 {isSaving ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />

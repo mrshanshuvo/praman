@@ -44,7 +44,7 @@ export default function ErrorBoundary({
           <Button
             size="sm"
             onClick={() => reset()}
-            className="w-full sm:w-auto bg-brand-pink hover:bg-brand-pink/90 text-white font-semibold gap-1.5 shadow-sm"
+            className="w-full sm:w-auto bg-brand-pink hover:bg-brand-pink/90 text-brand-light font-semibold gap-1.5 shadow-sm"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Try Again</span>

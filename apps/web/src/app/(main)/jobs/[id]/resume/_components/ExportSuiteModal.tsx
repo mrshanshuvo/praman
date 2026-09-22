@@ -316,7 +316,7 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
             <Button
               size="sm"
               onClick={handleOpenOverleaf}
-              className="w-full bg-brand-pink hover:bg-brand-pink/90 text-white font-semibold text-xs gap-1.5 shadow-xs cursor-pointer"
+              className="w-full bg-brand-pink hover:bg-brand-pink/90 text-brand-light font-semibold text-xs gap-1.5 shadow-xs cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Open in Overleaf</span>

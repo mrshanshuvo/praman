@@ -496,7 +496,7 @@ export function LatexViewer({
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{updateLatexMutation.isPending ? 'Saving to R2...' : 'Save & Sync'}</span>
-                <kbd className="hidden sm:inline-flex items-center text-2xs font-mono font-medium bg-black/20 text-white/90 px-1 py-0.2 rounded border border-white/20">
+                <kbd className="hidden sm:inline-flex items-center text-2xs font-mono font-medium bg-success-foreground/20 text-success-foreground px-1 py-0.2 rounded border border-success-foreground/30">
                   Ctrl+S
                 </kbd>
               </Button>

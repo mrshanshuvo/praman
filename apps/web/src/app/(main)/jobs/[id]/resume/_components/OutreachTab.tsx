@@ -507,7 +507,7 @@ ${coverLetter.senderName}
                   size="sm"
                   onClick={() => generateEmailMutation.mutate()}
                   disabled={generateEmailMutation.isPending}
-                  className="bg-brand-pink hover:bg-brand-pink/90 text-white font-semibold text-xs gap-1.5 shadow-xs cursor-pointer"
+                  className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light font-semibold text-xs gap-1.5 shadow-xs cursor-pointer"
                 >
                   {generateEmailMutation.isPending ? (
                     <>

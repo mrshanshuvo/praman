@@ -245,7 +245,7 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
         ) : pdfBlobUrl ? (
           <iframe
             src={`${pdfBlobUrl}#toolbar=1&navpanes=0`}
-            className="w-full h-full border-none rounded-xl bg-white shadow-inner"
+            className="w-full h-full border-none rounded-xl bg-paper shadow-inner"
             title="Live Compiled Resume PDF Preview"
           />
         ) : null}
