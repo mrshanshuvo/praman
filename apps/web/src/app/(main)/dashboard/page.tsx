@@ -6,9 +6,11 @@ import { useAuth } from '@/providers/AuthProvider';
 import {
   ActionCenterCard,
   DashboardHeader,
+  PipelineFunnelCard,
   QuickIngestModal,
   RecentActivityFeed,
-  StatsGrid,
+  SkillGapInsightsCard,
+  UpcomingInterviewsCard,
 } from './_components';
 
 export default function DashboardPage() {
@@ -29,10 +31,16 @@ export default function DashboardPage() {
       {/* 1. Prioritized Action Center: Urgent interviews, untailored high-match positions, stale follow-ups */}
       <ActionCenterCard jobs={jobs} onOpenQuickIngest={() => setIsQuickIngestOpen(true)} />
 
-      {/* 2. Core Funnel, Market Skill Gaps & Baseline Truth Stats */}
-      <StatsGrid profile={profile} jobs={jobs} />
+      {/* 2. Upcoming Interview Horizon (High priority for active job seekers) */}
+      <UpcomingInterviewsCard jobs={jobs} />
 
-      {/* 3. Real-Time Pipeline Activity Timeline */}
+      {/* 3. Core Analytics: Funnel Conversion & Market Skill Gap Insights */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PipelineFunnelCard jobs={jobs} />
+        <SkillGapInsightsCard jobs={jobs} profile={profile} />
+      </div>
+
+      {/* 4. Real-Time Pipeline Activity Timeline */}
       <RecentActivityFeed jobs={jobs} />
 
       {/* Quick JD Ingest Modal */}
