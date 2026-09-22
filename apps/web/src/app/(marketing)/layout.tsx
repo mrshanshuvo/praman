@@ -1,6 +1,5 @@
 import type React from 'react';
-import { MarketingFooter } from '@/components/MarketingFooter';
-import { MarketingNavbar } from '@/components/MarketingNavbar';
+import { MarketingFooter, MarketingNavbar } from './_components';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (

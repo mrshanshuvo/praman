@@ -22,8 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
 import { cn } from '@/lib/utils';
-import { JobCard, JobsEmptyState } from './_components/JobCard';
-import { JobsKanbanBoard } from './_components/JobsKanbanBoard';
+import { JobCard, JobsEmptyState, JobsKanbanBoard } from './_components';
 
 const STATUS_TABS = [
   { key: 'ALL', label: 'All Jobs' },

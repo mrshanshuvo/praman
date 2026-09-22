@@ -6,12 +6,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useCandidateProfile, useProfileMutations } from '@/hooks/usePramanApi';
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { CertificationsTab, EducationTab } from './_components/EducationCertsTabs';
+import { CertificationsTab } from './_components/CertificationsTab';
+import { EducationTab } from './_components/EducationTab';
 import { ExperiencesTab } from './_components/ExperiencesTab';
 import { PersonalTab } from './_components/PersonalTab';
 import { ProfileCompletenessCard } from './_components/ProfileCompletenessCard';
 import { ProfileHeaderCard } from './_components/ProfileHeaderCard';
 import { ProfileNavTabs, type ProfileTabId } from './_components/ProfileNavTabs';
+import { ProfileNotificationBanner } from './_components/ProfileNotificationBanner';
 import { ProfileSkeleton } from './_components/ProfileSkeleton';
 import { ProjectsTab } from './_components/ProjectsTab';
 import { SkillsTab } from './_components/SkillsTab';
@@ -53,7 +55,7 @@ function ProfileContent() {
 
   return (
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
-      {actions.notificationBanner}
+      <ProfileNotificationBanner notification={actions.notification} />
 
       {fetchError && (
         <Alert

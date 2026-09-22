@@ -12,13 +12,10 @@ import {
   Search,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import {
-  EvidenceInspectorModal,
-  type InspectedEvidence,
-} from '@/components/EvidenceInspectorModal';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { EvidenceTarget } from '@/components/ValidationReportPanel';
+import { EvidenceInspectorModal, type InspectedEvidence } from './EvidenceInspectorModal';
 
 interface ResumeViewerProps {
   resume: any;
