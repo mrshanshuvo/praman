@@ -276,4 +276,21 @@ describe('Golden Test: Adversarial Qualitative & Seniority Integrity Guard', () 
     );
     expect(flagged10or15).toBe(false);
   });
+
+  it('STILL audits genuine technical duration metrics (e.g. "reduced deployment time by 15 minutes") against candidate profile', () => {
+    const unverifiedTechnicalDurationText =
+      'Optimized CI/CD pipeline and reduced deployment time by 15 minutes across all services.';
+
+    const validation = validationService.validateFreeText(
+      unverifiedTechnicalDurationText,
+      juniorCandidateFixture,
+      'Cover Letter',
+    );
+
+    // Junior candidate profile does NOT have "15" or "15 minutes" in source text, so it MUST be flagged for audit!
+    const flagged15 = validation.numberFlags.some((f) =>
+      f.flaggedNumbers.some((num) => num === '15'),
+    );
+    expect(flagged15).toBe(true);
+  });
 });
