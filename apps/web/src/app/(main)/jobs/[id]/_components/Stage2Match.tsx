@@ -6,7 +6,7 @@ import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { useCandidateProfile } from '@/hooks/usePramanApi';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 import { MatchDiffInspector } from './MatchDiffInspector';
 import { StageEmpty } from './StageEmpty';
 import { StageHeader } from './StageHeader';

@@ -16,7 +16,7 @@ import type React from 'react';
 import { useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 
 export interface EvidenceTarget {
   type: 'skill' | 'source' | 'bullet';

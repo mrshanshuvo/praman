@@ -8,7 +8,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ValidationReportPanel } from '@/components/ValidationReportPanel';
 import { useCandidateProfile } from '@/hooks/usePramanApi';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 import { ResumeViewer } from '../resume/_components/ResumeViewer';
 import { StageEmpty } from './StageEmpty';
 

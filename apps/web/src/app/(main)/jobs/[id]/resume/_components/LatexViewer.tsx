@@ -23,7 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 import { CompiledPdfPreview } from './CompiledPdfPreview';
 import type { SheetSyncTarget } from './DocumentPreviewSheet';
 

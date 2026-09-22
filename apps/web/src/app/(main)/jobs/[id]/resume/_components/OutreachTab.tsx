@@ -28,7 +28,7 @@ import {
   useGenerateRecruiterEmail,
   useJobOutreach,
 } from '@/hooks/usePramanApi';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 import { triggerFileDownload } from '@/lib/zip';
 
 interface OutreachTabProps {

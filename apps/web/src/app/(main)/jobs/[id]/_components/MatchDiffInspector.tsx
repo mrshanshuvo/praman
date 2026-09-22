@@ -21,7 +21,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 import { SkillClaimTuningDialog } from './SkillClaimTuningDialog';
 
 interface MatchDiffInspectorProps {

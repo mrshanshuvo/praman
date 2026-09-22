@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
-import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlParams';
 import { cn } from '@/lib/utils';
 import { JobCard, JobsEmptyState, JobsKanbanBoard } from './_components';
 

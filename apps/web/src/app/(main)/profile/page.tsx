@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useCandidateProfile, useProfileMutations } from '@/hooks/usePramanApi';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/hooks/useUrlParams';
 import {
   CertificationsTab,
   EducationTab,

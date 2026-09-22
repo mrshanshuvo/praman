@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobResume } from '@/hooks/usePramanApi';
-import { useUrlQueryParam } from '@/hooks/useUrlTab';
+import { useUrlQueryParam } from '@/hooks/useUrlParams';
 import {
   type BulletDiffItem,
   diffBullets,
