@@ -14,7 +14,6 @@ import {
   ProfileCompletenessCard,
   ProfileHeaderCard,
   ProfileNavTabs,
-  ProfileNotificationBanner,
   ProfileSkeleton,
   type ProfileTabId,
   ProjectsTab,
@@ -58,8 +57,6 @@ function ProfileContent() {
 
   return (
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
-      <ProfileNotificationBanner notification={actions.notification} />
-
       {fetchError && (
         <Alert
           variant="destructive"

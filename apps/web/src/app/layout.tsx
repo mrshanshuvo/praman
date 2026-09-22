@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Berkshire_Swash, Galada, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <QueryProvider>
             <AuthProvider>{children}</AuthProvider>
+            <Toaster richColors position="bottom-right" />
           </QueryProvider>
         </ThemeProvider>
       </body>

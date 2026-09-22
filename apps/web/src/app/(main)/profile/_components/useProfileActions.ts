@@ -1,23 +1,15 @@
-import { useState } from 'react';
+import { toast } from 'sonner';
 import type { useProfileMutations } from '@/hooks/usePramanApi';
-import type { ProfileNotification } from './ProfileNotificationBanner';
 
 type ProfileMutations = ReturnType<typeof useProfileMutations>;
 
 export function useProfileActions(muts: ProfileMutations) {
-  const [notification, setNotification] = useState<ProfileNotification | null>(null);
-
-  const showMsg = (message: string, type: 'success' | 'error' = 'success') => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000);
-  };
-
   const runMutation = async (action: () => Promise<any>, successMsg: string) => {
     try {
       await action();
-      showMsg(successMsg);
+      toast.success(successMsg);
     } catch (err: any) {
-      showMsg(err.message || 'Operation failed', 'error');
+      toast.error(err.message || 'Operation failed');
     }
   };
 
@@ -27,8 +19,6 @@ export function useProfileActions(muts: ProfileMutations) {
   };
 
   return {
-    notification,
-    clearNotification: () => setNotification(null),
     handleUpdatePersonal: (data: any) =>
       runMutation(
         () => muts.updatePersonal.mutateAsync(data),

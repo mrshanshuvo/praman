@@ -5,7 +5,6 @@ export * from './PersonalTab';
 export * from './ProfileCompletenessCard';
 export * from './ProfileHeaderCard';
 export * from './ProfileNavTabs';
-export * from './ProfileNotificationBanner';
 export * from './ProfileSkeleton';
 export * from './ProjectsTab';
 export * from './ResumeImportModal';

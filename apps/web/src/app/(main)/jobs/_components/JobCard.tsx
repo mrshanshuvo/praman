@@ -2,6 +2,7 @@
 
 import { CheckCircle2, ChevronRight, FileText, Loader2, ShieldCheck, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -60,14 +61,25 @@ export function JobCard({ jd }: JobCardProps) {
         `Are you sure you want to delete "${structured.jobTitle || 'this job'}" and all associated pipeline stages?`,
       )
     ) {
-      await deleteJobMutation.mutateAsync(jd.id);
+      try {
+        await deleteJobMutation.mutateAsync(jd.id);
+        toast.success(`Deleted "${structured.jobTitle || 'Job'}"`);
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to delete job');
+      }
     }
   };
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    await updateStatusMutation.mutateAsync({ id: jd.id, status: e.target.value });
+    const newStatus = e.target.value;
+    try {
+      await updateStatusMutation.mutateAsync({ id: jd.id, status: newStatus });
+      toast.success(`Status updated to ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update status');
+    }
   };
 
   return (
