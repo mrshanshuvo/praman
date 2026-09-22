@@ -30,13 +30,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { downloadResumePdf, fetchResumePdfBlob } from '@/hooks/usePramanApi';
 import {
-  generateAtsJsonResume,
-  generateMarkdownResume,
-  generatePlainTextResume,
-} from '@/lib/plainTextResume';
-import { downloadZip, triggerFileDownload } from '@/lib/zip';
+  downloadCompleteResumeZip,
+  downloadLatex,
+  downloadResumePdf,
+  openInOverleaf,
+  sanitizeFilename,
+} from '@/lib/export-manager';
 import { ExportSuiteModal } from './ExportSuiteModal';
 
 interface ResumeAuditHeaderProps {
@@ -85,10 +85,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
 
-  const safeFilenameBase = (resumeJson?.personal?.name || 'Resume')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '');
+  const safeFilenameBase = sanitizeFilename(resumeJson?.personal?.name, 'Resume');
 
   const handleDownloadPdf = async () => {
     try {
@@ -107,71 +104,21 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   };
 
   const handleDownloadTex = () => {
-    triggerFileDownload(`${safeFilenameBase}_${templateId}.tex`, latexCode, 'application/x-tex');
+    downloadLatex(`${safeFilenameBase}_${templateId}.tex`, latexCode);
   };
 
   const handleDownloadZip = async () => {
     try {
       setIsDownloadingZip(true);
-      const plainText = generatePlainTextResume(resumeJson);
-      const markdown = generateMarkdownResume(resumeJson);
-      const atsJson = JSON.stringify(generateAtsJsonResume(resumeJson), null, 2);
-      const rawJson = JSON.stringify(resumeJson, null, 2);
-      const reportJson = validationReport ? JSON.stringify(validationReport, null, 2) : null;
-
-      const readme = `# ${resumeJson?.personal?.name || 'Candidate'} — Tailored Resume Package
-This archive contains your tailored, audited resume generated deterministically by Praman.
-
-## Included ATS Resume PDF Styling Variants:
-1. **resume_modern-developer.pdf**: Clean Helvetica/Inter sans-serif, high-contrast dark typography (#000000), deep navy (#004F90) link accents, square bullet highlights.
-2. **resume_classic-academic.pdf**: Traditional Computer Modern / Latin Modern Roman serif, small-caps section headings, academic rules.
-3. **resume_compact-executive.pdf**: Ultra-dense executive layout, bold leadership headers, tight margins maximizing 1-page capacity.
-
-## Source & Data Files:
-- **resume.tex**: Raw LaTeX source code.
-- **resume_ats.json**: Standardized ATS-ready canonical JSON resume.
-- **resume_evidence.json**: Ground-truth cross-reference ledger linking each bullet to verified records.
-- **validation_report.json**: Claim verification audit report.
-- **resume.txt**: Clean ASCII text for online job application textareas.
-- **resume.md**: Markdown format for portfolios and developer documentation.
-
-## Local Compilation:
-\`\`\`bash
-pdflatex resume.tex
-\`\`\`
-Or upload this package directly to Overleaf (New Project -> Upload Project).
-`;
-
-      const files: Record<string, string | Uint8Array> = {
-        'resume.tex': latexCode,
-        'resume_ats.json': atsJson,
-        'resume_evidence.json': rawJson,
-        'resume.txt': plainText,
-        'resume.md': markdown,
-        'README.md': readme,
-      };
-
-      if (reportJson) {
-        files['validation_report.json'] = reportJson;
-      }
-
-      // Fetch all 3 PDF styling variants in parallel
-      const templates = ['modern-developer', 'classic-academic', 'compact-executive'];
-      const pdfResults = await Promise.allSettled(
-        templates.map(async (tmpl) => {
-          const blob = await fetchResumePdfBlob(id, tmpl, selectedVersion);
-          const arrayBuffer = await blob.arrayBuffer();
-          return { tmpl, data: new Uint8Array(arrayBuffer) };
-        }),
-      );
-
-      for (const res of pdfResults) {
-        if (res.status === 'fulfilled') {
-          files[`resume_${res.value.tmpl}.pdf`] = res.value.data;
-        }
-      }
-
-      downloadZip(`${safeFilenameBase}_complete_package.zip`, files);
+      await downloadCompleteResumeZip({
+        candidateName: resumeJson?.personal?.name,
+        templateId,
+        latexCode,
+        resumeJson,
+        validationReport,
+        jobId: id,
+        version: selectedVersion,
+      });
     } catch (err) {
       console.error('Failed to generate complete ZIP package:', err);
     } finally {
@@ -180,20 +127,7 @@ Or upload this package directly to Overleaf (New Project -> Upload Project).
   };
 
   const handleOpenOverleaf = () => {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://www.overleaf.com/docs';
-    form.target = '_blank';
-
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'snip';
-    input.value = latexCode;
-
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    openInOverleaf(latexCode);
   };
 
   const handleCopyJson = () => {

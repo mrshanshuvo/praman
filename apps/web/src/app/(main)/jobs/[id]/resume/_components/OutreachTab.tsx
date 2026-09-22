@@ -29,7 +29,12 @@ import {
   useJobOutreach,
 } from '@/hooks/usePramanApi';
 import { useUrlTab } from '@/hooks/useUrlParams';
-import { triggerFileDownload } from '@/lib/zip';
+import {
+  downloadLatex,
+  downloadText,
+  openInOverleaf,
+  sanitizeFilename,
+} from '@/lib/export-manager';
 
 interface OutreachTabProps {
   jobId: string;
@@ -61,7 +66,7 @@ export function OutreachTab({ jobId, candidateName = 'Candidate' }: OutreachTabP
   const coverLetterLatex = outreach?.coverLetterLatex;
   const recruiterEmail = outreach?.recruiterEmail;
 
-  const safeCandidate = candidateName.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const safeCandidate = sanitizeFilename(candidateName);
 
   const handleDownloadTxt = () => {
     if (!coverLetter) return;
@@ -81,30 +86,17 @@ ${coverLetter.closing}
 ${coverLetter.signOff}
 ${coverLetter.senderName}
 `;
-    triggerFileDownload(`${safeCandidate}_cover_letter.txt`, text, 'text/plain');
+    downloadText(`${safeCandidate}_cover_letter.txt`, text);
   };
 
   const handleDownloadTex = () => {
     if (!coverLetterLatex) return;
-    triggerFileDownload(`${safeCandidate}_cover_letter.tex`, coverLetterLatex, 'application/x-tex');
+    downloadLatex(`${safeCandidate}_cover_letter.tex`, coverLetterLatex);
   };
 
   const handleOpenOverleaf = () => {
     if (!coverLetterLatex) return;
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://www.overleaf.com/docs';
-    form.target = '_blank';
-
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'snip';
-    input.value = coverLetterLatex;
-
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    openInOverleaf(coverLetterLatex);
   };
 
   return (

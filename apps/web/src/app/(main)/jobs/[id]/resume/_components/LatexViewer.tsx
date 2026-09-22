@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useUpdateResumeLatex } from '@/hooks/usePramanApi';
 import { useUrlTab } from '@/hooks/useUrlParams';
+import { downloadLatex, openInOverleaf, sanitizeFilename } from '@/lib/export-manager';
 import { CompiledPdfPreview } from './CompiledPdfPreview';
 import type { SheetSyncTarget } from './DocumentPreviewSheet';
 
@@ -295,33 +296,12 @@ export function LatexViewer({
       return;
     }
 
-    const blob = new Blob([code], { type: 'application/x-tex;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const safeName = candidateName.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    link.href = url;
-    link.download = `${safeName}_resume.tex`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const safeName = sanitizeFilename(candidateName);
+    downloadLatex(`${safeName}_resume.tex`, code);
   };
 
   const handleOpenOverleaf = () => {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://www.overleaf.com/docs';
-    form.target = '_blank';
-
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'snip';
-    input.value = code;
-
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    openInOverleaf(code);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
