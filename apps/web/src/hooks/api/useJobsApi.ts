@@ -5,6 +5,7 @@ import type {
   UserAiUsageSummary,
 } from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { API_URL, fetcher } from '@/lib/api-client';
 import { type JobFilterParams, queryKeys } from '@/lib/query-keys';
 
@@ -111,13 +112,71 @@ export function useDeleteJob() {
 
 export function useUpdateJobStatus() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       fetcher<any>(`${API_URL}/job-descriptions/${id}/status`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       }),
-    onSuccess: (_, variables) => {
+    onMutate: async ({ id, status }) => {
+      // 1. Cancel in-flight queries so they don't overwrite optimistic update
+      await queryClient.cancelQueries({ queryKey: queryKeys.jobs.lists() });
+      await queryClient.cancelQueries({ queryKey: queryKeys.jobs.detail(id) });
+
+      // 2. Snapshot current cache data for rollback
+      const previousJob = queryClient.getQueryData<JobDescriptionRecord>(queryKeys.jobs.detail(id));
+      const previousLists = queryClient.getQueriesData<any>({
+        queryKey: queryKeys.jobs.lists(),
+      });
+
+      // 3. Optimistically update single job detail query
+      if (previousJob) {
+        queryClient.setQueryData<JobDescriptionRecord>(queryKeys.jobs.detail(id), {
+          ...previousJob,
+          status: status as any,
+        });
+      }
+
+      // 4. Optimistically update all job lists
+      queryClient.setQueriesData<any>({ queryKey: queryKeys.jobs.lists() }, (oldData: any) => {
+        if (!oldData) return oldData;
+
+        if (Array.isArray(oldData.items)) {
+          return {
+            ...oldData,
+            items: oldData.items.map((job: JobDescriptionRecord) =>
+              job.id === id ? { ...job, status: status as any } : job,
+            ),
+          };
+        }
+
+        if (Array.isArray(oldData)) {
+          return oldData.map((job: JobDescriptionRecord) =>
+            job.id === id ? { ...job, status: status as any } : job,
+          );
+        }
+
+        return oldData;
+      });
+
+      return { previousJob, previousLists, id };
+    },
+    onError: (err: any, _, context) => {
+      // 5. Rollback cache on error
+      if (context?.previousJob) {
+        queryClient.setQueryData(queryKeys.jobs.detail(context.id), context.previousJob);
+      }
+      if (context?.previousLists) {
+        for (const [queryKey, data] of context.previousLists) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      toast.error(err?.message || 'Failed to update job status. Reverted change.');
+    },
+    onSettled: (_, __, variables) => {
+      // 6. Resync with backend
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(variables.id) });
     },

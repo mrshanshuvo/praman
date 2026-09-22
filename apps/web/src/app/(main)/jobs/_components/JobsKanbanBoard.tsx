@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -119,7 +120,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent, targetStatus: string) => {
+  const handleDrop = (e: React.DragEvent, targetStatus: string) => {
     e.preventDefault();
     setDragOverColumn(null);
     const id = e.dataTransfer.getData('text/plain') || draggedJobId;
@@ -131,21 +132,33 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
       return;
     }
 
-    try {
-      await updateStatusMutation.mutateAsync({ id, status: targetStatus });
-    } catch (err) {
-      console.error('Failed to update job status via drag-and-drop:', err);
-    } finally {
-      setDraggedJobId(null);
-    }
+    const colConfig = KANBAN_COLUMNS.find((c) => c.key === targetStatus);
+    const targetTitle = targetJob.structured?.jobTitle || 'Job';
+    setDraggedJobId(null);
+
+    updateStatusMutation.mutate(
+      { id, status: targetStatus },
+      {
+        onSuccess: () => {
+          toast.success(`"${targetTitle}" moved to ${colConfig?.label || targetStatus}`);
+        },
+      },
+    );
   };
 
-  const handleStatusSelect = async (id: string, newStatus: string) => {
-    try {
-      await updateStatusMutation.mutateAsync({ id, status: newStatus });
-    } catch (err) {
-      console.error('Failed to update job status:', err);
-    }
+  const handleStatusSelect = (id: string, newStatus: string) => {
+    const targetJob = jobs.find((j) => j.id === id);
+    const colConfig = KANBAN_COLUMNS.find((c) => c.key === newStatus);
+    const targetTitle = targetJob?.structured?.jobTitle || 'Job';
+
+    updateStatusMutation.mutate(
+      { id, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success(`"${targetTitle}" status updated to ${colConfig?.label || newStatus}`);
+        },
+      },
+    );
   };
 
   const handleDelete = async (e: React.MouseEvent, id: string, title: string) => {
