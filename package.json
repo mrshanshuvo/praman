@@ -13,6 +13,7 @@
     "test": "turbo test",
     "test:e2e": "pnpm --filter api test:e2e",
     "contract:emit": "pnpm --filter api contract:emit",
+    "db:update": "pnpm --filter api db:update",
     "seed": "pnpm --filter api seed"
   },
   "devDependencies": {
