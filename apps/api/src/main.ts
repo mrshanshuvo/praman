@@ -78,7 +78,7 @@ async function bootstrap() {
         'AI-powered resume tailoring platform API. ' +
           'Manages candidates, job descriptions, resume analysis, and AI-driven strategy generation.',
       )
-      .setVersion('1.0')
+      .setVersion('0.2.0')
       .addBearerAuth({
         type: 'http',
         scheme: 'bearer',
