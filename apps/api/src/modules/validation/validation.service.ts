@@ -259,11 +259,11 @@ export class ValidationService {
     location: string,
     outFlags: NumberFlag[],
   ) {
-    // Strip common conversational scheduling durations (e.g. "10-15 minutes", "15 min call", "within 24 hours")
-    // to avoid flagging harmless call-to-action suggestions as candidate metric claims.
-    // Achievement metrics (e.g. "35% latency reduction", "5,000 users", "$120k") remain strictly checked.
+    // Strip conversational scheduling durations that explicitly reference a call, chat, or meeting
+    // (e.g. "10-15 minutes for a quick call", "15 minute chat") from triggering achievement audits.
+    // Genuine technical duration claims (e.g. "reduced deployment time by 15 minutes") remain strictly audited.
     const conversationalSchedulingRegex =
-      /\b\d+(?:\s*[-–/]\s*\d+)?\s*(?:mins?|minutes?|hrs?|hours?)\s*(?:for\s+a\s+(?:quick\s+|brief\s+)?(?:call|chat|intro|conversation|sync|meeting)|call|chat|intro|sync|meeting|conversation)?\b/gi;
+      /\b\d+(?:\s*[-–/]\s*\d+)?\s*(?:mins?|minutes?|hrs?|hours?)\s+(?:for\s+(?:a\s+)?(?:quick\s+|brief\s+)?(?:call|chat|intro|conversation|sync|meeting)|call|chat|intro|sync|meeting|conversation)\b/gi;
     const sanitizedBullet = bullet.replace(conversationalSchedulingRegex, ' ');
 
     // Match numbers, percentages, rankings, currency, e.g. 50k, 12,000, 42%, $120k, 99.8%, #1
