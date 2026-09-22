@@ -97,11 +97,12 @@
   --color-info-foreground: var(--info-foreground);
   --color-status-neutral: var(--status-neutral);
 
-  /* --- 6. SYNTAX HIGHLIGHTING ------------------------------------------------ */
+  /* --- 6. SYNTAX HIGHLIGHTING & CODE/DOC TOKENS ---------------------------- */
   --color-syntax-keyword: var(--brand-pink);
   --color-syntax-string: var(--brand-cyan);
   --color-syntax-number: var(--info);
   --color-syntax-comment: var(--muted-foreground);
+  --color-resume-accent: var(--resume-accent);
 
   /* --- 7. SKELETON / SHIMMER ------------------------------------------------- */
   --color-shimmer-base: var(--muted);
@@ -158,6 +159,7 @@
   --brand-pink: #ff2e63;
   --brand-dark: #090b10;
   --brand-light: #ffffff;
+  --resume-accent: #004f90;
 
   --background: #f8fafc;
   --foreground: #0f172a;
@@ -231,6 +233,7 @@
   --brand-pink: #ff2e63;
   --brand-dark: #090b10;
   --brand-light: #ffffff;
+  --resume-accent: #004f90;
 
   --background: #090b10;
   --foreground: #f1f5f9;

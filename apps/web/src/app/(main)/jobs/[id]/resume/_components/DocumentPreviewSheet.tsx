@@ -171,7 +171,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                     : 'hover:bg-slate-50/80',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
                   Professional Summary
                 </h2>
                 <p className="text-xs text-slate-800 leading-relaxed">{resume.summary}</p>
@@ -197,7 +197,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                     : 'hover:bg-slate-50/80',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
                   Technical Skills
                 </h2>
                 <p className="text-xs text-slate-800 leading-relaxed font-medium">
@@ -225,7 +225,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                     : 'hover:bg-slate-50/80',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
                   Work Experience
                 </h2>
                 {resume.experience.map((exp: any, i: number) => (
@@ -290,7 +290,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                     : 'hover:bg-slate-50/80',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
                   Featured Projects
                 </h2>
                 {resume.projects.map((proj: any, i: number) => (
@@ -350,7 +350,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                     : 'hover:bg-slate-50/80',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#004f90] border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
                   Education
                 </h2>
                 {resume.education.map((edu: any, i: number) => (
