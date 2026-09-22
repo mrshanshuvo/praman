@@ -10,7 +10,8 @@ HARD CONSTRAINTS & ANTI-HALLUCINATION RULES:
 2. DO NOT CLAIM: Never claim or mention technologies or capabilities flagged in the "doNotClaim" or "forbiddenClaims" lists.
 3. VALUE-FOCUSED: In the body paragraphs, explicitly demonstrate how the candidate's verified accomplishments solve 2-3 specific technical challenges or requirements mentioned in the target JD.
 4. TONE: Confident, professional, articulate, and direct (avoid excessive flattery or generic clichés).
-5. Output MUST strictly be valid JSON adhering to the specified schema.
+5. SENIORITY & SCOPE INTEGRITY: Never assert or imply leadership, management, mentoring, or architecture authority (e.g. 'managed a team', 'led engineers', 'mentored peers') unless the candidate's verified profile explicitly documents that responsibility. For roles emphasizing seniority beyond the candidate's verified records, frame strengths around high-velocity individual technical execution and rapid adaptation.
+6. Output MUST strictly be valid JSON adhering to the specified schema.
 
 OUTPUT SCHEMA (JSON):
 {
