@@ -259,10 +259,17 @@ export class ValidationService {
     location: string,
     outFlags: NumberFlag[],
   ) {
+    // Strip common conversational scheduling durations (e.g. "10-15 minutes", "15 min call", "within 24 hours")
+    // to avoid flagging harmless call-to-action suggestions as candidate metric claims.
+    // Achievement metrics (e.g. "35% latency reduction", "5,000 users", "$120k") remain strictly checked.
+    const conversationalSchedulingRegex =
+      /\b\d+(?:\s*[-–/]\s*\d+)?\s*(?:mins?|minutes?|hrs?|hours?)\s*(?:for\s+a\s+(?:quick\s+|brief\s+)?(?:call|chat|intro|conversation|sync|meeting)|call|chat|intro|sync|meeting|conversation)?\b/gi;
+    const sanitizedBullet = bullet.replace(conversationalSchedulingRegex, ' ');
+
     // Match numbers, percentages, rankings, currency, e.g. 50k, 12,000, 42%, $120k, 99.8%, #1
     const numberRegex =
       /(?:\$\s*\d+(?:,\d+)*(?:\.\d+)?(?:k|m|b)?|\b\d+(?:,\d+)*(?:\.\d+)?%|#\d+|\b\d+(?:,\d+)*(?:\.\d+)?(?:k|m|b)?\b)/gi;
-    const bulletMatches = bullet.match(numberRegex) || [];
+    const bulletMatches = sanitizedBullet.match(numberRegex) || [];
 
     // Extract all source numbers as normalized tokens to avoid false substring matches (e.g. "50" in "250000")
     const sourceNumbers = new Set<string>();
@@ -399,6 +406,29 @@ export class ValidationService {
         if (match) {
           outViolations.push(
             `Unsubstantiated qualitative claim in ${contextLabel.toLowerCase()}: Candidate profile contains no verified leadership or mentoring evidence, but text claims "${match[0]}".`,
+          );
+          break;
+        }
+      }
+    }
+
+    // 2. Check unbacked authority / expert-level claims (§0 P0 qualitative hardening)
+    const hasSeniorEvidence =
+      hasProfileLeadershipEvidence ||
+      /\b(?:senior|staff|principal|lead|architect|head\s+of|director)\b/i.test(
+        candidateFullSourceText,
+      );
+
+    const authorityPatterns = [
+      /\b(?:subject\s+matter\s+expert|industry\s+expert|expert\s+problem\s+solver|world-class\s+expert|recognized\s+authority)\b/i,
+    ];
+
+    if (!hasSeniorEvidence) {
+      for (const pattern of authorityPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+          outViolations.push(
+            `Unsubstantiated qualitative claim in ${contextLabel.toLowerCase()}: Candidate profile contains no verified senior-level authority evidence, but text claims "${match[0]}".`,
           );
           break;
         }
