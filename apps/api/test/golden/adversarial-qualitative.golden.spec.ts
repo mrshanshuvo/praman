@@ -226,4 +226,54 @@ describe('Golden Test: Adversarial Qualitative & Seniority Integrity Guard', () 
     expect(report.status).toBe('VALIDATED');
     expect(report.violations).toHaveLength(0);
   });
+
+  it('REJECTS ungrounded authority/expert claims (e.g. "expert problem solver", "subject matter expert") from junior candidates', () => {
+    const ungroundedExpertResume = {
+      personal: {
+        name: 'Samir Dev',
+        contact: { email: 'samir@example.com' },
+      },
+      summary:
+        'Frontend Developer and recognized expert problem solver with subject matter expert capabilities.',
+      experience: [],
+      projects: [],
+      skills: ['React', 'JavaScript'],
+      education: [{ sourceEducationId: 'edu-junior-1' }],
+    };
+
+    const report = validationService.validateResume(ungroundedExpertResume, juniorCandidateFixture);
+
+    expect(report.status).toBe('REJECTED');
+    expect(
+      report.violations.some(
+        (v) =>
+          v.includes('Unsubstantiated qualitative claim') &&
+          (v.includes('expert problem solver') || v.includes('subject matter expert')),
+      ),
+    ).toBe(true);
+  });
+
+  it('DOES NOT flag harmless scheduling call durations (e.g. "10-15 minutes for a quick call") in outreach emails', () => {
+    const outreachEmailWithScheduling = `
+      Hi Team,
+
+      I built responsive UI components in React and optimized bundle sizes.
+      Achieved high quality across web pages.
+
+      Do you have 10-15 minutes for a quick call this week to discuss the opportunity?
+    `;
+
+    const validation = validationService.validateFreeText(
+      outreachEmailWithScheduling,
+      juniorCandidateFixture,
+      'Outreach Email',
+    );
+
+    expect(validation.violations).toHaveLength(0);
+    // Should NOT flag 10 and 15 from "10-15 minutes for a quick call"
+    const flagged10or15 = validation.numberFlags.some((f) =>
+      f.flaggedNumbers.some((num) => num === '10' || num === '15'),
+    );
+    expect(flagged10or15).toBe(false);
+  });
 });
