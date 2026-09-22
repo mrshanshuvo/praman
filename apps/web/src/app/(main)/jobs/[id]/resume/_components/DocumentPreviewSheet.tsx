@@ -121,7 +121,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
         >
           <Card
             id="resume-printable-document"
-            className="w-198.5 min-h-280.75 bg-white text-slate-900 font-sans p-12 shadow-2xl rounded-none border border-slate-200 select-text print:shadow-none print:border-none print:m-0 print:p-8"
+            className="w-198.5 min-h-280.75 bg-paper text-paper-foreground font-sans p-12 shadow-2xl rounded-none border border-paper-border select-text print:shadow-none print:border-none print:m-0 print:p-8"
           >
             {/* Document Header */}
             <div
@@ -134,13 +134,13 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                 })
               }
               title="Double-click to jump to code in LaTeX editor (Overleaf style)"
-              className="text-center border-b border-slate-300 pb-4 mb-5 cursor-pointer hover:bg-slate-50/80 p-2 rounded-lg transition-colors"
+              className="text-center border-b border-paper-border pb-4 mb-5 cursor-pointer hover:bg-muted/40 p-2 rounded-lg transition-colors"
             >
-              <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 uppercase">
+              <h1 className="text-3xl font-extrabold tracking-tight text-paper-foreground uppercase">
                 {personal.name || 'Candidate Name'}
               </h1>
 
-              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-600 mt-2 font-medium">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-paper-muted mt-2 font-medium">
                 {contact.email && <span>{contact.email}</span>}
                 {contact.phone && <span>• {contact.phone}</span>}
                 {personal.location && <span>• {personal.location}</span>}
@@ -168,13 +168,13 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                   'mb-5 p-2 rounded-lg transition-all cursor-pointer',
                   highlightedSection === 'summary' || highlightedSection === 'professionalsummary'
                     ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
-                    : 'hover:bg-slate-50/80',
+                    : 'hover:bg-muted/40',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Professional Summary
                 </h2>
-                <p className="text-xs text-slate-800 leading-relaxed">{resume.summary}</p>
+                <p className="text-xs text-paper-foreground/90 leading-relaxed">{resume.summary}</p>
               </div>
             )}
 
@@ -194,13 +194,13 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                   'mb-5 p-2 rounded-lg transition-all cursor-pointer',
                   highlightedSection === 'skills' || highlightedSection === 'technicalskills'
                     ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
-                    : 'hover:bg-slate-50/80',
+                    : 'hover:bg-muted/40',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Technical Skills
                 </h2>
-                <p className="text-xs text-slate-800 leading-relaxed font-medium">
+                <p className="text-xs text-paper-foreground/90 leading-relaxed font-medium">
                   {resume.skills.join(' • ')}
                 </p>
               </div>
@@ -222,10 +222,10 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                   'mb-5 space-y-3 p-2 rounded-lg transition-all cursor-pointer',
                   highlightedSection === 'experience'
                     ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
-                    : 'hover:bg-slate-50/80',
+                    : 'hover:bg-muted/40',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Work Experience
                 </h2>
                 {resume.experience.map((exp: any, i: number) => (
@@ -242,12 +242,12 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                     }}
                   >
                     <div className="flex items-baseline justify-between text-xs">
-                      <span className="font-bold text-slate-950">
+                      <span className="font-bold text-paper-foreground">
                         {exp.title}{' '}
-                        <span className="font-normal text-slate-600">— {exp.company}</span>
+                        <span className="font-normal text-paper-muted">— {exp.company}</span>
                       </span>
                     </div>
-                    <ul className="pl-4 list-disc text-xs text-slate-800 space-y-1 leading-relaxed">
+                    <ul className="pl-4 list-disc text-xs text-paper-foreground/90 space-y-1 leading-relaxed">
                       {exp.bullets?.map((b: string, idx: number) => (
                         <li
                           key={idx}
@@ -287,10 +287,10 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                   'mb-5 space-y-3 p-2 rounded-lg transition-all cursor-pointer',
                   highlightedSection === 'projects'
                     ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
-                    : 'hover:bg-slate-50/80',
+                    : 'hover:bg-muted/40',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Featured Projects
                 </h2>
                 {resume.projects.map((proj: any, i: number) => (
@@ -306,8 +306,8 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                       });
                     }}
                   >
-                    <div className="text-xs font-bold text-slate-950">{proj.name}</div>
-                    <ul className="pl-4 list-disc text-xs text-slate-800 space-y-1 leading-relaxed">
+                    <div className="text-xs font-bold text-paper-foreground">{proj.name}</div>
+                    <ul className="pl-4 list-disc text-xs text-paper-foreground/90 space-y-1 leading-relaxed">
                       {proj.bullets?.map((b: string, idx: number) => (
                         <li
                           key={idx}
@@ -347,17 +347,17 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                   'mb-4 p-2 rounded-lg transition-all cursor-pointer',
                   highlightedSection === 'education'
                     ? 'ring-2 ring-brand-cyan bg-brand-cyan/10'
-                    : 'hover:bg-slate-50/80',
+                    : 'hover:bg-muted/40',
                 )}
               >
-                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-slate-300 pb-1 mb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Education
                 </h2>
                 {resume.education.map((edu: any, i: number) => (
-                  <div key={i} className="text-xs text-slate-800">
-                    <span className="font-bold text-slate-950">{edu.degree}</span>
+                  <div key={i} className="text-xs text-paper-foreground/90">
+                    <span className="font-bold text-paper-foreground">{edu.degree}</span>
                     {edu.institution && (
-                      <span className="text-slate-600"> — {edu.institution}</span>
+                      <span className="text-paper-muted"> — {edu.institution}</span>
                     )}
                   </div>
                 ))}

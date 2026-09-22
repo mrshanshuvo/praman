@@ -629,7 +629,7 @@ export function LatexViewer({
       >
         {/* Code Editor Pane */}
         {(viewMode === 'code' || viewMode === 'split') && (
-          <div className="relative flex bg-slate-950 text-slate-100 font-mono text-xs overflow-hidden h-full flex-1 min-h-0">
+          <div className="relative flex bg-editor-bg text-foreground font-mono text-xs overflow-hidden h-full flex-1 min-h-0">
             {/* Hidden Mirror for Exact Word-Wrap Height Measurement */}
             {wordWrap && (
               <div
@@ -649,7 +649,7 @@ export function LatexViewer({
             <div
               ref={lineNumbersRef}
               aria-hidden="true"
-              className="w-12 py-4 pr-3 pl-2 bg-slate-900/90 text-slate-500 font-mono text-right select-none overflow-hidden shrink-0 border-r border-slate-800 leading-relaxed"
+              className="w-12 py-4 pr-3 pl-2 bg-editor-gutter text-muted-foreground font-mono text-right select-none overflow-hidden shrink-0 border-r border-editor-border leading-relaxed"
             >
               {lines.map((_, i) => (
                 <div
@@ -677,7 +677,7 @@ export function LatexViewer({
               title="Double-click any line to jump preview to this section (Overleaf style)"
               spellCheck={false}
               className={cn(
-                'flex-1 p-4 bg-transparent text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none overflow-y-auto tab-size-2',
+                'flex-1 p-4 bg-transparent text-foreground/90 font-mono text-xs leading-relaxed outline-none resize-none overflow-y-auto tab-size-2',
                 wordWrap
                   ? 'whitespace-pre-wrap wrap-break-word overflow-x-hidden'
                   : 'whitespace-pre overflow-x-auto',

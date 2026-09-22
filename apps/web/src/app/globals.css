@@ -103,6 +103,13 @@
   --color-syntax-number: var(--info);
   --color-syntax-comment: var(--muted-foreground);
   --color-resume-accent: var(--resume-accent);
+  --color-editor-bg: var(--editor-bg);
+  --color-editor-gutter: var(--editor-gutter);
+  --color-editor-border: var(--editor-border);
+  --color-paper: var(--paper-bg);
+  --color-paper-foreground: var(--paper-foreground);
+  --color-paper-muted: var(--paper-muted);
+  --color-paper-border: var(--paper-border);
 
   /* --- 7. SKELETON / SHIMMER ------------------------------------------------- */
   --color-shimmer-base: var(--muted);
@@ -160,6 +167,15 @@
   --brand-dark: #090b10;
   --brand-light: #ffffff;
   --resume-accent: #004f90;
+
+  --editor-bg: #090b10;
+  --editor-gutter: #121620;
+  --editor-border: rgba(241, 245, 249, 0.1);
+
+  --paper-bg: #ffffff;
+  --paper-foreground: #0f172a;
+  --paper-muted: #475569;
+  --paper-border: #cbd5e1;
 
   --background: #f8fafc;
   --foreground: #0f172a;
@@ -234,6 +250,15 @@
   --brand-dark: #090b10;
   --brand-light: #ffffff;
   --resume-accent: #004f90;
+
+  --editor-bg: #090b10;
+  --editor-gutter: #121620;
+  --editor-border: rgba(241, 245, 249, 0.1);
+
+  --paper-bg: #ffffff;
+  --paper-foreground: #0f172a;
+  --paper-muted: #475569;
+  --paper-border: #cbd5e1;
 
   --background: #090b10;
   --foreground: #f1f5f9;
