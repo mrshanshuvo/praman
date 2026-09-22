@@ -57,17 +57,43 @@ export class ResumeService {
     const sanitizedProfile = await this.candidateService.getSanitizedProfile(targetUserId);
 
     // Stage 4: Resume Generator call 1
-    let resumeJson = await this.aiService.runStructuredCall<ResumeData>({
-      systemPrompt: RESUME_GENERATOR_SYSTEM_PROMPT_V1,
-      userPrompt: JSON.stringify({
-        candidateProfile: sanitizedProfile,
-        structuredJd: jd.structured,
-        matchAnalysis: analysis.result,
-        resumeStrategy: strategy.result,
-      }),
-      outputSchema: ResumeSchema,
-      schemaName: 'Resume',
-    });
+    const call1 =
+      typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+        ? await this.aiService.runStructuredCallWithTelemetry<ResumeData>({
+            systemPrompt: RESUME_GENERATOR_SYSTEM_PROMPT_V1,
+            userPrompt: JSON.stringify({
+              candidateProfile: sanitizedProfile,
+              structuredJd: jd.structured,
+              matchAnalysis: analysis.result,
+              resumeStrategy: strategy.result,
+            }),
+            outputSchema: ResumeSchema,
+            schemaName: 'Resume',
+          })
+        : {
+            data: await this.aiService.runStructuredCall<ResumeData>({
+              systemPrompt: RESUME_GENERATOR_SYSTEM_PROMPT_V1,
+              userPrompt: JSON.stringify({
+                candidateProfile: sanitizedProfile,
+                structuredJd: jd.structured,
+                matchAnalysis: analysis.result,
+                resumeStrategy: strategy.result,
+              }),
+              outputSchema: ResumeSchema,
+              schemaName: 'Resume',
+            }),
+            telemetry: {
+              model: 'default',
+              promptTokens: 0,
+              completionTokens: 0,
+              totalTokens: 0,
+              durationMs: 0,
+              costUsd: 0,
+            },
+          };
+
+    let resumeJson = call1.data;
+    let combinedTelemetry = { ...call1.telemetry };
 
     // Evidence cross-check validation
     let validationReport = this.validationService.validateResume(resumeJson, profile);
@@ -81,7 +107,7 @@ export class ResumeService {
       try {
         const retryFeedback = `\n\nCRITICAL FIX NEEDED: The resume you generated had the following verified evidence discrepancies:\n${validationReport.violations.map((v) => `• ${v}`).join('\n')}\nRegenerate the resume strictly adhering to the candidate's exact profile records and source IDs.`;
 
-        resumeJson = await this.aiService.runStructuredCall<ResumeData>({
+        const retryParams = {
           systemPrompt: RESUME_GENERATOR_SYSTEM_PROMPT_V1,
           userPrompt:
             JSON.stringify({
@@ -92,7 +118,32 @@ export class ResumeService {
             }) + retryFeedback,
           outputSchema: ResumeSchema,
           schemaName: 'Resume',
-        });
+        };
+
+        const call2 =
+          typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+            ? await this.aiService.runStructuredCallWithTelemetry<ResumeData>(retryParams)
+            : {
+                data: await this.aiService.runStructuredCall<ResumeData>(retryParams),
+                telemetry: {
+                  model: 'default',
+                  promptTokens: 0,
+                  completionTokens: 0,
+                  totalTokens: 0,
+                  durationMs: 0,
+                  costUsd: 0,
+                },
+              };
+
+        resumeJson = call2.data;
+        combinedTelemetry = {
+          model: call2.telemetry.model,
+          promptTokens: combinedTelemetry.promptTokens + call2.telemetry.promptTokens,
+          completionTokens: combinedTelemetry.completionTokens + call2.telemetry.completionTokens,
+          totalTokens: combinedTelemetry.totalTokens + call2.telemetry.totalTokens,
+          durationMs: combinedTelemetry.durationMs + call2.telemetry.durationMs,
+          costUsd: Number((combinedTelemetry.costUsd + call2.telemetry.costUsd).toFixed(6)),
+        };
 
         // Re-validate
         validationReport = this.validationService.validateResume(resumeJson, profile);
@@ -125,7 +176,26 @@ export class ResumeService {
       status: statusToSave,
       version,
       isLatest: true,
+      aiModel: combinedTelemetry.model,
+      promptTokens: combinedTelemetry.promptTokens,
+      completionTokens: combinedTelemetry.completionTokens,
+      durationMs: combinedTelemetry.durationMs,
+      costUsd: combinedTelemetry.costUsd,
     });
+
+    if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+      await this.prisma.client.orm.public.AiGenerationLog.create({
+        userId: targetUserId,
+        jobDescriptionId: jd.id,
+        stage: 'resume',
+        model: combinedTelemetry.model,
+        promptTokens: combinedTelemetry.promptTokens,
+        completionTokens: combinedTelemetry.completionTokens,
+        totalTokens: combinedTelemetry.totalTokens,
+        durationMs: combinedTelemetry.durationMs,
+        costUsd: combinedTelemetry.costUsd,
+      });
+    }
 
     // Generate dynamic LaTeX code and upload to Cloudflare R2
     let texKey: string | null = null;

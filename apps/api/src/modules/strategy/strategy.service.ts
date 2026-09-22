@@ -35,15 +35,39 @@ export class StrategyService {
     }
 
     // Run Stage 3: Resume Strategy
-    const strategy = await this.aiService.runStructuredCall<ResumeStrategy>({
-      systemPrompt: RESUME_STRATEGY_SYSTEM_PROMPT_V1,
-      userPrompt: JSON.stringify({
-        structuredJd: jd.structured,
-        matchAnalysis: analysis.result,
-      }),
-      outputSchema: ResumeStrategySchema,
-      schemaName: 'ResumeStrategy',
-    });
+    const callResult =
+      typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+        ? await this.aiService.runStructuredCallWithTelemetry<ResumeStrategy>({
+            systemPrompt: RESUME_STRATEGY_SYSTEM_PROMPT_V1,
+            userPrompt: JSON.stringify({
+              structuredJd: jd.structured,
+              matchAnalysis: analysis.result,
+            }),
+            outputSchema: ResumeStrategySchema,
+            schemaName: 'ResumeStrategy',
+          })
+        : {
+            data: await this.aiService.runStructuredCall<ResumeStrategy>({
+              systemPrompt: RESUME_STRATEGY_SYSTEM_PROMPT_V1,
+              userPrompt: JSON.stringify({
+                structuredJd: jd.structured,
+                matchAnalysis: analysis.result,
+              }),
+              outputSchema: ResumeStrategySchema,
+              schemaName: 'ResumeStrategy',
+            }),
+            telemetry: {
+              model: 'default',
+              promptTokens: 0,
+              completionTokens: 0,
+              totalTokens: 0,
+              durationMs: 0,
+              costUsd: 0,
+            },
+          };
+
+    const strategy = callResult.data;
+    const telemetry = callResult.telemetry;
 
     // Check if strategy already exists
     let strategyRecord = await this.prisma.client.orm.public.ResumeStrategy.where({
@@ -53,11 +77,37 @@ export class StrategyService {
     if (strategyRecord) {
       strategyRecord = await this.prisma.client.orm.public.ResumeStrategy.where({
         id: strategyRecord.id,
-      }).update({ result: strategy });
+      }).update({
+        result: strategy,
+        aiModel: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
+      });
     } else {
       strategyRecord = await this.prisma.client.orm.public.ResumeStrategy.create({
         candidateJdAnalysisId: analysis.id,
         result: strategy,
+        aiModel: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
+      });
+    }
+
+    if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+      await this.prisma.client.orm.public.AiGenerationLog.create({
+        userId: jd.userId,
+        jobDescriptionId: jd.id,
+        stage: 'strategy',
+        model: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        totalTokens: telemetry.totalTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
       });
     }
 

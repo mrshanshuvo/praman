@@ -60,12 +60,27 @@ export class JobDescriptionController {
     return this.jdService.getAllJds(user?.id, query);
   }
 
+  @Get('telemetry/usage')
+  @ApiOperation({ summary: 'Get aggregate AI token usage, cost, and quota for current user' })
+  @ApiResponse({ status: 200, description: 'User AI token usage and quota metrics' })
+  async getUserAiUsage(@CurrentUser() user?: AuthUser) {
+    return this.jdService.getUserAiUsage(user?.id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a single job description by ID with analysis tree' })
   @ApiResponse({ status: 200, description: 'Job description details' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async getJd(@Param('id') id: string) {
     return this.jdService.getJdById(id);
+  }
+
+  @Get(':id/telemetry')
+  @ApiOperation({ summary: 'Get AI cost, token, and latency telemetry logs for a job' })
+  @ApiResponse({ status: 200, description: 'Job AI telemetry summary and stage breakdown' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async getJobTelemetry(@Param('id') id: string, @CurrentUser() user?: AuthUser) {
+    return this.jdService.getJobTelemetry(id, user?.id);
   }
 
   @Delete(':id')

@@ -1,15 +1,18 @@
 import { randomUUID } from 'node:crypto';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type {
+  AiStageTelemetry,
   ApplicationNote,
   ApplicationStatus,
   ApplicationTracker,
   CreateMilestoneDto,
   CreateNoteDto,
   InterviewMilestone,
+  JobTelemetrySummary,
   PaginationQueryDto,
   StructuredJd,
   UpdateApplicationTrackerDto,
+  UserAiUsageSummary,
 } from '@praman/schemas';
 import { StructuredJdSchema } from '@praman/schemas';
 import { PrismaService } from '../../core/database/prisma.service.js';
@@ -65,19 +68,59 @@ export class JobDescriptionService {
     }
 
     // Run Stage 1: JD Analyzer
-    const structured = await this.aiService.runStructuredCall<StructuredJd>({
-      systemPrompt: JD_ANALYZER_SYSTEM_PROMPT_V1,
-      userPrompt: JSON.stringify({ rawText }),
-      outputSchema: StructuredJdSchema,
-      schemaName: 'StructuredJd',
-    });
+    const callResult =
+      typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+        ? await this.aiService.runStructuredCallWithTelemetry<StructuredJd>({
+            systemPrompt: JD_ANALYZER_SYSTEM_PROMPT_V1,
+            userPrompt: JSON.stringify({ rawText }),
+            outputSchema: StructuredJdSchema,
+            schemaName: 'StructuredJd',
+          })
+        : {
+            data: await this.aiService.runStructuredCall<StructuredJd>({
+              systemPrompt: JD_ANALYZER_SYSTEM_PROMPT_V1,
+              userPrompt: JSON.stringify({ rawText }),
+              outputSchema: StructuredJdSchema,
+              schemaName: 'StructuredJd',
+            }),
+            telemetry: {
+              model: 'default',
+              promptTokens: 0,
+              completionTokens: 0,
+              totalTokens: 0,
+              durationMs: 0,
+              costUsd: 0,
+            },
+          };
+
+    const structured = callResult.data;
+    const telemetry = callResult.telemetry;
 
     // Save to Database
     const jd = await this.prisma.client.orm.public.JobDescription.create({
       userId,
       rawText,
       structured,
+      aiModel: telemetry.model,
+      promptTokens: telemetry.promptTokens,
+      completionTokens: telemetry.completionTokens,
+      durationMs: telemetry.durationMs,
+      costUsd: telemetry.costUsd,
     });
+
+    if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+      await this.prisma.client.orm.public.AiGenerationLog.create({
+        userId,
+        jobDescriptionId: jd.id,
+        stage: 'structuring',
+        model: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        totalTokens: telemetry.totalTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
+      });
+    }
 
     return jd;
   }
@@ -459,5 +502,112 @@ export class JobDescriptionService {
     });
 
     return { success: true, noteId };
+  }
+
+  async getJobTelemetry(id: string, targetUserId?: string): Promise<JobTelemetrySummary> {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+    if (!jd) throw new NotFoundException(`Job description with ID ${id} not found`);
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const logs = this.prisma.client.orm.public.AiGenerationLog?.where
+      ? await this.prisma.client.orm.public.AiGenerationLog.where({
+          jobDescriptionId: id,
+        }).all()
+      : [];
+
+    let totalTokens = 0;
+    let promptTokens = 0;
+    let completionTokens = 0;
+    let totalCostUsd = 0;
+    let totalDurationMs = 0;
+
+    const stages: AiStageTelemetry[] = logs.map((log: any) => {
+      totalTokens += log.totalTokens || 0;
+      promptTokens += log.promptTokens || 0;
+      completionTokens += log.completionTokens || 0;
+      totalCostUsd += log.costUsd || 0;
+      totalDurationMs += log.durationMs || 0;
+
+      return {
+        stage: log.stage,
+        model: log.model,
+        promptTokens: log.promptTokens,
+        completionTokens: log.completionTokens,
+        totalTokens: log.totalTokens,
+        durationMs: log.durationMs,
+        costUsd: log.costUsd,
+        createdAt: log.createdAt ? new Date(log.createdAt).toISOString() : undefined,
+      };
+    });
+
+    return {
+      jobDescriptionId: id,
+      totalTokens,
+      promptTokens,
+      completionTokens,
+      totalCostUsd: Number(totalCostUsd.toFixed(6)),
+      totalDurationMs,
+      stages,
+    };
+  }
+
+  async getUserAiUsage(targetUserId?: string): Promise<UserAiUsageSummary> {
+    let userId = targetUserId;
+    if (!userId) {
+      const user = await this.candidateService.getDefaultUser();
+      userId = user.id;
+    }
+
+    const logs = this.prisma.client.orm.public.AiGenerationLog?.where
+      ? await this.prisma.client.orm.public.AiGenerationLog.where({
+          userId,
+        }).all()
+      : [];
+
+    let totalTokens = 0;
+    let promptTokens = 0;
+    let completionTokens = 0;
+    let totalCostUsd = 0;
+    const stageBreakdown: Record<string, { count: number; tokens: number; costUsd: number }> = {};
+
+    for (const log of logs) {
+      const p = log.promptTokens || 0;
+      const c = log.completionTokens || 0;
+      const t = log.totalTokens || p + c;
+      const cost = log.costUsd || 0;
+
+      totalTokens += t;
+      promptTokens += p;
+      completionTokens += c;
+      totalCostUsd += cost;
+
+      const stage = log.stage || 'unknown';
+      if (!stageBreakdown[stage]) {
+        stageBreakdown[stage] = { count: 0, tokens: 0, costUsd: 0 };
+      }
+      stageBreakdown[stage].count += 1;
+      stageBreakdown[stage].tokens += t;
+      stageBreakdown[stage].costUsd = Number((stageBreakdown[stage].costUsd + cost).toFixed(6));
+    }
+
+    const quotaLimitTokens = 500_000;
+    const quotaUsedPercentage = Math.min(
+      100,
+      Number(((totalTokens / quotaLimitTokens) * 100).toFixed(1)),
+    );
+
+    return {
+      userId,
+      totalTokens,
+      promptTokens,
+      completionTokens,
+      totalCostUsd: Number(totalCostUsd.toFixed(6)),
+      totalGenerations: logs.length,
+      quotaLimitTokens,
+      quotaUsedPercentage,
+      stageBreakdown,
+    };
   }
 }

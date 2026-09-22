@@ -29,15 +29,39 @@ export class MatchService {
     const profile = await this.candidateService.getSanitizedProfile(userId || jd.userId);
 
     // Run Stage 2: Candidate Matcher
-    const matchAnalysis = await this.aiService.runStructuredCall<MatchAnalysis>({
-      systemPrompt: CANDIDATE_MATCHER_SYSTEM_PROMPT_V1,
-      userPrompt: JSON.stringify({
-        structuredJd: jd.structured,
-        candidateProfile: profile,
-      }),
-      outputSchema: MatchAnalysisSchema,
-      schemaName: 'MatchAnalysis',
-    });
+    const callResult =
+      typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+        ? await this.aiService.runStructuredCallWithTelemetry<MatchAnalysis>({
+            systemPrompt: CANDIDATE_MATCHER_SYSTEM_PROMPT_V1,
+            userPrompt: JSON.stringify({
+              structuredJd: jd.structured,
+              candidateProfile: profile,
+            }),
+            outputSchema: MatchAnalysisSchema,
+            schemaName: 'MatchAnalysis',
+          })
+        : {
+            data: await this.aiService.runStructuredCall<MatchAnalysis>({
+              systemPrompt: CANDIDATE_MATCHER_SYSTEM_PROMPT_V1,
+              userPrompt: JSON.stringify({
+                structuredJd: jd.structured,
+                candidateProfile: profile,
+              }),
+              outputSchema: MatchAnalysisSchema,
+              schemaName: 'MatchAnalysis',
+            }),
+            telemetry: {
+              model: 'default',
+              promptTokens: 0,
+              completionTokens: 0,
+              totalTokens: 0,
+              durationMs: 0,
+              costUsd: 0,
+            },
+          };
+
+    const matchAnalysis = callResult.data;
+    const telemetry = callResult.telemetry;
 
     const { score, label } = calculateMatchScore(matchAnalysis);
 
@@ -53,6 +77,11 @@ export class MatchService {
         result: matchAnalysis,
         matchScore: score,
         matchLabel: label,
+        aiModel: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
       });
     } else {
       analysisRecord = await this.prisma.client.orm.public.CandidateJdAnalysis.create({
@@ -60,6 +89,25 @@ export class MatchService {
         result: matchAnalysis,
         matchScore: score,
         matchLabel: label,
+        aiModel: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
+      });
+    }
+
+    if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+      await this.prisma.client.orm.public.AiGenerationLog.create({
+        userId: jd.userId,
+        jobDescriptionId: jd.id,
+        stage: 'match',
+        model: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        totalTokens: telemetry.totalTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
       });
     }
 

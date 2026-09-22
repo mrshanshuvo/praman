@@ -76,12 +76,27 @@ export class OutreachService {
       strategy: strategy?.result || null,
     });
 
-    const coverLetter = await this.aiService.runStructuredCall<CoverLetter>({
+    const callParams = {
       systemPrompt: COVER_LETTER_SYSTEM_PROMPT_V1,
       userPrompt,
       outputSchema: CoverLetterSchema,
       schemaName: 'CoverLetter',
-    });
+    };
+
+    const { data: coverLetter, telemetry } =
+      typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+        ? await this.aiService.runStructuredCallWithTelemetry<CoverLetter>(callParams)
+        : {
+            data: await this.aiService.runStructuredCall<CoverLetter>(callParams),
+            telemetry: {
+              model: 'default',
+              promptTokens: 0,
+              completionTokens: 0,
+              totalTokens: 0,
+              durationMs: 0,
+              costUsd: 0,
+            },
+          };
 
     const coverLetterLatex = this.formatCoverLetterLatex(coverLetter);
 
@@ -104,18 +119,33 @@ export class OutreachService {
       );
     }
 
+    if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+      await this.prisma.client.orm.public.AiGenerationLog.create({
+        userId: targetUserId || jd.userId,
+        jobDescriptionId: jd.id,
+        stage: 'cover_letter',
+        model: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        totalTokens: telemetry.totalTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
+      });
+    }
+
     if (resume) {
       const coverLetterRecord = {
         coverLetter,
         coverLetterLatex,
         validation,
+        telemetry,
         generatedAt: new Date().toISOString(),
       };
 
       await this.prisma.client.orm.public.Resume.where({
         id: resume.id,
       }).update({
-        coverLetterJson: coverLetterRecord,
+        coverLetterJson: coverLetterRecord as any,
       });
     }
 
@@ -141,23 +171,53 @@ export class OutreachService {
       strategy: strategy?.result || null,
     });
 
-    const recruiterEmail = await this.aiService.runStructuredCall<RecruiterEmail>({
+    const emailParams = {
       systemPrompt: RECRUITER_EMAIL_SYSTEM_PROMPT_V1,
       userPrompt,
       outputSchema: RecruiterEmailSchema,
       schemaName: 'RecruiterEmail',
-    });
+    };
+
+    const { data: recruiterEmail, telemetry } =
+      typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+        ? await this.aiService.runStructuredCallWithTelemetry<RecruiterEmail>(emailParams)
+        : {
+            data: await this.aiService.runStructuredCall<RecruiterEmail>(emailParams),
+            telemetry: {
+              model: 'default',
+              promptTokens: 0,
+              completionTokens: 0,
+              totalTokens: 0,
+              durationMs: 0,
+              costUsd: 0,
+            },
+          };
+
+    if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+      await this.prisma.client.orm.public.AiGenerationLog.create({
+        userId: targetUserId || jd.userId,
+        jobDescriptionId: jd.id,
+        stage: 'recruiter_email',
+        model: telemetry.model,
+        promptTokens: telemetry.promptTokens,
+        completionTokens: telemetry.completionTokens,
+        totalTokens: telemetry.totalTokens,
+        durationMs: telemetry.durationMs,
+        costUsd: telemetry.costUsd,
+      });
+    }
 
     if (resume) {
       const recruiterEmailRecord = {
         recruiterEmail,
+        telemetry,
         generatedAt: new Date().toISOString(),
       };
 
       await this.prisma.client.orm.public.Resume.where({
         id: resume.id,
       }).update({
-        recruiterEmailJson: recruiterEmailRecord,
+        recruiterEmailJson: recruiterEmailRecord as any,
       });
     }
 

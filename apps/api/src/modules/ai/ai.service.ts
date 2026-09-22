@@ -12,6 +12,46 @@ export interface StructuredCallParams<T> {
   maxTokens?: number;
 }
 
+export interface AiTelemetry {
+  model: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  durationMs: number;
+  costUsd: number;
+}
+
+export interface StructuredCallResult<T> {
+  data: T;
+  telemetry: AiTelemetry;
+}
+
+const MODEL_PRICING_PER_MILLION: Record<string, { prompt: number; completion: number }> = {
+  'groq/compound-mini': { prompt: 0.15, completion: 0.6 },
+  'qwen/qwen3.8-27b': { prompt: 0.2, completion: 0.6 },
+  'gpt-4o': { prompt: 2.5, completion: 10.0 },
+  'gpt-4o-mini': { prompt: 0.15, completion: 0.6 },
+  'gpt-4-turbo': { prompt: 10.0, completion: 30.0 },
+  'gpt-3.5-turbo': { prompt: 0.5, completion: 1.5 },
+  'openai/gpt-oss-20b': { prompt: 0.1, completion: 0.3 },
+  'openai/gpt-oss-120b': { prompt: 0.3, completion: 0.9 },
+};
+
+export function calculateCostUsd(
+  model: string,
+  promptTokens: number,
+  completionTokens: number,
+): number {
+  const normalized = model.toLowerCase();
+  const pricing = Object.entries(MODEL_PRICING_PER_MILLION).find(([key]) =>
+    normalized.includes(key.toLowerCase()),
+  )?.[1] || { prompt: 0.2, completion: 0.8 };
+
+  const promptCost = (promptTokens / 1_000_000) * pricing.prompt;
+  const completionCost = (completionTokens / 1_000_000) * pricing.completion;
+  return Number((promptCost + completionCost).toFixed(6));
+}
+
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
@@ -63,29 +103,54 @@ export class AiService {
     return ['groq/compound-mini', 'openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'qwen/qwen3.8-27b'];
   }
 
-  async runStructuredCall<T>(params: StructuredCallParams<T>): Promise<T> {
+  async runStructuredCallWithTelemetry<T>(
+    params: StructuredCallParams<T>,
+  ): Promise<StructuredCallResult<T>> {
     const { schemaName = 'output' } = params;
+    const startTime = performance.now();
 
     // If an API key is provided, use the OpenAI-compatible endpoint
     if (this.apiKey) {
       this.logger.log(
         `Running structured call [${schemaName}] using model: ${this.currentModel} (cascade: ${this.models.join(' -> ')})`,
       );
-      return this.callLlmWithRetry(params, 2);
+      return this.callLlmWithRetry(params, 2, undefined, startTime);
     }
 
     // Deterministic offline pipeline engine (when API key is not yet set in .env)
     this.logger.warn(
       `No OPENAI_API_KEY detected in environment. Using deterministic rule-based engine for [${schemaName}].`,
     );
-    return this.fallbackDeterministicEngine(params);
+    const data = this.fallbackDeterministicEngine(params);
+    const durationMs = Math.round(performance.now() - startTime);
+    const promptChars = params.systemPrompt.length + params.userPrompt.length;
+    const promptTokens = Math.max(1, Math.ceil(promptChars / 4));
+    const completionTokens = Math.max(1, Math.ceil(JSON.stringify(data).length / 4));
+
+    return {
+      data,
+      telemetry: {
+        model: 'deterministic-offline-engine',
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+        durationMs,
+        costUsd: 0,
+      },
+    };
+  }
+
+  async runStructuredCall<T>(params: StructuredCallParams<T>): Promise<T> {
+    const res = await this.runStructuredCallWithTelemetry(params);
+    return res.data;
   }
 
   private async callLlmWithRetry<T>(
     params: StructuredCallParams<T>,
     remainingRetries: number,
     previousError?: string,
-  ): Promise<T> {
+    startTime = performance.now(),
+  ): Promise<StructuredCallResult<T>> {
     const {
       systemPrompt,
       userPrompt,
@@ -150,7 +215,7 @@ export class AiService {
             this.logger.warn(
               `[Cascade] Daily quota (TPD) reached for [${previousModel}]. Auto-switching to fallback model [${nextModel}].`,
             );
-            return this.callLlmWithRetry(params, 2);
+            return this.callLlmWithRetry(params, 2, undefined, startTime);
           }
           this.logger.error(
             `[Cascade] All models in cascade exhausted their daily limit: ${this.models.join(', ')}`,
@@ -164,7 +229,7 @@ export class AiService {
             `Rate limit (429 TPM) hit on [${schemaName}] using [${currentAttemptModel}]. Auto-waiting ${sleepMs}ms before retry...`,
           );
           await new Promise((resolve) => setTimeout(resolve, sleepMs));
-          return this.callLlmWithRetry(params, remainingRetries - 1);
+          return this.callLlmWithRetry(params, remainingRetries - 1, undefined, startTime);
         }
 
         // Retries exhausted for this model on rate limits: cascade to next model if available
@@ -175,7 +240,7 @@ export class AiService {
           this.logger.warn(
             `[Cascade] Retries exhausted for [${previousModel}] on rate limit. Switching to [${nextModel}].`,
           );
-          return this.callLlmWithRetry(params, 2);
+          return this.callLlmWithRetry(params, 2, undefined, startTime);
         }
       }
 
@@ -188,7 +253,7 @@ export class AiService {
         this.logger.warn(
           `[Cascade] Model [${previousModel}] failed with status ${response.status} (${errText.slice(0, 120)}...). Auto-switching to fallback model [${nextModel}].`,
         );
-        return this.callLlmWithRetry(params, 2);
+        return this.callLlmWithRetry(params, 2, undefined, startTime);
       }
 
       this.logger.error(
@@ -209,7 +274,25 @@ export class AiService {
       const schemaCheck = outputSchema.safeParse(parsedJson);
 
       if (schemaCheck.success) {
-        return schemaCheck.data;
+        const promptTokens =
+          result.usage?.prompt_tokens ?? Math.max(1, Math.ceil(promptToSend.length / 4));
+        const completionTokens =
+          result.usage?.completion_tokens ?? Math.max(1, Math.ceil((content?.length || 0) / 4));
+        const totalTokens = result.usage?.total_tokens ?? promptTokens + completionTokens;
+        const durationMs = Math.round(performance.now() - startTime);
+        const costUsd = calculateCostUsd(currentAttemptModel, promptTokens, completionTokens);
+
+        return {
+          data: schemaCheck.data,
+          telemetry: {
+            model: currentAttemptModel,
+            promptTokens,
+            completionTokens,
+            totalTokens,
+            durationMs,
+            costUsd,
+          },
+        };
       }
 
       const errors = schemaCheck.error.errors
@@ -220,7 +303,7 @@ export class AiService {
         this.logger.warn(
           `Schema validation failed for [${schemaName}] using [${currentAttemptModel}], retrying with error feedback: ${errors}`,
         );
-        return this.callLlmWithRetry(params, remainingRetries - 1, errors);
+        return this.callLlmWithRetry(params, remainingRetries - 1, errors, startTime);
       }
 
       // If schema validation retries are exhausted on this model, cascade to next model
@@ -231,13 +314,13 @@ export class AiService {
         this.logger.warn(
           `[Cascade] Schema validation failed repeatedly on [${previousModel}] for [${schemaName}]. Switching to fallback model [${nextModel}].`,
         );
-        return this.callLlmWithRetry(params, 2);
+        return this.callLlmWithRetry(params, 2, undefined, startTime);
       }
 
       throw new Error(`LLM output failed schema validation: ${errors}`);
     } catch (e: any) {
       if (remainingRetries > 0 && !e.message?.includes('schema validation')) {
-        return this.callLlmWithRetry(params, remainingRetries - 1, e.message);
+        return this.callLlmWithRetry(params, remainingRetries - 1, e.message, startTime);
       }
       throw e;
     }
