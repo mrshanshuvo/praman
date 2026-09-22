@@ -9,8 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useCreateJob } from '@/hooks/usePramanApi';
-import { JdIngestionForm } from './_components/JdIngestionForm';
-import { JdResultView } from './_components/JdResultView';
+import { JdIngestionForm, JdResultView } from './_components';
 
 export default function NewJobPage() {
   const router = useRouter();
