@@ -1,15 +1,10 @@
 import type { JobDescriptionRecord, PaginationMeta } from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API_URL, fetcher } from '@/lib/api-client';
+import { type JobFilterParams, queryKeys } from '@/lib/query-keys';
 
-export interface UseJobsOptions {
+export interface UseJobsOptions extends JobFilterParams {
   enabled?: boolean;
-  page?: number;
-  limit?: number;
-  status?: string;
-  q?: string;
-  sortBy?: string;
-  all?: boolean;
 }
 
 export type PaginatedJobsList = JobDescriptionRecord[] & {
@@ -30,15 +25,14 @@ export function useJobs(options?: UseJobsOptions) {
   const url = `${API_URL}/job-descriptions${qs ? `?${qs}` : ''}`;
 
   return useQuery<PaginatedJobsList>({
-    queryKey: [
-      'jobs',
-      options?.page,
-      options?.limit,
-      options?.status,
-      options?.q,
-      options?.sortBy,
-      options?.all,
-    ],
+    queryKey: queryKeys.jobs.list({
+      page: options?.page,
+      limit: options?.limit,
+      status: options?.status,
+      q: options?.q,
+      sortBy: options?.sortBy,
+      all: options?.all,
+    }),
     queryFn: async () => {
       const res = await fetcher<
         JobDescriptionRecord[] | { items: JobDescriptionRecord[]; meta: PaginationMeta }
@@ -76,7 +70,7 @@ export function useJobs(options?: UseJobsOptions) {
 
 export function useJob(id: string) {
   return useQuery({
-    queryKey: ['jobs', id],
+    queryKey: queryKeys.jobs.detail(id),
     queryFn: () => fetcher<JobDescriptionRecord>(`${API_URL}/job-descriptions/${id}`),
     enabled: Boolean(id),
   });
@@ -92,7 +86,7 @@ export function useCreateJob() {
         body: JSON.stringify(data),
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
     },
   });
 }
@@ -105,7 +99,7 @@ export function useDeleteJob() {
         method: 'DELETE',
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
     },
   });
 }
@@ -119,8 +113,8 @@ export function useUpdateJobStatus() {
         body: JSON.stringify({ status }),
       }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobs', variables.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(variables.id) });
     },
   });
 }
@@ -133,8 +127,7 @@ export function useRunStage(id: string) {
         method: 'POST',
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', id] });
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
     },
   });
 }
@@ -147,8 +140,7 @@ export function useRunFullPipeline(id: string) {
         method: 'POST',
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', id] });
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
     },
   });
 }

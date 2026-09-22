@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 import type { PipelineStage } from '@/components/PipelineStepper';
+import { queryKeys } from '@/lib/query-keys';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const TOKEN_KEY = 'praman_auth_token';
@@ -227,7 +228,7 @@ export function usePipelineStream(jobId: string, options?: UsePipelineStreamOpti
                   strategy: 'completed',
                   resume: 'completed',
                 });
-                queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
+                queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
                 options?.onComplete?.();
               } else if (event.status === 'failed') {
                 const failMsg = event.message || 'Pipeline execution failed';

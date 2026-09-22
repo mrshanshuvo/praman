@@ -11,10 +11,11 @@ import type {
 } from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API_URL, fetcher } from '@/lib/api-client';
+import { queryKeys } from '@/lib/query-keys';
 
 export function useCandidateProfile(options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: ['candidate-profile'],
+    queryKey: queryKeys.candidate.profile(),
     queryFn: () => fetcher<CandidateProfile>(`${API_URL}/candidate-profile`),
     enabled: options?.enabled ?? true,
   });
@@ -22,7 +23,7 @@ export function useCandidateProfile(options?: { enabled?: boolean }) {
 
 export function useProfileMutations() {
   const queryClient = useQueryClient();
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['candidate-profile'] });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.candidate.all });
 
   const updatePersonal = useMutation({
     mutationFn: (personal: UpdateCandidatePersonal) =>
@@ -236,7 +237,7 @@ export function useImportProfile() {
         body: JSON.stringify(data),
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['candidate-profile'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.candidate.all });
     },
   });
 }

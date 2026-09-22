@@ -10,6 +10,7 @@ import type {
 } from '@praman/schemas';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { API_URL, fetcher } from '@/lib/api-client';
+import { queryKeys } from '@/lib/query-keys';
 
 export function useUpdateTrackerDossier(jobId: string) {
   const queryClient = useQueryClient();
@@ -21,8 +22,8 @@ export function useUpdateTrackerDossier(jobId: string) {
         body: JSON.stringify(data),
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
     },
   });
 }
@@ -37,8 +38,8 @@ export function useAddMilestone(jobId: string) {
         body: JSON.stringify(data),
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
     },
   });
 }
@@ -56,8 +57,8 @@ export function useUpdateMilestone(jobId: string) {
         },
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
     },
   });
 }
@@ -73,8 +74,8 @@ export function useDeleteMilestone(jobId: string) {
         },
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
     },
   });
 }
@@ -89,7 +90,7 @@ export function useAddJobNote(jobId: string) {
         body: JSON.stringify(data),
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
     },
   });
 }
@@ -104,7 +105,7 @@ export function useUpdateJobNote(jobId: string) {
         body: JSON.stringify(data),
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
     },
   });
 }
@@ -120,7 +121,7 @@ export function useDeleteJobNote(jobId: string) {
         },
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', jobId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
     },
   });
 }

@@ -13,12 +13,13 @@ import {
   fetchResumePdfBlob,
   getResumePdfUrl,
 } from '@/lib/api-client';
+import { queryKeys } from '@/lib/query-keys';
 
 export { downloadResumePdf, fetchResumePdfBlob, getResumePdfUrl };
 
 export function useJobResume(id: string, versionOrId?: string) {
   return useQuery({
-    queryKey: ['jobs', id, 'resume', versionOrId || 'latest'],
+    queryKey: queryKeys.jobs.resume(id, versionOrId),
     queryFn: () =>
       fetcher<ResumeRecord>(
         `${API_URL}/job-descriptions/${id}/resume${versionOrId ? `?version=${encodeURIComponent(versionOrId)}` : ''}`,
@@ -29,7 +30,7 @@ export function useJobResume(id: string, versionOrId?: string) {
 
 export function useResumeVersions(id: string) {
   return useQuery({
-    queryKey: ['jobs', id, 'resume', 'versions'],
+    queryKey: queryKeys.jobs.resumeVersions(id),
     queryFn: () =>
       fetcher<ResumeVersionSummary[]>(`${API_URL}/job-descriptions/${id}/resume/versions`),
     enabled: Boolean(id),
@@ -43,14 +44,7 @@ export function useJobResumeLatex(id: string, templateId?: string, versionOrId?:
   const qs = queryParams.toString();
 
   return useQuery({
-    queryKey: [
-      'jobs',
-      id,
-      'resume',
-      'latex',
-      templateId || 'modern-developer',
-      versionOrId || 'latest',
-    ],
+    queryKey: queryKeys.jobs.resumeLatex(id, templateId, versionOrId),
     queryFn: () =>
       fetcher<{ latex: string; templateId?: string }>(
         `${API_URL}/job-descriptions/${id}/resume/latex${qs ? `?${qs}` : ''}`,
@@ -81,14 +75,14 @@ export function useUpdateResumeLatex(id: string) {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.resumes(id) });
     },
   });
 }
 
 export function useJobOutreach(id: string) {
   return useQuery({
-    queryKey: ['jobs', id, 'outreach'],
+    queryKey: queryKeys.jobs.outreach(id),
     queryFn: () =>
       fetcher<{
         coverLetter: CoverLetter | null;
@@ -109,8 +103,8 @@ export function useGenerateCoverLetter(id: string) {
         { method: 'POST' },
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'outreach'] });
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.outreach(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.resumes(id) });
     },
   });
 }
@@ -126,8 +120,8 @@ export function useGenerateRecruiterEmail(id: string) {
         },
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'outreach'] });
-      queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.outreach(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.resumes(id) });
     },
   });
 }
