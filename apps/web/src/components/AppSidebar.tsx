@@ -197,7 +197,7 @@ export function AppSidebar() {
           <>
             <div
               className="relative group cursor-pointer"
-              title={`${user?.name || 'User'} (${user?.email})`}
+              title={user ? `${user.name || 'User'} (${user.email})` : 'Guest'}
             >
               <Avatar size="sm" className="size-9 shrink-0 ring-1 ring-border">
                 <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-xs font-bold text-brand-dark uppercase">
@@ -216,8 +216,8 @@ export function AppSidebar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={logout}
-              className="size-9 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => logout()}
+              className="size-9 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
@@ -247,8 +247,8 @@ export function AppSidebar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={logout}
-                className="h-7 px-2 text-2xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex items-center gap-1.5"
+                onClick={() => logout()}
+                className="h-7 px-2 text-2xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex items-center gap-1.5 cursor-pointer"
                 title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />

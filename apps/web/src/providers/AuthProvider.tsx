@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -32,37 +33,48 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
   refreshSession: () => Promise<string | null>;
-  logout: () => Promise<void>;
+  logout: (redirectUrl?: string | null) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const logout = useCallback(async () => {
-    const currentToken =
-      token || (typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null);
-    if (currentToken) {
-      try {
-        await fetch(`${API_URL}/auth/logout`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${currentToken}`,
-          },
-        });
-      } catch {
-        // Silently proceed - credentials must always be purged locally even if offline
+  const logout = useCallback(
+    async (redirectUrl: unknown = '/login') => {
+      const targetUrl =
+        typeof redirectUrl === 'string' || redirectUrl === null ? redirectUrl : '/login';
+      const currentToken =
+        token || (typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null);
+      if (currentToken) {
+        try {
+          await fetch(`${API_URL}/auth/logout`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${currentToken}`,
+            },
+          });
+        } catch {
+          // Silently proceed - credentials must always be purged locally even if offline
+        }
       }
-    }
 
-    localStorage.removeItem(TOKEN_KEY);
-    removeAuthCookie();
-    setToken(null);
-    setUser(null);
-  }, [token]);
+      localStorage.removeItem(TOKEN_KEY);
+      removeAuthCookie();
+      setToken(null);
+      setUser(null);
+      queryClient.clear();
+
+      if (typeof window !== 'undefined' && targetUrl) {
+        window.location.href = targetUrl;
+      }
+    },
+    [token, queryClient],
+  );
 
   const refreshSession = useCallback(async (): Promise<string | null> => {
     try {
@@ -87,7 +99,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(authUser);
       return newAccessToken;
     } catch {
-      await logout();
+      const isPublicRoute =
+        typeof window !== 'undefined' &&
+        ['/', '/login', '/register'].includes(window.location.pathname);
+      await logout(isPublicRoute ? null : '/login');
       return null;
     }
   }, [logout]);

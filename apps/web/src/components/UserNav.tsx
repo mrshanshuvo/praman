@@ -60,7 +60,7 @@ export function UserNav() {
       <Button
         variant="ghost"
         size="icon-xs"
-        onClick={logout}
+        onClick={() => logout()}
         title="Sign Out"
         className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
       >

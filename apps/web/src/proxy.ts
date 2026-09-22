@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 const AUTH_COOKIE_NAME = 'praman_auth_token';
 
 // Protected routes requiring authentication
-const PROTECTED_PREFIXES = ['/profile', '/jobs'];
+const PROTECTED_PREFIXES = ['/dashboard', '/profile', '/jobs'];
 
 // Public auth routes that redirect to /profile if already logged in
 const AUTH_ROUTES = ['/login', '/register'];
