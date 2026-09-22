@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -35,7 +36,7 @@ interface ActionCenterCardProps {
 }
 
 export function ActionCenterCard({ jobs = [], onOpenQuickIngest }: ActionCenterCardProps) {
-  const now = Date.now();
+  const [now] = useState(() => Date.now());
 
   const actionItems: ActionItem[] = [];
 

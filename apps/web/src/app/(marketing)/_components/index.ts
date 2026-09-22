@@ -1,3 +1,3 @@
-export * from '../../(main)/_components/FeatureHighlights';
-export * from '../../(main)/_components/PipelineArchitecture';
+export * from './FeatureHighlights';
 export * from './LandingHero';
+export * from './PipelineArchitecture';

@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useCandidateProfile, useJobs } from '@/hooks/usePramanApi';
 import { useAuth } from '@/providers/AuthProvider';
-import { StatsGrid } from '../_components';
-import { ActionCenterCard } from './_components/ActionCenterCard';
-import { DashboardHeader } from './_components/DashboardHeader';
-import { QuickIngestModal } from './_components/QuickIngestModal';
-import { RecentActivityFeed } from './_components/RecentActivityFeed';
+import {
+  ActionCenterCard,
+  DashboardHeader,
+  QuickIngestModal,
+  RecentActivityFeed,
+  StatsGrid,
+} from './_components';
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();

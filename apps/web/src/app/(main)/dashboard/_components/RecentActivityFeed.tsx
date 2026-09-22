@@ -12,6 +12,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -25,11 +26,13 @@ interface ActivityEvent {
   linkHref: string;
 }
 
-function formatRelativeTime(dateStr?: string | null): { label: string; ms: number } {
+function formatRelativeTime(
+  dateStr: string | null | undefined,
+  nowMs: number,
+): { label: string; ms: number } {
   if (!dateStr) return { label: 'Recently', ms: 0 };
   const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  const diffMs = nowMs - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);
   const diffHour = Math.floor(diffMin / 60);
@@ -51,6 +54,7 @@ interface RecentActivityFeedProps {
 }
 
 export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
+  const [nowMs] = useState(() => Date.now());
   const events: ActivityEvent[] = [];
 
   for (const job of jobs) {
@@ -59,7 +63,7 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
 
     // 1. Job Ingested Event
     if (job.createdAt) {
-      const { label, ms } = formatRelativeTime(job.createdAt);
+      const { label, ms } = formatRelativeTime(job.createdAt, nowMs);
       events.push({
         id: `job-created-${job.id}`,
         type: 'job',
@@ -74,7 +78,7 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
     // 2. Tailored Resume Compiled Event
     const resume = job.analysis?.strategy?.resume;
     if (resume?.resumeJson && (resume.updatedAt || resume.createdAt)) {
-      const { label, ms } = formatRelativeTime(resume.updatedAt || resume.createdAt);
+      const { label, ms } = formatRelativeTime(resume.updatedAt || resume.createdAt, nowMs);
       events.push({
         id: `resume-${job.id}`,
         type: 'resume',
@@ -91,7 +95,7 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
     for (const m of milestones) {
       const milestoneTime = m.createdAt || m.scheduledAt;
       if (milestoneTime) {
-        const { label, ms } = formatRelativeTime(milestoneTime);
+        const { label, ms } = formatRelativeTime(milestoneTime, nowMs);
         events.push({
           id: `milestone-${m.id || job.id}`,
           type: 'milestone',
@@ -108,7 +112,7 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
     const notes = job.tracker?.notes || [];
     for (const n of notes) {
       if (n.createdAt) {
-        const { label, ms } = formatRelativeTime(n.createdAt);
+        const { label, ms } = formatRelativeTime(n.createdAt, nowMs);
         events.push({
           id: `note-${n.id || job.id}`,
           type: 'note',
