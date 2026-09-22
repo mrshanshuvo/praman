@@ -2,8 +2,8 @@
 
 import { AlertCircle, ArrowRight, Loader2, Lock, Mail, User } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -11,8 +11,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/co
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from') || '/profile';
   const { register, isAuthenticated, isLoading } = useAuth();
 
   const [name, setName] = useState('');
@@ -24,9 +26,9 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/profile');
+      router.replace(from);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +48,7 @@ export default function RegisterPage() {
 
     try {
       await register(email.trim(), password, name.trim() || undefined);
-      router.push('/profile');
+      router.push(from);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setError(message);
@@ -172,7 +174,7 @@ export default function RegisterPage() {
         <p className="text-xs text-muted-foreground">
           Already have an account?{' '}
           <Link
-            href="/login"
+            href={from !== '/profile' ? `/login?from=${encodeURIComponent(from)}` : '/login'}
             className={buttonVariants({
               variant: 'link',
               size: 'xs',
@@ -184,5 +186,17 @@ export default function RegisterPage() {
         </p>
       </CardFooter>
     </Card>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-96 w-full animate-pulse rounded-2xl bg-card border border-border" />
+      }
+    >
+      <RegisterForm />
+    </Suspense>
   );
 }

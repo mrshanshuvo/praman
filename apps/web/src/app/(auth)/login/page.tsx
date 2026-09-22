@@ -2,8 +2,8 @@
 
 import { AlertCircle, ArrowRight, KeyRound, Loader2, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -11,8 +11,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/co
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from') || '/dashboard';
   const { login, isAuthenticated, isLoading } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -22,9 +24,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/dashboard');
+      router.replace(from);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password);
-      router.push('/dashboard');
+      router.push(from);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Login failed';
       setError(message);
@@ -141,7 +143,9 @@ export default function LoginPage() {
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link
-            href="/register"
+            href={
+              from !== '/dashboard' ? `/register?from=${encodeURIComponent(from)}` : '/register'
+            }
             className={buttonVariants({
               variant: 'link',
               size: 'xs',
@@ -153,5 +157,17 @@ export default function LoginPage() {
         </p>
       </CardFooter>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-96 w-full animate-pulse rounded-2xl bg-card border border-border" />
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

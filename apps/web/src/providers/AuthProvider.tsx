@@ -5,6 +5,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const TOKEN_KEY = 'praman_auth_token';
+const REFRESH_TOKEN_KEY = 'praman_refresh_token';
 
 function setAuthCookie(authToken: string) {
   if (typeof document === 'undefined') return;
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
       removeAuthCookie();
       setToken(null);
       setUser(null);
@@ -95,6 +97,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       localStorage.setItem(TOKEN_KEY, newAccessToken);
       setAuthCookie(newAccessToken);
+      if (data.refreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+      }
       setToken(newAccessToken);
       setUser(authUser);
       return newAccessToken;
@@ -162,6 +167,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     localStorage.setItem(TOKEN_KEY, accessToken);
     setAuthCookie(accessToken);
+    if (data.refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+    }
     setToken(accessToken);
     setUser(authUser);
   };
@@ -185,6 +193,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     localStorage.setItem(TOKEN_KEY, accessToken);
     setAuthCookie(accessToken);
+    if (data.refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+    }
     setToken(accessToken);
     setUser(authUser);
   };

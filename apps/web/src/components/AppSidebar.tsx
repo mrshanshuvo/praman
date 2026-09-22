@@ -32,8 +32,8 @@ interface NavItem {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const { data: jobs = [] } = useJobs();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { data: jobs = [] } = useJobs({ enabled: isAuthenticated });
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);

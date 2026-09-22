@@ -26,7 +26,7 @@ export function proxy(request: NextRequest) {
   // 3. Guest-Only Route Gating: Redirect authenticated users away from /login & /register
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname === route);
   if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL('/profile', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // 4. Downstream forwarding with correlation and security headers

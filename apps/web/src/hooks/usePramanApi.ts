@@ -22,6 +22,63 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const TOKEN_KEY = 'praman_auth_token';
 const REFRESH_TOKEN_KEY = 'praman_refresh_token';
 
+let activeRefreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (activeRefreshPromise) {
+    return activeRefreshPromise;
+  }
+
+  activeRefreshPromise = (async () => {
+    try {
+      const storedRefreshToken =
+        typeof window !== 'undefined' ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
+      const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
+      });
+
+      if (!refreshRes.ok) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(REFRESH_TOKEN_KEY);
+          // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+          document.cookie = `${TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
+            window.location.href = `/login?from=${encodeURIComponent(currentPath + window.location.search)}`;
+          }
+        }
+        return null;
+      }
+
+      const data = await refreshRes.json();
+      const newAccessToken: string = data.accessToken;
+      const newRefreshToken: string | undefined = data.refreshToken;
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(TOKEN_KEY, newAccessToken);
+        const isSecure = window.location.protocol === 'https:';
+        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
+        document.cookie = `${TOKEN_KEY}=${encodeURIComponent(newAccessToken)}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`;
+        if (newRefreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+        }
+      }
+
+      return newAccessToken;
+    } catch {
+      return null;
+    } finally {
+      activeRefreshPromise = null;
+    }
+  })();
+
+  return activeRefreshPromise;
+}
+
 async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {});
 
@@ -38,44 +95,15 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
     headers,
   });
 
-  // If 401 Unauthorized, attempt a single silent refresh
+  // If 401 Unauthorized, attempt deduplicated silent refresh
   if (res.status === 401 && typeof window !== 'undefined' && !url.includes('/auth/')) {
-    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    try {
-      const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
+    const newAccessToken = await refreshAccessToken();
+    if (newAccessToken) {
+      headers.set('Authorization', `Bearer ${newAccessToken}`);
+      res = await fetch(url, {
+        ...options,
+        headers,
       });
-
-      if (refreshRes.ok) {
-        const data = await refreshRes.json();
-        const newAccessToken = data.accessToken;
-        const newRefreshToken = data.refreshToken;
-
-        localStorage.setItem(TOKEN_KEY, newAccessToken);
-        const isSecure = window.location.protocol === 'https:';
-        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
-        document.cookie = `${TOKEN_KEY}=${encodeURIComponent(newAccessToken)}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`;
-        if (newRefreshToken) {
-          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
-        }
-
-        // Retry original request with newly issued access token
-        headers.set('Authorization', `Bearer ${newAccessToken}`);
-        res = await fetch(url, {
-          ...options,
-          headers,
-        });
-      } else {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
-        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
-        document.cookie = `${TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
-      }
-    } catch {
-      // Network error during refresh
     }
   }
 
@@ -417,35 +445,12 @@ export async function fetchResumePdfBlob(
 
   let response = await fetch(url, { headers });
 
-  // If 401 Unauthorized, attempt silent refresh
+  // If 401 Unauthorized, attempt deduplicated silent refresh
   if (response.status === 401 && typeof window !== 'undefined') {
-    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    try {
-      const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined }),
-      });
-
-      if (refreshRes.ok) {
-        const data = await refreshRes.json();
-        const newAccessToken = data.accessToken;
-        const newRefreshToken = data.refreshToken;
-
-        localStorage.setItem(TOKEN_KEY, newAccessToken);
-        const isSecure = window.location.protocol === 'https:';
-        // biome-ignore lint/suspicious/noDocumentCookie: Client cookie synchronization for Next.js 16 proxy boundary
-        document.cookie = `${TOKEN_KEY}=${encodeURIComponent(newAccessToken)}; path=/; max-age=604800; SameSite=Lax${isSecure ? '; Secure' : ''}`;
-        if (newRefreshToken) {
-          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
-        }
-
-        headers.set('Authorization', `Bearer ${newAccessToken}`);
-        response = await fetch(url, { headers });
-      }
-    } catch {
-      // refresh attempt failed
+    const newAccessToken = await refreshAccessToken();
+    if (newAccessToken) {
+      headers.set('Authorization', `Bearer ${newAccessToken}`);
+      response = await fetch(url, { headers });
     }
   }
 
