@@ -4,6 +4,10 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
+    "aiGenerationLog": {
+      "model": "AiGenerationLog",
+      "namespace": "public"
+    },
     "candidateJdAnalysis": {
       "model": "CandidateJdAnalysis",
       "namespace": "public"
@@ -118,12 +122,161 @@
           }
         },
         "models": {
-          "CandidateJdAnalysis": {
+          "AiGenerationLog": {
             "fields": {
+              "completionTokens": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "costUsd": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "durationMs": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "jobDescriptionId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "model": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "promptTokens": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "stage": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "totalTokens": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "completionTokens": {
+                  "column": "completionTokens"
+                },
+                "costUsd": {
+                  "column": "costUsd"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "durationMs": {
+                  "column": "durationMs"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "jobDescriptionId": {
+                  "column": "jobDescriptionId"
+                },
+                "model": {
+                  "column": "model"
+                },
+                "promptTokens": {
+                  "column": "promptTokens"
+                },
+                "stage": {
+                  "column": "stage"
+                },
+                "totalTokens": {
+                  "column": "totalTokens"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "aiGenerationLog"
+            }
+          },
+          "CandidateJdAnalysis": {
+            "fields": {
+              "aiModel": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "completionTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "costUsd": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "durationMs": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -149,6 +302,13 @@
                 }
               },
               "matchScore": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "promptTokens": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -206,8 +366,20 @@
             },
             "storage": {
               "fields": {
+                "aiModel": {
+                  "column": "aiModel"
+                },
+                "completionTokens": {
+                  "column": "completionTokens"
+                },
+                "costUsd": {
+                  "column": "costUsd"
+                },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "durationMs": {
+                  "column": "durationMs"
                 },
                 "id": {
                   "column": "id"
@@ -220,6 +392,9 @@
                 },
                 "matchScore": {
                   "column": "matchScore"
+                },
+                "promptTokens": {
+                  "column": "promptTokens"
                 },
                 "result": {
                   "column": "result"
@@ -764,6 +939,27 @@
           },
           "JobDescription": {
             "fields": {
+              "aiModel": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "completionTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "costUsd": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -771,10 +967,24 @@
                   "kind": "scalar"
                 }
               },
+              "durationMs": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "promptTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -863,11 +1073,26 @@
             },
             "storage": {
               "fields": {
+                "aiModel": {
+                  "column": "aiModel"
+                },
+                "completionTokens": {
+                  "column": "completionTokens"
+                },
+                "costUsd": {
+                  "column": "costUsd"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "durationMs": {
+                  "column": "durationMs"
+                },
                 "id": {
                   "column": "id"
+                },
+                "promptTokens": {
+                  "column": "promptTokens"
                 },
                 "rawText": {
                   "column": "rawText"
@@ -1024,6 +1249,27 @@
           },
           "Resume": {
             "fields": {
+              "aiModel": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "completionTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "costUsd": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
               "coverLetterJson": {
                 "nullable": true,
                 "type": {
@@ -1038,6 +1284,13 @@
                   "kind": "scalar"
                 }
               },
+              "durationMs": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -1049,6 +1302,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "promptTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -1128,17 +1388,32 @@
             },
             "storage": {
               "fields": {
+                "aiModel": {
+                  "column": "aiModel"
+                },
+                "completionTokens": {
+                  "column": "completionTokens"
+                },
+                "costUsd": {
+                  "column": "costUsd"
+                },
                 "coverLetterJson": {
                   "column": "coverLetterJson"
                 },
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "durationMs": {
+                  "column": "durationMs"
+                },
                 "id": {
                   "column": "id"
                 },
                 "isLatest": {
                   "column": "isLatest"
+                },
+                "promptTokens": {
+                  "column": "promptTokens"
                 },
                 "recruiterEmailJson": {
                   "column": "recruiterEmailJson"
@@ -1168,10 +1443,31 @@
           },
           "ResumeStrategy": {
             "fields": {
+              "aiModel": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "candidateJdAnalysisId": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "completionTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "costUsd": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
                   "kind": "scalar"
                 }
               },
@@ -1182,10 +1478,24 @@
                   "kind": "scalar"
                 }
               },
+              "durationMs": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "promptTokens": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -1239,14 +1549,29 @@
             },
             "storage": {
               "fields": {
+                "aiModel": {
+                  "column": "aiModel"
+                },
                 "candidateJdAnalysisId": {
                   "column": "candidateJdAnalysisId"
+                },
+                "completionTokens": {
+                  "column": "completionTokens"
+                },
+                "costUsd": {
+                  "column": "costUsd"
                 },
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "durationMs": {
+                  "column": "durationMs"
+                },
                 "id": {
                   "column": "id"
+                },
+                "promptTokens": {
+                  "column": "promptTokens"
                 },
                 "result": {
                   "column": "result"
@@ -1485,8 +1810,18 @@
       "public": {
         "entries": {
           "table": {
-            "candidateJdAnalysis": {
+            "aiGenerationLog": {
               "columns": {
+                "completionTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "costUsd": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": false
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -1495,6 +1830,87 @@
                   },
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "durationMs": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "jobDescriptionId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "model": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "promptTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "stage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "totalTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "candidateJdAnalysis": {
+              "columns": {
+                "aiModel": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "completionTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "costUsd": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "durationMs": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "id": {
                   "codecId": "pg/text@1",
@@ -1512,6 +1928,11 @@
                   "nullable": true
                 },
                 "matchScore": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "promptTokens": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
@@ -1927,6 +2348,21 @@
                 }
               ],
               "columns": {
+                "aiModel": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "completionTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "costUsd": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -1936,10 +2372,20 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "durationMs": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "promptTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "rawText": {
                   "codecId": "pg/text@1",
@@ -2132,6 +2578,21 @@
                 }
               ],
               "columns": {
+                "aiModel": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "completionTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "costUsd": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
+                },
                 "coverLetterJson": {
                   "codecId": "pg/json@1",
                   "nativeType": "json",
@@ -2146,6 +2607,11 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "durationMs": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -2159,6 +2625,11 @@
                   },
                   "nativeType": "bool",
                   "nullable": false
+                },
+                "promptTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "recruiterEmailJson": {
                   "codecId": "pg/json@1",
@@ -2247,10 +2718,25 @@
             },
             "resumeStrategy": {
               "columns": {
+                "aiModel": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "candidateJdAnalysisId": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "completionTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "costUsd": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
                 },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -2261,10 +2747,20 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "durationMs": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "promptTokens": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "result": {
                   "codecId": "pg/json@1",
@@ -2491,12 +2987,23 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "32230c3f68e1ad5194c3f7bdbb302d1f549e69152c52c439fcbd5f3499593ba1"
+    "storageHash": "b581f6ae0d8380cb5144430e019a73e17bf8004236549e5879476b8a751dd315"
   },
   "execution": {
-    "executionHash": "0ef841f71a95bc453d5bb993a110e3634a6b437ab48383edd7e4d87f1374008c",
+    "executionHash": "8dcf4da230b1090f0c6d42635e20dbee5a2639182338f6ad28eb991a36951ce7",
     "mutations": {
       "defaults": [
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "aiGenerationLog"
+          }
+        },
         {
           "onCreate": {
             "id": "uuidv4",

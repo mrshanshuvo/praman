@@ -107,9 +107,14 @@ model JobDescription {
   structured Json
   status     ApplicationStatus    @default(SAVED)
   tracker    Json?
-  createdAt  TimestamptzString    @default(now())
-  updatedAt  temporal.updatedAtString()
-  analysis   CandidateJdAnalysis?
+  aiModel          String?
+  promptTokens     Int?
+  completionTokens Int?
+  durationMs       Int?
+  costUsd          Float?
+  createdAt        TimestamptzString    @default(now())
+  updatedAt        temporal.updatedAtString()
+  analysis         CandidateJdAnalysis?
 }
 
 model CandidateJdAnalysis {
@@ -119,6 +124,11 @@ model CandidateJdAnalysis {
   result           Json
   matchScore       Int?
   matchLabel       String?
+  aiModel          String?
+  promptTokens     Int?
+  completionTokens Int?
+  durationMs       Int?
+  costUsd          Float?
   createdAt        TimestamptzString @default(now())
   updatedAt        temporal.updatedAtString()
   strategy         ResumeStrategy?
@@ -129,6 +139,11 @@ model ResumeStrategy {
   candidateJdAnalysisId String              @unique
   candidateJdAnalysis   CandidateJdAnalysis @relation(fields: [candidateJdAnalysisId], references: [id])
   result                Json
+  aiModel               String?
+  promptTokens          Int?
+  completionTokens      Int?
+  durationMs            Int?
+  costUsd               Float?
   createdAt             TimestamptzString   @default(now())
   updatedAt             temporal.updatedAtString()
   resumes               Resume[]
@@ -145,8 +160,27 @@ model Resume {
   isLatest           Boolean           @default(true)
   coverLetterJson    Json?
   recruiterEmailJson Json?
+  aiModel            String?
+  promptTokens       Int?
+  completionTokens   Int?
+  durationMs         Int?
+  costUsd            Float?
   createdAt          TimestamptzString @default(now())
   updatedAt          temporal.updatedAtString()
+}
+
+model AiGenerationLog {
+  id               String            @id @default(uuid())
+  userId           String?
+  jobDescriptionId String?
+  stage            String
+  model            String
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  durationMs       Int
+  costUsd          Float
+  createdAt        TimestamptzString @default(now())
 }
 
 enum ResumeStatus {

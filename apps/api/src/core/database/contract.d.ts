@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'32230c3f68e1ad5194c3f7bdbb302d1f549e69152c52c439fcbd5f3499593ba1'>;
+  StorageHashBase<'b581f6ae0d8380cb5144430e019a73e17bf8004236549e5879476b8a751dd315'>;
 export type ExecutionHash =
-  ExecutionHashBase<'0ef841f71a95bc453d5bb993a110e3634a6b437ab48383edd7e4d87f1374008c'>;
+  ExecutionHashBase<'8dcf4da230b1090f0c6d42635e20dbee5a2639182338f6ad28eb991a36951ce7'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -242,12 +242,30 @@ type DefaultLiteralValue<CodecId extends string, Encoded> = CodecId extends keyo
 
 export type FieldOutputTypes = {
   readonly public: {
+    readonly AiGenerationLog: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'] | null;
+      readonly jobDescriptionId: CodecTypes['pg/text@1']['output'] | null;
+      readonly stage: CodecTypes['pg/text@1']['output'];
+      readonly model: CodecTypes['pg/text@1']['output'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'];
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'];
+      readonly totalTokens: CodecTypes['pg/int4@1']['output'];
+      readonly durationMs: CodecTypes['pg/int4@1']['output'];
+      readonly costUsd: CodecTypes['pg/float8@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
     readonly CandidateJdAnalysis: {
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly jobDescriptionId: CodecTypes['pg/text@1']['output'];
       readonly result: CodecTypes['pg/json@1']['output'];
       readonly matchScore: CodecTypes['pg/int4@1']['output'] | null;
       readonly matchLabel: CodecTypes['pg/text@1']['output'] | null;
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -300,6 +318,11 @@ export type FieldOutputTypes = {
       readonly structured: CodecTypes['pg/json@1']['output'];
       readonly status: 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
       readonly tracker: CodecTypes['pg/json@1']['output'] | null;
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -325,6 +348,11 @@ export type FieldOutputTypes = {
       readonly isLatest: CodecTypes['pg/bool@1']['output'];
       readonly coverLetterJson: CodecTypes['pg/json@1']['output'] | null;
       readonly recruiterEmailJson: CodecTypes['pg/json@1']['output'] | null;
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -332,6 +360,11 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly candidateJdAnalysisId: CodecTypes['pg/text@1']['output'];
       readonly result: CodecTypes['pg/json@1']['output'];
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -357,12 +390,30 @@ export type FieldOutputTypes = {
 };
 export type FieldInputTypes = {
   readonly public: {
+    readonly AiGenerationLog: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'] | null;
+      readonly jobDescriptionId: CodecTypes['pg/text@1']['input'] | null;
+      readonly stage: CodecTypes['pg/text@1']['input'];
+      readonly model: CodecTypes['pg/text@1']['input'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'];
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'];
+      readonly totalTokens: CodecTypes['pg/int4@1']['input'];
+      readonly durationMs: CodecTypes['pg/int4@1']['input'];
+      readonly costUsd: CodecTypes['pg/float8@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
     readonly CandidateJdAnalysis: {
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly jobDescriptionId: CodecTypes['pg/text@1']['input'];
       readonly result: CodecTypes['pg/json@1']['input'];
       readonly matchScore: CodecTypes['pg/int4@1']['input'] | null;
       readonly matchLabel: CodecTypes['pg/text@1']['input'] | null;
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -415,6 +466,11 @@ export type FieldInputTypes = {
       readonly structured: CodecTypes['pg/json@1']['input'];
       readonly status: 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
       readonly tracker: CodecTypes['pg/json@1']['input'] | null;
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -440,6 +496,11 @@ export type FieldInputTypes = {
       readonly isLatest: CodecTypes['pg/bool@1']['input'];
       readonly coverLetterJson: CodecTypes['pg/json@1']['input'] | null;
       readonly recruiterEmailJson: CodecTypes['pg/json@1']['input'] | null;
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -447,6 +508,11 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly candidateJdAnalysisId: CodecTypes['pg/text@1']['input'];
       readonly result: CodecTypes['pg/json@1']['input'];
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -472,12 +538,30 @@ export type FieldInputTypes = {
 };
 export type StorageColumnTypes = {
   readonly public: {
-    readonly candidateJdAnalysis: {
+    readonly aiGenerationLog: {
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'];
+      readonly costUsd: CodecTypes['pg/float8@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly durationMs: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly jobDescriptionId: CodecTypes['pg/text@1']['output'] | null;
+      readonly model: CodecTypes['pg/text@1']['output'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'];
+      readonly stage: CodecTypes['pg/text@1']['output'];
+      readonly totalTokens: CodecTypes['pg/int4@1']['output'];
+      readonly userId: CodecTypes['pg/text@1']['output'] | null;
+    };
+    readonly candidateJdAnalysis: {
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly jobDescriptionId: CodecTypes['pg/text@1']['output'];
       readonly matchLabel: CodecTypes['pg/text@1']['output'] | null;
       readonly matchScore: CodecTypes['pg/int4@1']['output'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
       readonly result: CodecTypes['pg/json@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -524,8 +608,13 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly jobDescription: {
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
       readonly rawText: CodecTypes['pg/text@1']['output'];
       readonly status: 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
       readonly structured: CodecTypes['pg/json@1']['output'];
@@ -546,10 +635,15 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly resume: {
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly coverLetterJson: CodecTypes['pg/json@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly isLatest: CodecTypes['pg/bool@1']['output'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
       readonly recruiterEmailJson: CodecTypes['pg/json@1']['output'] | null;
       readonly resumeJson: CodecTypes['pg/json@1']['output'];
       readonly resumeStrategyId: CodecTypes['pg/text@1']['output'];
@@ -559,9 +653,14 @@ export type StorageColumnTypes = {
       readonly version: CodecTypes['pg/int4@1']['output'];
     };
     readonly resumeStrategy: {
+      readonly aiModel: CodecTypes['pg/text@1']['output'] | null;
       readonly candidateJdAnalysisId: CodecTypes['pg/text@1']['output'];
+      readonly completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly durationMs: CodecTypes['pg/int4@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['output'] | null;
       readonly result: CodecTypes['pg/json@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -587,12 +686,30 @@ export type StorageColumnTypes = {
 };
 export type StorageColumnInputTypes = {
   readonly public: {
-    readonly candidateJdAnalysis: {
+    readonly aiGenerationLog: {
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'];
+      readonly costUsd: CodecTypes['pg/float8@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly durationMs: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly jobDescriptionId: CodecTypes['pg/text@1']['input'] | null;
+      readonly model: CodecTypes['pg/text@1']['input'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'];
+      readonly stage: CodecTypes['pg/text@1']['input'];
+      readonly totalTokens: CodecTypes['pg/int4@1']['input'];
+      readonly userId: CodecTypes['pg/text@1']['input'] | null;
+    };
+    readonly candidateJdAnalysis: {
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly jobDescriptionId: CodecTypes['pg/text@1']['input'];
       readonly matchLabel: CodecTypes['pg/text@1']['input'] | null;
       readonly matchScore: CodecTypes['pg/int4@1']['input'] | null;
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
       readonly result: CodecTypes['pg/json@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -639,8 +756,13 @@ export type StorageColumnInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly jobDescription: {
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
       readonly rawText: CodecTypes['pg/text@1']['input'];
       readonly status: 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
       readonly structured: CodecTypes['pg/json@1']['input'];
@@ -661,10 +783,15 @@ export type StorageColumnInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly resume: {
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly coverLetterJson: CodecTypes['pg/json@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly isLatest: CodecTypes['pg/bool@1']['input'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
       readonly recruiterEmailJson: CodecTypes['pg/json@1']['input'] | null;
       readonly resumeJson: CodecTypes['pg/json@1']['input'];
       readonly resumeStrategyId: CodecTypes['pg/text@1']['input'];
@@ -674,9 +801,14 @@ export type StorageColumnInputTypes = {
       readonly version: CodecTypes['pg/int4@1']['input'];
     };
     readonly resumeStrategy: {
+      readonly aiModel: CodecTypes['pg/text@1']['input'] | null;
       readonly candidateJdAnalysisId: CodecTypes['pg/text@1']['input'];
+      readonly completionTokens: CodecTypes['pg/int4@1']['input'] | null;
+      readonly costUsd: CodecTypes['pg/float8@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly durationMs: CodecTypes['pg/int4@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
+      readonly promptTokens: CodecTypes['pg/int4@1']['input'] | null;
       readonly result: CodecTypes['pg/json@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -802,6 +934,11 @@ export namespace Models {
     structured: CodecTypes['pg/json@1']['output'];
     status: 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
     tracker: CodecTypes['pg/json@1']['output'] | null;
+    aiModel: CodecTypes['pg/text@1']['output'] | null;
+    promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+    completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+    durationMs: CodecTypes['pg/int4@1']['output'] | null;
+    costUsd: CodecTypes['pg/float8@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     analysis: public_CandidateJdAnalysis | null;
@@ -814,6 +951,11 @@ export namespace Models {
     result: CodecTypes['pg/json@1']['output'];
     matchScore: CodecTypes['pg/int4@1']['output'] | null;
     matchLabel: CodecTypes['pg/text@1']['output'] | null;
+    aiModel: CodecTypes['pg/text@1']['output'] | null;
+    promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+    completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+    durationMs: CodecTypes['pg/int4@1']['output'] | null;
+    costUsd: CodecTypes['pg/float8@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     jobDescription: public_JobDescription;
@@ -824,6 +966,11 @@ export namespace Models {
     id: CodecTypes['pg/text@1']['output'];
     candidateJdAnalysisId: CodecTypes['pg/text@1']['output'];
     result: CodecTypes['pg/json@1']['output'];
+    aiModel: CodecTypes['pg/text@1']['output'] | null;
+    promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+    completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+    durationMs: CodecTypes['pg/int4@1']['output'] | null;
+    costUsd: CodecTypes['pg/float8@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     candidateJdAnalysis: public_CandidateJdAnalysis;
@@ -840,10 +987,29 @@ export namespace Models {
     isLatest: CodecTypes['pg/bool@1']['output'];
     coverLetterJson: CodecTypes['pg/json@1']['output'] | null;
     recruiterEmailJson: CodecTypes['pg/json@1']['output'] | null;
+    aiModel: CodecTypes['pg/text@1']['output'] | null;
+    promptTokens: CodecTypes['pg/int4@1']['output'] | null;
+    completionTokens: CodecTypes['pg/int4@1']['output'] | null;
+    durationMs: CodecTypes['pg/int4@1']['output'] | null;
+    costUsd: CodecTypes['pg/float8@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     resumeStrategy: public_ResumeStrategy;
     readonly [RelationKeys]?: 'resumeStrategy';
+  };
+  export type public_AiGenerationLog = {
+    id: CodecTypes['pg/text@1']['output'];
+    userId: CodecTypes['pg/text@1']['output'] | null;
+    jobDescriptionId: CodecTypes['pg/text@1']['output'] | null;
+    stage: CodecTypes['pg/text@1']['output'];
+    model: CodecTypes['pg/text@1']['output'];
+    promptTokens: CodecTypes['pg/int4@1']['output'];
+    completionTokens: CodecTypes['pg/int4@1']['output'];
+    totalTokens: CodecTypes['pg/int4@1']['output'];
+    durationMs: CodecTypes['pg/int4@1']['output'];
+    costUsd: CodecTypes['pg/float8@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    readonly [RelationKeys]?: never;
   };
 }
 
@@ -860,6 +1026,7 @@ export declare const models: {
     CandidateJdAnalysis: Models.public_CandidateJdAnalysis;
     ResumeStrategy: Models.public_ResumeStrategy;
     Resume: Models.public_Resume;
+    AiGenerationLog: Models.public_AiGenerationLog;
   };
 };
 
@@ -881,6 +1048,70 @@ type ContractBase = Omit<
         readonly kind: 'postgres-schema';
         readonly entries: {
           readonly table: {
+            readonly aiGenerationLog: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly userId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly jobDescriptionId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly stage: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly model: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly promptTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly completionTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly totalTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly durationMs: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly costUsd: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: false;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
             readonly candidateJdAnalysis: {
               columns: {
                 readonly id: {
@@ -906,6 +1137,31 @@ type ContractBase = Omit<
                 readonly matchLabel: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly aiModel: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly promptTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly completionTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly durationMs: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly costUsd: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
                   readonly nullable: true;
                 };
                 readonly createdAt: {
@@ -1257,6 +1513,31 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/json@1';
                   readonly nullable: true;
                 };
+                readonly aiModel: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly promptTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly completionTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly durationMs: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly costUsd: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: true;
+                };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -1432,6 +1713,31 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/json@1';
                   readonly nullable: true;
                 };
+                readonly aiModel: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly promptTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly completionTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly durationMs: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly costUsd: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: true;
+                };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -1485,6 +1791,31 @@ type ContractBase = Omit<
                   readonly nativeType: 'json';
                   readonly codecId: 'pg/json@1';
                   readonly nullable: false;
+                };
+                readonly aiModel: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly promptTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly completionTokens: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly durationMs: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly costUsd: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: true;
                 };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
@@ -1683,11 +2014,84 @@ type ContractBase = Omit<
       readonly model: 'ResumeStrategy';
     };
     readonly resume: { readonly namespace: 'public' & NamespaceId; readonly model: 'Resume' };
+    readonly aiGenerationLog: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'AiGenerationLog';
+    };
   };
   readonly domain: {
     readonly namespaces: {
       readonly public: {
         readonly models: {
+          readonly AiGenerationLog: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly userId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly jobDescriptionId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly stage: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly model: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly promptTokens: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly completionTokens: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly totalTokens: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly durationMs: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly costUsd: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: {
+              readonly table: 'aiGenerationLog';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly userId: { readonly column: 'userId' };
+                readonly jobDescriptionId: { readonly column: 'jobDescriptionId' };
+                readonly stage: { readonly column: 'stage' };
+                readonly model: { readonly column: 'model' };
+                readonly promptTokens: { readonly column: 'promptTokens' };
+                readonly completionTokens: { readonly column: 'completionTokens' };
+                readonly totalTokens: { readonly column: 'totalTokens' };
+                readonly durationMs: { readonly column: 'durationMs' };
+                readonly costUsd: { readonly column: 'costUsd' };
+                readonly createdAt: { readonly column: 'createdAt' };
+              };
+            };
+          };
           readonly CandidateJdAnalysis: {
             readonly fields: {
               readonly id: {
@@ -1709,6 +2113,26 @@ type ContractBase = Omit<
               readonly matchLabel: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly aiModel: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly promptTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly completionTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly durationMs: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly costUsd: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
               };
               readonly createdAt: {
                 readonly nullable: false;
@@ -1760,6 +2184,11 @@ type ContractBase = Omit<
                 readonly result: { readonly column: 'result' };
                 readonly matchScore: { readonly column: 'matchScore' };
                 readonly matchLabel: { readonly column: 'matchLabel' };
+                readonly aiModel: { readonly column: 'aiModel' };
+                readonly promptTokens: { readonly column: 'promptTokens' };
+                readonly completionTokens: { readonly column: 'completionTokens' };
+                readonly durationMs: { readonly column: 'durationMs' };
+                readonly costUsd: { readonly column: 'costUsd' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -2136,6 +2565,26 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
               };
+              readonly aiModel: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly promptTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly completionTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly durationMs: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly costUsd: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -2184,6 +2633,11 @@ type ContractBase = Omit<
                 readonly structured: { readonly column: 'structured' };
                 readonly status: { readonly column: 'status' };
                 readonly tracker: { readonly column: 'tracker' };
+                readonly aiModel: { readonly column: 'aiModel' };
+                readonly promptTokens: { readonly column: 'promptTokens' };
+                readonly completionTokens: { readonly column: 'completionTokens' };
+                readonly durationMs: { readonly column: 'durationMs' };
+                readonly costUsd: { readonly column: 'costUsd' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -2309,6 +2763,26 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
               };
+              readonly aiModel: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly promptTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly completionTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly durationMs: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly costUsd: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -2351,6 +2825,11 @@ type ContractBase = Omit<
                 readonly isLatest: { readonly column: 'isLatest' };
                 readonly coverLetterJson: { readonly column: 'coverLetterJson' };
                 readonly recruiterEmailJson: { readonly column: 'recruiterEmailJson' };
+                readonly aiModel: { readonly column: 'aiModel' };
+                readonly promptTokens: { readonly column: 'promptTokens' };
+                readonly completionTokens: { readonly column: 'completionTokens' };
+                readonly durationMs: { readonly column: 'durationMs' };
+                readonly costUsd: { readonly column: 'costUsd' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -2369,6 +2848,26 @@ type ContractBase = Omit<
               readonly result: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly aiModel: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly promptTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly completionTokens: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly durationMs: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly costUsd: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
               };
               readonly createdAt: {
                 readonly nullable: false;
@@ -2417,6 +2916,11 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly candidateJdAnalysisId: { readonly column: 'candidateJdAnalysisId' };
                 readonly result: { readonly column: 'result' };
+                readonly aiModel: { readonly column: 'aiModel' };
+                readonly promptTokens: { readonly column: 'promptTokens' };
+                readonly completionTokens: { readonly column: 'completionTokens' };
+                readonly durationMs: { readonly column: 'durationMs' };
+                readonly costUsd: { readonly column: 'costUsd' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -2619,6 +3123,14 @@ type ContractBase = Omit<
     readonly executionHash: ExecutionHash;
     readonly mutations: {
       readonly defaults: readonly [
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'aiGenerationLog';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
         {
           readonly ref: {
             readonly namespace: 'public';

@@ -101,6 +101,11 @@ export interface ResumeRecord {
   coverLetterJson?: any;
   recruiterEmailJson?: any;
   downloadUrl?: string | null;
+  aiModel?: string | null;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+  durationMs?: number | null;
+  costUsd?: number | null;
   createdAt: string;
   updatedAt: string;
 }

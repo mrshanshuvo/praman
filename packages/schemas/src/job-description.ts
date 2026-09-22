@@ -186,6 +186,11 @@ export interface CandidateJdAnalysisRecord {
   result: MatchAnalysis | null;
   matchScore?: number | null;
   matchLabel?: string | null;
+  aiModel?: string | null;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+  durationMs?: number | null;
+  costUsd?: number | null;
   createdAt: string;
   updatedAt: string;
   strategy?: {
@@ -194,6 +199,11 @@ export interface CandidateJdAnalysisRecord {
     result: ResumeStrategy | null;
     resume?: ResumeRecord | null;
     resumes?: ResumeRecord[];
+    aiModel?: string | null;
+    promptTokens?: number | null;
+    completionTokens?: number | null;
+    durationMs?: number | null;
+    costUsd?: number | null;
     createdAt: string;
     updatedAt: string;
   } | null;
@@ -206,7 +216,45 @@ export interface JobDescriptionRecord {
   structured: StructuredJd;
   status: ApplicationStatus;
   tracker?: ApplicationTracker | null;
+  aiModel?: string | null;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+  durationMs?: number | null;
+  costUsd?: number | null;
   createdAt: string;
   updatedAt: string;
   analysis?: CandidateJdAnalysisRecord | null;
+}
+
+export interface AiStageTelemetry {
+  stage: string;
+  model: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  durationMs: number;
+  costUsd: number;
+  createdAt?: string;
+}
+
+export interface JobTelemetrySummary {
+  jobDescriptionId: string;
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalCostUsd: number;
+  totalDurationMs: number;
+  stages: AiStageTelemetry[];
+}
+
+export interface UserAiUsageSummary {
+  userId: string;
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalCostUsd: number;
+  totalGenerations: number;
+  quotaLimitTokens: number;
+  quotaUsedPercentage: number;
+  stageBreakdown: Record<string, { count: number; tokens: number; costUsd: number }>;
 }
