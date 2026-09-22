@@ -1,29 +1,26 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Put,
-  Query,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  type CreateJobDescriptionDto,
   CreateJobDescriptionDtoSchema,
+  type CreateMilestoneDto,
   CreateMilestoneDtoSchema,
+  type CreateNoteDto,
   CreateNoteDtoSchema,
+  type PaginationQueryDto,
   PaginationQuerySchema,
+  type UpdateApplicationTrackerDto,
   UpdateApplicationTrackerDtoSchema,
+  type UpdateJobStatusDto,
   UpdateJobStatusDtoSchema,
+  type UpdateMilestoneDto,
   UpdateMilestoneDtoSchema,
+  type UpdateNoteDto,
   UpdateNoteDtoSchema,
 } from '@praman/schemas';
 import type { Response } from 'express';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { MatchService } from '../match/match.service.js';
 import { PipelineService } from '../pipeline/pipeline.service.js';
 import { ResumeService } from '../resume/resume.service.js';
@@ -46,21 +43,21 @@ export class JobDescriptionController {
   @ApiOperation({ summary: 'Create and analyze a raw job description' })
   @ApiResponse({ status: 201, description: 'JD created and parsed into structured format' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
-  async createJd(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateJobDescriptionDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.createAndAnalyze(parse.data.rawText, user?.id, parse.data.force);
+  async createJd(
+    @Body(new ZodValidationPipe(CreateJobDescriptionDtoSchema)) dto: CreateJobDescriptionDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.jdService.createAndAnalyze(dto.rawText, user?.id, dto.force);
   }
 
   @Get()
   @ApiOperation({ summary: 'List all job descriptions for current user (supports pagination)' })
   @ApiResponse({ status: 200, description: 'List of job descriptions or paginated response' })
-  async listJds(@Query() query: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = PaginationQuerySchema.safeParse(query);
-    const pagination = parse.success ? parse.data : undefined;
-    return this.jdService.getAllJds(user?.id, pagination);
+  async listJds(
+    @Query(new ZodValidationPipe(PaginationQuerySchema)) query?: PaginationQueryDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.jdService.getAllJds(user?.id, query);
   }
 
   @Get(':id')
@@ -86,14 +83,10 @@ export class JobDescriptionController {
   @ApiResponse({ status: 404, description: 'Job description not found' })
   async updateStatus(
     @Param('id') id: string,
-    @Body() body: unknown,
+    @Body(new ZodValidationPipe(UpdateJobStatusDtoSchema)) dto: UpdateJobStatusDto,
     @CurrentUser() user?: AuthUser,
   ) {
-    const parse = UpdateJobStatusDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.updateStatus(id, parse.data.status, user?.id);
+    return this.jdService.updateStatus(id, dto.status, user?.id);
   }
 
   // --- Tracker & Milestones Endpoints ---
@@ -112,14 +105,11 @@ export class JobDescriptionController {
   @ApiResponse({ status: 200, description: 'Application tracker updated' })
   async updateTrackerDossier(
     @Param('id') id: string,
-    @Body() body: unknown,
+    @Body(new ZodValidationPipe(UpdateApplicationTrackerDtoSchema))
+    dto: UpdateApplicationTrackerDto,
     @CurrentUser() user?: AuthUser,
   ) {
-    const parse = UpdateApplicationTrackerDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.updateTrackerDossier(id, parse.data, user?.id);
+    return this.jdService.updateTrackerDossier(id, dto, user?.id);
   }
 
   @Post(':id/milestones')
@@ -127,14 +117,10 @@ export class JobDescriptionController {
   @ApiResponse({ status: 201, description: 'Interview milestone created' })
   async addMilestone(
     @Param('id') id: string,
-    @Body() body: unknown,
+    @Body(new ZodValidationPipe(CreateMilestoneDtoSchema)) dto: CreateMilestoneDto,
     @CurrentUser() user?: AuthUser,
   ) {
-    const parse = CreateMilestoneDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.addMilestone(id, parse.data, user?.id);
+    return this.jdService.addMilestone(id, dto, user?.id);
   }
 
   @Patch(':id/milestones/:milestoneId')
@@ -143,14 +129,10 @@ export class JobDescriptionController {
   async updateMilestone(
     @Param('id') id: string,
     @Param('milestoneId') milestoneId: string,
-    @Body() body: unknown,
+    @Body(new ZodValidationPipe(UpdateMilestoneDtoSchema)) dto: UpdateMilestoneDto,
     @CurrentUser() user?: AuthUser,
   ) {
-    const parse = UpdateMilestoneDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.updateMilestone(id, milestoneId, parse.data, user?.id);
+    return this.jdService.updateMilestone(id, milestoneId, dto, user?.id);
   }
 
   @Delete(':id/milestones/:milestoneId')
@@ -167,12 +149,12 @@ export class JobDescriptionController {
   @Post(':id/notes')
   @ApiOperation({ summary: 'Add a timestamped application note' })
   @ApiResponse({ status: 201, description: 'Note added' })
-  async addNote(@Param('id') id: string, @Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateNoteDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.addNote(id, parse.data, user?.id);
+  async addNote(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(CreateNoteDtoSchema)) dto: CreateNoteDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.jdService.addNote(id, dto, user?.id);
   }
 
   @Patch(':id/notes/:noteId')
@@ -181,14 +163,10 @@ export class JobDescriptionController {
   async updateNote(
     @Param('id') id: string,
     @Param('noteId') noteId: string,
-    @Body() body: unknown,
+    @Body(new ZodValidationPipe(UpdateNoteDtoSchema)) dto: UpdateNoteDto,
     @CurrentUser() user?: AuthUser,
   ) {
-    const parse = UpdateNoteDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.jdService.updateNote(id, noteId, parse.data, user?.id);
+    return this.jdService.updateNote(id, noteId, dto, user?.id);
   }
 
   @Delete(':id/notes/:noteId')

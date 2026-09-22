@@ -1,26 +1,35 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  type BatchImportProfileRequest,
   BatchImportProfileRequestSchema,
+  type CreateCertificationDto,
   CreateCertificationDtoSchema,
+  type CreateEducationDto,
   CreateEducationDtoSchema,
+  type CreateExperienceDto,
   CreateExperienceDtoSchema,
+  type CreateProjectDto,
   CreateProjectDtoSchema,
+  type CreateSkillDto,
   CreateSkillDtoSchema,
+  type ParseResumeRequest,
   ParseResumeRequestSchema,
+  type UpdateCandidatePersonal,
   UpdateCandidatePersonalSchema,
+  type UpdateCertificationDto,
+  UpdateCertificationDtoSchema,
+  type UpdateEducationDto,
+  UpdateEducationDtoSchema,
+  type UpdateExperienceDto,
+  UpdateExperienceDtoSchema,
+  type UpdateProjectDto,
+  UpdateProjectDtoSchema,
+  type UpdateSkillDto,
+  UpdateSkillDtoSchema,
 } from '@praman/schemas';
 import { type AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { CandidateService } from './candidate.service.js';
 import { ResumeParserService } from './resume-parser.service.js';
 
@@ -36,23 +45,20 @@ export class CandidateController {
   @Post('parse-resume')
   @ApiOperation({ summary: 'Parse raw resume text heuristically offline' })
   @ApiResponse({ status: 200, description: 'Parsed resume data returned' })
-  async parseResume(@Body() body: unknown) {
-    const parse = ParseResumeRequestSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.resumeParserService.parse(parse.data.rawText);
+  async parseResume(
+    @Body(new ZodValidationPipe(ParseResumeRequestSchema)) dto: ParseResumeRequest,
+  ) {
+    return this.resumeParserService.parse(dto.rawText);
   }
 
   @Post('import')
   @ApiOperation({ summary: 'Batch import parsed resume into candidate profile' })
   @ApiResponse({ status: 200, description: 'Profile imported successfully' })
-  async importProfile(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = BatchImportProfileRequestSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.batchImportProfile(parse.data, user?.id);
+  async importProfile(
+    @Body(new ZodValidationPipe(BatchImportProfileRequestSchema)) dto: BatchImportProfileRequest,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.batchImportProfile(dto, user?.id);
   }
 
   @Get()
@@ -65,55 +71,61 @@ export class CandidateController {
   @Put()
   @ApiOperation({ summary: 'Update personal contact details and links' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
-  async updatePersonal(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = UpdateCandidatePersonalSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.updatePersonal(parse.data, user?.id);
+  async updatePersonal(
+    @Body(new ZodValidationPipe(UpdateCandidatePersonalSchema)) dto: UpdateCandidatePersonal,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.updatePersonal(dto, user?.id);
   }
 
   @Put('personal')
   @ApiOperation({ summary: 'Update personal contact details and links (alias)' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
-  async updatePersonalAlias(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    return this.updatePersonal(body, user);
+  async updatePersonalAlias(
+    @Body(new ZodValidationPipe(UpdateCandidatePersonalSchema)) dto: UpdateCandidatePersonal,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.updatePersonal(dto, user);
   }
 
   @Patch()
   @ApiOperation({ summary: 'Partially update personal details and links' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
-  async patchPersonal(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    return this.updatePersonal(body, user);
+  async patchPersonal(
+    @Body(new ZodValidationPipe(UpdateCandidatePersonalSchema)) dto: UpdateCandidatePersonal,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.updatePersonal(dto, user);
   }
 
   @Patch('personal')
   @ApiOperation({ summary: 'Partially update personal details and links (alias)' })
   @ApiResponse({ status: 200, description: 'Personal details updated' })
-  async patchPersonalAlias(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    return this.updatePersonal(body, user);
+  async patchPersonalAlias(
+    @Body(new ZodValidationPipe(UpdateCandidatePersonalSchema)) dto: UpdateCandidatePersonal,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.updatePersonal(dto, user);
   }
 
   // Experiences
   @Post('experiences')
   @ApiOperation({ summary: 'Add a work experience entry' })
   @ApiResponse({ status: 201, description: 'Experience added' })
-  async addExperience(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateExperienceDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.addExperience(parse.data, user?.id);
+  async addExperience(
+    @Body(new ZodValidationPipe(CreateExperienceDtoSchema)) dto: CreateExperienceDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.addExperience(dto, user?.id);
   }
 
   @Put('experiences/:id')
   @ApiOperation({ summary: 'Update an existing work experience entry' })
-  async updateExperience(@Param('id') id: string, @Body() body: unknown) {
-    const parse = CreateExperienceDtoSchema.partial().safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.updateExperience(id, parse.data);
+  async updateExperience(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateExperienceDtoSchema)) dto: UpdateExperienceDto,
+  ) {
+    return this.candidateService.updateExperience(id, dto);
   }
 
   @Delete('experiences/:id')
@@ -126,22 +138,20 @@ export class CandidateController {
   @Post('projects')
   @ApiOperation({ summary: 'Add a project entry' })
   @ApiResponse({ status: 201, description: 'Project added' })
-  async addProject(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateProjectDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.addProject(parse.data, user?.id);
+  async addProject(
+    @Body(new ZodValidationPipe(CreateProjectDtoSchema)) dto: CreateProjectDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.addProject(dto, user?.id);
   }
 
   @Put('projects/:id')
   @ApiOperation({ summary: 'Update an existing project entry' })
-  async updateProject(@Param('id') id: string, @Body() body: unknown) {
-    const parse = CreateProjectDtoSchema.partial().safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.updateProject(id, parse.data);
+  async updateProject(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateProjectDtoSchema)) dto: UpdateProjectDto,
+  ) {
+    return this.candidateService.updateProject(id, dto);
   }
 
   @Delete('projects/:id')
@@ -154,22 +164,20 @@ export class CandidateController {
   @Post('skills')
   @ApiOperation({ summary: 'Add a skill entry' })
   @ApiResponse({ status: 201, description: 'Skill added' })
-  async addSkill(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateSkillDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.addSkill(parse.data, user?.id);
+  async addSkill(
+    @Body(new ZodValidationPipe(CreateSkillDtoSchema)) dto: CreateSkillDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.addSkill(dto, user?.id);
   }
 
   @Put('skills/:id')
   @ApiOperation({ summary: 'Update a skill entry' })
-  async updateSkill(@Param('id') id: string, @Body() body: unknown) {
-    const parse = CreateSkillDtoSchema.partial().safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.updateSkill(id, parse.data);
+  async updateSkill(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateSkillDtoSchema)) dto: UpdateSkillDto,
+  ) {
+    return this.candidateService.updateSkill(id, dto);
   }
 
   @Delete('skills/:id')
@@ -182,22 +190,20 @@ export class CandidateController {
   @Post('educations')
   @ApiOperation({ summary: 'Add an education entry' })
   @ApiResponse({ status: 201, description: 'Education added' })
-  async addEducation(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateEducationDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.addEducation(parse.data, user?.id);
+  async addEducation(
+    @Body(new ZodValidationPipe(CreateEducationDtoSchema)) dto: CreateEducationDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.addEducation(dto, user?.id);
   }
 
   @Put('educations/:id')
   @ApiOperation({ summary: 'Update an education entry' })
-  async updateEducation(@Param('id') id: string, @Body() body: unknown) {
-    const parse = CreateEducationDtoSchema.partial().safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.updateEducation(id, parse.data);
+  async updateEducation(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateEducationDtoSchema)) dto: UpdateEducationDto,
+  ) {
+    return this.candidateService.updateEducation(id, dto);
   }
 
   @Delete('educations/:id')
@@ -210,22 +216,20 @@ export class CandidateController {
   @Post('certifications')
   @ApiOperation({ summary: 'Add a certification entry' })
   @ApiResponse({ status: 201, description: 'Certification added' })
-  async addCertification(@Body() body: unknown, @CurrentUser() user?: AuthUser) {
-    const parse = CreateCertificationDtoSchema.safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.addCertification(parse.data, user?.id);
+  async addCertification(
+    @Body(new ZodValidationPipe(CreateCertificationDtoSchema)) dto: CreateCertificationDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.candidateService.addCertification(dto, user?.id);
   }
 
   @Put('certifications/:id')
   @ApiOperation({ summary: 'Update a certification entry' })
-  async updateCertification(@Param('id') id: string, @Body() body: unknown) {
-    const parse = CreateCertificationDtoSchema.partial().safeParse(body);
-    if (!parse.success) {
-      throw new BadRequestException(parse.error.flatten());
-    }
-    return this.candidateService.updateCertification(id, parse.data);
+  async updateCertification(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateCertificationDtoSchema)) dto: UpdateCertificationDto,
+  ) {
+    return this.candidateService.updateCertification(id, dto);
   }
 
   @Delete('certifications/:id')

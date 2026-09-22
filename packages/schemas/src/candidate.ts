@@ -92,18 +92,28 @@ export type CandidateProfile = z.infer<typeof CandidateProfileSchema>;
 // DTOs for adding/editing items (where id may be omitted or generated on backend)
 export const CreateSkillDtoSchema = SkillSchema.omit({ id: true });
 export type CreateSkillDto = z.infer<typeof CreateSkillDtoSchema>;
+export const UpdateSkillDtoSchema = CreateSkillDtoSchema.partial();
+export type UpdateSkillDto = z.infer<typeof UpdateSkillDtoSchema>;
 
 export const CreateExperienceDtoSchema = ExperienceSchema.omit({ id: true });
 export type CreateExperienceDto = z.infer<typeof CreateExperienceDtoSchema>;
+export const UpdateExperienceDtoSchema = CreateExperienceDtoSchema.partial();
+export type UpdateExperienceDto = z.infer<typeof UpdateExperienceDtoSchema>;
 
 export const CreateProjectDtoSchema = ProjectSchema.omit({ id: true });
 export type CreateProjectDto = z.infer<typeof CreateProjectDtoSchema>;
+export const UpdateProjectDtoSchema = CreateProjectDtoSchema.partial();
+export type UpdateProjectDto = z.infer<typeof UpdateProjectDtoSchema>;
 
 export const CreateEducationDtoSchema = EducationSchema.omit({ id: true });
 export type CreateEducationDto = z.infer<typeof CreateEducationDtoSchema>;
+export const UpdateEducationDtoSchema = CreateEducationDtoSchema.partial();
+export type UpdateEducationDto = z.infer<typeof UpdateEducationDtoSchema>;
 
 export const CreateCertificationDtoSchema = CertificationSchema.omit({ id: true });
 export type CreateCertificationDto = z.infer<typeof CreateCertificationDtoSchema>;
+export const UpdateCertificationDtoSchema = CreateCertificationDtoSchema.partial();
+export type UpdateCertificationDto = z.infer<typeof UpdateCertificationDtoSchema>;
 
 export const ParseResumeRequestSchema = z.object({
   rawText: z.string().min(20, 'Resume text must be at least 20 characters'),
