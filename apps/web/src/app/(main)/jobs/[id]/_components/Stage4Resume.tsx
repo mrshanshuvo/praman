@@ -1,6 +1,6 @@
 'use client';
 
-import type { ResumeStatus } from '@praman/schemas';
+import type { ResumeData, ResumeRecord, ResumeStatus, ValidationReport } from '@praman/schemas';
 import { ExternalLink, FileJson, FileText, Play, RefreshCw, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { JsonCard } from '@/components/JsonCard';
@@ -14,10 +14,10 @@ import { StageEmpty } from './StageEmpty';
 
 interface Stage4ResumeProps {
   jobId: string;
-  resumeJson: any;
-  validationReport: any;
+  resumeJson: ResumeData | null | undefined;
+  validationReport: ValidationReport | null | undefined;
   resumeStatus: ResumeStatus | undefined;
-  resumeRecord: any;
+  resumeRecord: ResumeRecord | null | undefined;
   hasStrategy: boolean;
   isRunning: boolean;
   isDisabled: boolean;

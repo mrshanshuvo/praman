@@ -1,4 +1,10 @@
-import type { ResumeRecord, ResumeVersionSummary } from '@praman/schemas';
+import type {
+  CoverLetter,
+  NumberFlag,
+  RecruiterEmail,
+  ResumeRecord,
+  ResumeVersionSummary,
+} from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   API_URL,
@@ -85,10 +91,10 @@ export function useJobOutreach(id: string) {
     queryKey: ['jobs', id, 'outreach'],
     queryFn: () =>
       fetcher<{
-        coverLetter: any | null;
+        coverLetter: CoverLetter | null;
         coverLetterLatex: string | null;
-        coverLetterValidation: { numberFlags: any[]; violations: string[] } | null;
-        recruiterEmail: any | null;
+        coverLetterValidation: { numberFlags: NumberFlag[]; violations: string[] } | null;
+        recruiterEmail: RecruiterEmail | null;
       }>(`${API_URL}/job-descriptions/${id}/outreach`),
     enabled: Boolean(id),
   });
@@ -98,7 +104,7 @@ export function useGenerateCoverLetter(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>
-      fetcher<{ coverLetter: any; coverLetterLatex: string }>(
+      fetcher<{ coverLetter: CoverLetter; coverLetterLatex: string }>(
         `${API_URL}/job-descriptions/${id}/outreach/cover-letter`,
         { method: 'POST' },
       ),
@@ -113,9 +119,12 @@ export function useGenerateRecruiterEmail(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>
-      fetcher<{ recruiterEmail: any }>(`${API_URL}/job-descriptions/${id}/outreach/email`, {
-        method: 'POST',
-      }),
+      fetcher<{ recruiterEmail: RecruiterEmail }>(
+        `${API_URL}/job-descriptions/${id}/outreach/email`,
+        {
+          method: 'POST',
+        },
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs', id, 'outreach'] });
       queryClient.invalidateQueries({ queryKey: ['jobs', id, 'resume'] });

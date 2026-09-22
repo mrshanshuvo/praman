@@ -145,7 +145,7 @@ export function AppSidebar() {
             </span>
             <div className="space-y-1">
               {recentJobs.map((j) => {
-                const score = j.analysis?.result?.overallScore;
+                const score = j.analysis?.matchScore;
                 const details = [j.structured?.seniority, j.structured?.locationOrWorkMode]
                   .filter(Boolean)
                   .join(' · ');

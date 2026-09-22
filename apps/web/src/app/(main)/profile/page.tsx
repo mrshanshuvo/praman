@@ -48,7 +48,7 @@ function ProfileContent() {
 
   if (loading) return <ProfileSkeleton />;
 
-  const personal = profile?.personal || {};
+  const personal = profile?.personal;
   const experiences = profile?.experiences || [];
   const projects = profile?.projects || [];
   const skills = profile?.skills || [];

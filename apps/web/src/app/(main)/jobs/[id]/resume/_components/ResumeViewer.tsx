@@ -1,6 +1,6 @@
 'use client';
 
-import type { ValidationReport } from '@praman/schemas';
+import type { CandidateProfile, ResumeData, ValidationReport } from '@praman/schemas';
 import { cn } from 'cn';
 import {
   AlertTriangle,
@@ -18,9 +18,9 @@ import type { EvidenceTarget } from '@/components/ValidationReportPanel';
 import { EvidenceInspectorModal, type InspectedEvidence } from './EvidenceInspectorModal';
 
 interface ResumeViewerProps {
-  resume: any;
+  resume: ResumeData;
   validationReport?: ValidationReport | null;
-  candidateProfile?: any;
+  candidateProfile?: CandidateProfile;
   activeTarget?: EvidenceTarget | null;
   onSelectTarget?: (target: EvidenceTarget | null) => void;
 }

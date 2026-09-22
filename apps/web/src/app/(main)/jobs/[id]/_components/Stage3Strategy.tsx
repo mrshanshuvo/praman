@@ -1,5 +1,6 @@
 'use client';
 
+import type { ResumeStrategy } from '@praman/schemas';
 import { JsonCard } from '@/components/JsonCard';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { StageEmpty } from './StageEmpty';
 import { StageHeader } from './StageHeader';
 
 interface Stage3StrategyProps {
-  strategy: any;
+  strategy: ResumeStrategy | null | undefined;
   hasAnalysis: boolean;
   isRunning: boolean;
   isDisabled: boolean;

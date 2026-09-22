@@ -125,7 +125,7 @@ export default function ResumeAuditPage() {
         resumeJson={resume}
         latexCode={latex}
         templateId={selectedTemplate}
-        matchAnalysis={jd?.analysis?.result || jd?.analysis}
+        matchAnalysis={jd?.analysis?.result ?? null}
         isFetching={isFetching}
         isRegenerating={runStageMutation.isPending}
         onRefresh={() => refetch()}

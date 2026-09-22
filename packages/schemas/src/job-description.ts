@@ -1,7 +1,11 @@
 import { z } from 'zod';
+import type { MatchAnalysis } from './match';
+import type { ResumeRecord } from './resume';
+import type { ResumeStrategy } from './strategy';
 
 export const StructuredJdSchema = z.object({
   jobTitle: z.string().describe('The primary title of the job opening'),
+  company: z.string().nullable().optional().describe('Company or hiring organization if specified'),
   seniority: z
     .string()
     .nullable()
@@ -179,7 +183,7 @@ export type UpdateApplicationTrackerDto = z.infer<typeof UpdateApplicationTracke
 export interface CandidateJdAnalysisRecord {
   id: string;
   jobDescriptionId: string;
-  result: any;
+  result: MatchAnalysis | null;
   matchScore?: number | null;
   matchLabel?: string | null;
   createdAt: string;
@@ -187,9 +191,9 @@ export interface CandidateJdAnalysisRecord {
   strategy?: {
     id: string;
     candidateJdAnalysisId: string;
-    result: any;
-    resume?: any;
-    resumes?: any[];
+    result: ResumeStrategy | null;
+    resume?: ResumeRecord | null;
+    resumes?: ResumeRecord[];
     createdAt: string;
     updatedAt: string;
   } | null;

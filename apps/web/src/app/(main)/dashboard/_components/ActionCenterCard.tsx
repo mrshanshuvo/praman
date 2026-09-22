@@ -41,8 +41,8 @@ export function ActionCenterCard({ jobs = [], onOpenQuickIngest }: ActionCenterC
   const actionItems: ActionItem[] = [];
 
   for (const job of jobs) {
-    const jobTitle = job.structured?.jobTitle || (job as any).title || 'Target Role';
-    const company = (job as any).company || (job.structured as any)?.company || 'Target Company';
+    const jobTitle = job.structured?.jobTitle || 'Target Role';
+    const company = job.structured?.company || 'Target Company';
 
     // 1. Check for Upcoming Scheduled Interviews
     const milestones = job.tracker?.milestones || [];
@@ -79,10 +79,7 @@ export function ActionCenterCard({ jobs = [], onOpenQuickIngest }: ActionCenterC
     }
 
     // 2. High Match Score but Resume not yet generated
-    const matchScore =
-      job.analysis?.matchScore ??
-      (job.analysis?.result as any)?.overallScore ??
-      (job.analysis?.result as any)?.score;
+    const matchScore = job.analysis?.matchScore ?? 0;
     const hasResume = Boolean(job.analysis?.strategy?.resume?.resumeJson);
 
     if (matchScore && matchScore >= 65 && !hasResume) {

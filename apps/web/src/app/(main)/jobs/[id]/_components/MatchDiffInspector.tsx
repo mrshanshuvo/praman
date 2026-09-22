@@ -1,6 +1,6 @@
 'use client';
 
-import type { MatchAnalysis, StructuredJd } from '@praman/schemas';
+import type { CandidateProfile, MatchAnalysis, Skill, StructuredJd } from '@praman/schemas';
 import {
   AlertOctagon,
   AlertTriangle,
@@ -27,7 +27,7 @@ import { SkillClaimTuningDialog } from './SkillClaimTuningDialog';
 interface MatchDiffInspectorProps {
   analysis: MatchAnalysis;
   structured?: StructuredJd;
-  candidateProfile?: any;
+  candidateProfile?: CandidateProfile;
   onRunStage?: () => void;
   isRunning?: boolean;
 }
@@ -52,12 +52,12 @@ export function MatchDiffInspector({
   const [tuningSkill, setTuningSkill] = useState<{
     name: string;
     type?: 'required' | 'preferred';
-    existingSkill?: any;
+    existingSkill?: Skill;
   } | null>(null);
   const [hasModifiedClaims, setHasModifiedClaims] = useState(false);
 
   const candidateSkillsMap = useMemo(() => {
-    const map = new Map<string, any>();
+    const map = new Map<string, Skill>();
     for (const sk of candidateProfile?.skills || []) {
       if (sk?.name) map.set(sk.name.toLowerCase().trim(), sk);
     }
@@ -179,7 +179,7 @@ export function MatchDiffInspector({
     setTuningSkill({
       name,
       type,
-      existingSkill: existing || null,
+      existingSkill: existing,
     });
   };
 

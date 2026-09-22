@@ -1,5 +1,6 @@
 'use client';
 
+import type { CandidatePersonal, UpdateCandidatePersonal } from '@praman/schemas';
 import { Check, Edit2, Globe, Mail, MapPin, Phone, RefreshCw, Sparkles } from 'lucide-react';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -18,14 +19,14 @@ import { Input } from '@/components/ui/input';
 import { ResumeImportModal } from './ResumeImportModal';
 
 interface ProfileHeaderCardProps {
-  personal: any;
+  personal?: CandidatePersonal | null;
   isFetching: boolean;
   onRefresh: () => void;
-  onUpdatePersonal: (personal: any) => Promise<void>;
+  onUpdatePersonal: (personal: UpdateCandidatePersonal) => Promise<void>;
 }
 
 export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
-  personal = {},
+  personal,
   isFetching,
   onRefresh,
   onUpdatePersonal,
@@ -35,26 +36,26 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const [form, setForm] = useState({
-    name: personal.name || '',
-    title: personal.title || '',
-    location: personal.location || '',
-    email: personal.contact?.email || '',
-    phone: personal.contact?.phone || '',
-    github: personal.links?.github || '',
-    linkedin: personal.links?.linkedin || '',
-    portfolio: personal.links?.portfolio || '',
+    name: personal?.name || '',
+    title: personal?.title || '',
+    location: personal?.location || '',
+    email: personal?.contact?.email || '',
+    phone: personal?.contact?.phone || '',
+    github: personal?.links?.github || '',
+    linkedin: personal?.links?.linkedin || '',
+    portfolio: personal?.links?.portfolio || '',
   });
 
   const handleOpenEdit = () => {
     setForm({
-      name: personal.name || '',
-      title: personal.title || '',
-      location: personal.location || '',
-      email: personal.contact?.email || '',
-      phone: personal.contact?.phone || '',
-      github: personal.links?.github || '',
-      linkedin: personal.links?.linkedin || '',
-      portfolio: personal.links?.portfolio || '',
+      name: personal?.name || '',
+      title: personal?.title || '',
+      location: personal?.location || '',
+      email: personal?.contact?.email || '',
+      phone: personal?.contact?.phone || '',
+      github: personal?.links?.github || '',
+      linkedin: personal?.links?.linkedin || '',
+      portfolio: personal?.links?.portfolio || '',
     });
     setIsEditOpen(true);
   };
@@ -63,13 +64,13 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     e.preventDefault();
     setIsSaving(true);
     try {
-      const updatedPersonal = {
+      const updatedPersonal: UpdateCandidatePersonal = {
         ...personal,
         name: form.name,
         title: form.title,
         location: form.location,
         contact: {
-          ...personal.contact,
+          ...personal?.contact,
           email: form.email,
           phone: form.phone,
         },
@@ -94,12 +95,12 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-brand-pink/10 border border-brand-pink/30 flex items-center justify-center text-brand-pink dark:bg-brand-cyan/10 dark:border-brand-cyan/30 dark:text-brand-cyan text-2xl font-bold font-mono shadow-xs shrink-0">
-              {personal.name ? personal.name.charAt(0).toUpperCase() : 'C'}
+              {personal?.name ? personal.name.charAt(0).toUpperCase() : 'C'}
             </div>
             <div>
               <div className="flex items-center gap-2.5">
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-                  {personal.name || 'Candidate Profile'}
+                  {personal?.name || 'Candidate Profile'}
                 </h1>
                 <Badge
                   variant="outline"
@@ -109,22 +110,22 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                 </Badge>
               </div>
               <p className="text-muted-foreground text-sm sm:text-base mt-1">
-                {personal.title || 'Full-Stack Developer'}
+                {personal?.title || 'Full-Stack Developer'}
               </p>
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-3">
-                {personal.location && (
+                {personal?.location && (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/70 text-foreground/85">
                     <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                     {personal.location}
                   </span>
                 )}
-                {personal.contact?.email && (
+                {personal?.contact?.email && (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/70 text-foreground/85">
                     <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                     {personal.contact.email}
                   </span>
                 )}
-                {personal.contact?.phone && (
+                {personal?.contact?.phone && (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/70 text-foreground/85">
                     <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                     {personal.contact.phone}
@@ -169,9 +170,9 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         </div>
 
         {/* External links */}
-        {personal.links && Object.keys(personal.links).length > 0 && (
+        {personal?.links && Object.keys(personal.links).length > 0 && (
           <div className="flex flex-wrap items-center gap-2 mt-6 pt-5 border-t border-border">
-            {Object.entries(personal.links).map(([k, v]: [string, any]) => (
+            {Object.entries(personal.links).map(([k, v]) => (
               <a
                 key={k}
                 href={v}

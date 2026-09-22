@@ -1,9 +1,8 @@
 'use client';
 
-import type { SkillLevel } from '@praman/schemas';
+import type { CreateSkillDto, Skill, SkillLevel } from '@praman/schemas';
 import { Edit2, Plus, Trash2 } from 'lucide-react';
-import type React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,12 +16,9 @@ import {
 import { SkillLevelBadge } from './SkillLevelBadge';
 
 interface SkillsTabProps {
-  skills: any[];
-  onAdd: (payload: { name: string; level: SkillLevel; evidence: string }) => Promise<void>;
-  onUpdate?: (
-    id: string,
-    payload: { name: string; level: SkillLevel; evidence: string },
-  ) => Promise<void>;
+  skills: Skill[];
+  onAdd: (payload: CreateSkillDto) => Promise<void>;
+  onUpdate?: (id: string, payload: Partial<CreateSkillDto>) => Promise<void>;
   onDelete: (id: string, name: string) => Promise<void>;
 }
 
@@ -44,7 +40,7 @@ export function SkillsTab({ skills, onAdd, onUpdate, onDelete }: SkillsTabProps)
     setShowForm(true);
   };
 
-  const handleStartEdit = (sk: any) => {
+  const handleStartEdit = (sk: Skill) => {
     setEditingId(sk.id);
     setForm({
       name: sk.name || '',
@@ -163,7 +159,7 @@ export function SkillsTab({ skills, onAdd, onUpdate, onDelete }: SkillsTabProps)
 
       {/* Grouped by Level */}
       {SKILL_LEVELS.map((level) => {
-        const group = skills.filter((s: any) => s.level === level);
+        const group = skills.filter((s) => s.level === level);
         if (group.length === 0) return null;
         return (
           <div key={level} className="space-y-3">
@@ -172,7 +168,7 @@ export function SkillsTab({ skills, onAdd, onUpdate, onDelete }: SkillsTabProps)
               <span className="text-xs text-muted-foreground">({group.length} skills)</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {group.map((sk: any) => (
+              {group.map((sk) => (
                 <Card
                   key={sk.id}
                   className="p-3 border-border bg-card/80 hover:border-brand-pink/50 dark:hover:border-brand-cyan/40 flex flex-row items-start justify-between gap-2 group transition"

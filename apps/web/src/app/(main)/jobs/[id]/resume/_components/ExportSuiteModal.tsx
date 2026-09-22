@@ -1,5 +1,6 @@
 'use client';
 
+import type { ResumeData, ValidationReport } from '@praman/schemas';
 import {
   Archive,
   Check,
@@ -52,14 +53,14 @@ export const TEMPLATE_LABELS: Record<string, { name: string; badge: string }> = 
 interface ExportSuiteModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  resumeData: any;
+  resumeData: ResumeData;
   latexCode?: string;
   templateId?: string;
   downloadUrl?: string | null;
   candidateName?: string;
   jobId?: string;
   version?: string;
-  validationReport?: any;
+  validationReport?: ValidationReport | null;
 }
 
 export const ExportSuiteModal: React.FC<ExportSuiteModalProps> = ({

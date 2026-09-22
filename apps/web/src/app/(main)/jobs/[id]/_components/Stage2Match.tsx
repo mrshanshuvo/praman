@@ -1,5 +1,6 @@
 'use client';
 
+import type { MatchAnalysis, StructuredJd } from '@praman/schemas';
 import { Code2, FileText, Layers } from 'lucide-react';
 import { JsonCard } from '@/components/JsonCard';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
@@ -12,8 +13,8 @@ import { StageEmpty } from './StageEmpty';
 import { StageHeader } from './StageHeader';
 
 interface Stage2MatchProps {
-  analysis: any;
-  structured?: any;
+  analysis: MatchAnalysis | null | undefined;
+  structured?: StructuredJd;
   isRunning: boolean;
   isDisabled: boolean;
   onRun: () => void;

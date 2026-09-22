@@ -1,17 +1,18 @@
 'use client';
 
+import type { Education } from '@praman/schemas';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
 interface EducationTabProps {
-  educations: any[];
+  educations: Education[];
 }
 
 export function EducationTab({ educations }: EducationTabProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-base font-semibold text-foreground">Academic Education</h3>
-      {educations.map((edu: any) => (
+      {educations.map((edu) => (
         <Card
           key={edu.id}
           className="p-5 border-border bg-card hover:border-brand-pink/50 dark:hover:border-brand-cyan/40 transition space-y-2 gap-0"

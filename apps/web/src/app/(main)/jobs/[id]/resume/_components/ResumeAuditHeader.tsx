@@ -1,5 +1,11 @@
 'use client';
 
+import type {
+  MatchAnalysis,
+  ResumeData,
+  ResumeVersionSummary,
+  ValidationReport,
+} from '@praman/schemas';
 import { cn } from 'cn';
 import {
   Archive,
@@ -43,19 +49,19 @@ interface ResumeAuditHeaderProps {
   id: string;
   status?: string;
   downloadUrl?: string | null;
-  resumeJson: any;
+  resumeJson: ResumeData;
   latexCode?: string;
   templateId?: string;
-  matchAnalysis?: any;
+  matchAnalysis?: MatchAnalysis | null;
   isFetching: boolean;
   isRegenerating: boolean;
   onRefresh: () => void;
   onRegenerate: () => void;
-  versions?: any[];
+  versions?: ResumeVersionSummary[];
   selectedVersion?: string;
   onSelectVersion?: (version: string) => void;
   currentVersion?: number;
-  validationReport?: any;
+  validationReport?: ValidationReport | null;
   onOpenDiff?: () => void;
   onOpenAudit?: () => void;
 }

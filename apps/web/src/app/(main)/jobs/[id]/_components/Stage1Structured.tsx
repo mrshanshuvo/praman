@@ -1,11 +1,12 @@
 'use client';
 
+import type { StructuredJd } from '@praman/schemas';
 import { JsonCard } from '@/components/JsonCard';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
 interface Stage1StructuredProps {
-  structured: any;
+  structured?: StructuredJd;
 }
 
 export function Stage1Structured({ structured }: Stage1StructuredProps) {

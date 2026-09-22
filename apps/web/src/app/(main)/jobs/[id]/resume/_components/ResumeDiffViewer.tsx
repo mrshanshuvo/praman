@@ -1,6 +1,6 @@
 'use client';
 
-import type { ResumeVersionSummary } from '@praman/schemas';
+import type { ResumeData, ResumeVersionSummary } from '@praman/schemas';
 import { cn } from 'cn';
 import {
   ArrowLeftRight,
@@ -32,7 +32,7 @@ import {
 
 interface ResumeDiffViewerProps {
   jobId: string;
-  currentResume: any;
+  currentResume: ResumeData | null | undefined;
   currentVersion?: string | number;
   versions?: ResumeVersionSummary[];
   onRegenerate?: () => void;

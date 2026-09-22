@@ -1,7 +1,13 @@
 import type {
   BatchImportProfileRequest,
   CandidateProfile,
+  CreateCertificationDto,
+  CreateEducationDto,
+  CreateExperienceDto,
+  CreateProjectDto,
+  CreateSkillDto,
   ParsedResumeData,
+  UpdateCandidatePersonal,
 } from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API_URL, fetcher } from '@/lib/api-client';
@@ -19,7 +25,7 @@ export function useProfileMutations() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['candidate-profile'] });
 
   const updatePersonal = useMutation({
-    mutationFn: (personal: any) =>
+    mutationFn: (personal: UpdateCandidatePersonal) =>
       fetcher(`${API_URL}/candidate-profile/personal`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -29,7 +35,7 @@ export function useProfileMutations() {
   });
 
   const addExperience = useMutation({
-    mutationFn: (data: any) =>
+    mutationFn: (data: CreateExperienceDto) =>
       fetcher(`${API_URL}/candidate-profile/experiences`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,7 +45,7 @@ export function useProfileMutations() {
   });
 
   const updateExperience = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateExperienceDto> }) =>
       fetcher(`${API_URL}/candidate-profile/experiences/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +63,7 @@ export function useProfileMutations() {
   });
 
   const addProject = useMutation({
-    mutationFn: (data: any) =>
+    mutationFn: (data: CreateProjectDto) =>
       fetcher(`${API_URL}/candidate-profile/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,7 +73,7 @@ export function useProfileMutations() {
   });
 
   const updateProject = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateProjectDto> }) =>
       fetcher(`${API_URL}/candidate-profile/projects/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -85,7 +91,7 @@ export function useProfileMutations() {
   });
 
   const addSkill = useMutation({
-    mutationFn: (data: any) =>
+    mutationFn: (data: CreateSkillDto) =>
       fetcher(`${API_URL}/candidate-profile/skills`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,7 +101,7 @@ export function useProfileMutations() {
   });
 
   const updateSkill = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateSkillDto> }) =>
       fetcher(`${API_URL}/candidate-profile/skills/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -113,7 +119,7 @@ export function useProfileMutations() {
   });
 
   const addEducation = useMutation({
-    mutationFn: (data: any) =>
+    mutationFn: (data: CreateEducationDto) =>
       fetcher(`${API_URL}/candidate-profile/educations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,7 +129,7 @@ export function useProfileMutations() {
   });
 
   const updateEducation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateEducationDto> }) =>
       fetcher(`${API_URL}/candidate-profile/educations/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -141,7 +147,7 @@ export function useProfileMutations() {
   });
 
   const addCertification = useMutation({
-    mutationFn: (data: any) =>
+    mutationFn: (data: CreateCertificationDto) =>
       fetcher(`${API_URL}/candidate-profile/certifications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -151,7 +157,7 @@ export function useProfileMutations() {
   });
 
   const updateCertification = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCertificationDto> }) =>
       fetcher(`${API_URL}/candidate-profile/certifications/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

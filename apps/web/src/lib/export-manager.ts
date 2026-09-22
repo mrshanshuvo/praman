@@ -69,13 +69,15 @@ export function downloadJson(filename: string, data: unknown): void {
   triggerFileDownload(filename, jsonStr, 'application/json');
 }
 
+import type { ResumeData, ValidationReport } from '@praman/schemas';
+
 export interface CompleteZipPackageOptions {
   candidateName?: string;
   templateId?: string;
   templateName?: string;
   latexCode: string;
-  resumeJson: any;
-  validationReport?: any;
+  resumeJson: ResumeData;
+  validationReport?: ValidationReport | null;
   jobId?: string;
   version?: string;
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import type { JobDescriptionRecord } from '@praman/schemas';
 import { CheckCircle2, ChevronRight, FileText, Loader2, ShieldCheck, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -33,13 +34,13 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
 };
 
 interface JobCardProps {
-  jd: any;
+  jd: JobDescriptionRecord;
 }
 
 export function JobCard({ jd }: JobCardProps) {
   const structured = jd.structured || {};
   const analysis = jd.analysis;
-  const matchData = analysis?.result || analysis;
+  const matchData = analysis?.result;
   const strategy = analysis?.strategy;
   const resume = strategy?.resume;
 

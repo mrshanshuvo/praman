@@ -1,5 +1,6 @@
 'use client';
 
+import type { CreateProjectDto, Project } from '@praman/schemas';
 import { Edit2, ExternalLink, Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -10,9 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 interface ProjectsTabProps {
-  projects: any[];
-  onAdd: (payload: any) => Promise<void>;
-  onUpdate?: (id: string, payload: any) => Promise<void>;
+  projects: Project[];
+  onAdd: (payload: CreateProjectDto) => Promise<void>;
+  onUpdate?: (id: string, payload: Partial<CreateProjectDto>) => Promise<void>;
   onDelete: (id: string, name: string) => Promise<void>;
 }
 
@@ -36,7 +37,7 @@ export function ProjectsTab({ projects, onAdd, onUpdate, onDelete }: ProjectsTab
     setShowForm(true);
   };
 
-  const handleStartEdit = (proj: any) => {
+  const handleStartEdit = (proj: Project) => {
     setEditingId(proj.id);
     setForm({
       name: proj.name || '',
@@ -197,7 +198,7 @@ export function ProjectsTab({ projects, onAdd, onUpdate, onDelete }: ProjectsTab
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        {projects.map((proj: any) => (
+        {projects.map((proj) => (
           <Card
             key={proj.id}
             className="p-5 border-border bg-card hover:border-brand-pink/50 dark:hover:border-brand-cyan/40 transition gap-0"

@@ -1,5 +1,6 @@
 'use client';
 
+import type { CreateExperienceDto, Experience } from '@praman/schemas';
 import { Edit2, Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -10,9 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 interface ExperiencesTabProps {
-  experiences: any[];
-  onAdd: (payload: any) => Promise<void>;
-  onUpdate?: (id: string, payload: any) => Promise<void>;
+  experiences: Experience[];
+  onAdd: (payload: CreateExperienceDto) => Promise<void>;
+  onUpdate?: (id: string, payload: Partial<CreateExperienceDto>) => Promise<void>;
   onDelete: (id: string, company: string) => Promise<void>;
 }
 
@@ -38,7 +39,7 @@ export function ExperiencesTab({ experiences, onAdd, onUpdate, onDelete }: Exper
     setShowForm(true);
   };
 
-  const handleStartEdit = (exp: any) => {
+  const handleStartEdit = (exp: Experience) => {
     setEditingId(exp.id);
     setForm({
       company: exp.company || '',
@@ -217,7 +218,7 @@ export function ExperiencesTab({ experiences, onAdd, onUpdate, onDelete }: Exper
       )}
 
       <div className="space-y-4">
-        {experiences.map((exp: any) => (
+        {experiences.map((exp) => (
           <Card
             key={exp.id}
             className="p-5 border-border bg-card/80 hover:border-brand-pink/50 dark:hover:border-brand-cyan/40 transition gap-0"

@@ -1,5 +1,6 @@
 'use client';
 
+import type { InterviewMilestone, JobDescriptionRecord } from '@praman/schemas';
 import {
   Archive,
   Briefcase,
@@ -82,7 +83,7 @@ function BookmarkIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 interface JobsKanbanBoardProps {
-  jobs: any[];
+  jobs: JobDescriptionRecord[];
 }
 
 export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
@@ -251,11 +252,13 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                         {/* Upcoming Interview Chip */}
                         {(() => {
                           const upcoming = jd.tracker?.milestones
-                            ?.filter((m: any) => m.status === 'SCHEDULED' && m.scheduledAt)
+                            ?.filter(
+                              (m: InterviewMilestone) => m.status === 'SCHEDULED' && m.scheduledAt,
+                            )
                             ?.sort(
-                              (a: any, b: any) =>
-                                new Date(a.scheduledAt).getTime() -
-                                new Date(b.scheduledAt).getTime(),
+                              (a: InterviewMilestone, b: InterviewMilestone) =>
+                                new Date(a.scheduledAt ?? '').getTime() -
+                                new Date(b.scheduledAt ?? '').getTime(),
                             )[0];
                           if (!upcoming) return null;
                           return (
@@ -263,7 +266,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                               <Calendar className="w-3 h-3 shrink-0" />
                               <span className="truncate">
                                 {upcoming.stage.replace('_', ' ')} ·{' '}
-                                {new Date(upcoming.scheduledAt).toLocaleDateString([], {
+                                {new Date(upcoming.scheduledAt ?? '').toLocaleDateString([], {
                                   month: 'short',
                                   day: 'numeric',
                                 })}
@@ -273,9 +276,9 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                         })()}
 
                         {/* Match Score Indicator */}
-                        {analysis && (
+                        {analysis?.result && (
                           <div className="flex items-center justify-between pt-1">
-                            <MatchScoreBadge analysis={analysis} variant="compact" />
+                            <MatchScoreBadge analysis={analysis.result} variant="compact" />
                             {isValidated && (
                               <span
                                 className="text-2xs font-mono px-1.5 py-0.2 rounded border bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30 font-bold"

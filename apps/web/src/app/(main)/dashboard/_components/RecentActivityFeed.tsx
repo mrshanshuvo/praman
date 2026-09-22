@@ -58,8 +58,8 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
   const events: ActivityEvent[] = [];
 
   for (const job of jobs) {
-    const jobTitle = job.structured?.jobTitle || (job as any).title || 'Target Role';
-    const company = (job as any).company || (job.structured as any)?.company || 'Target Company';
+    const jobTitle = job.structured?.jobTitle || 'Target Role';
+    const company = job.structured?.company || 'Target Company';
 
     // 1. Job Ingested Event
     if (job.createdAt) {

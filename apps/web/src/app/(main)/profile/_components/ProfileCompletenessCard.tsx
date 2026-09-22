@@ -1,5 +1,13 @@
 'use client';
 
+import type {
+  CandidatePersonal,
+  Certification,
+  Education,
+  Experience,
+  Project,
+  Skill,
+} from '@praman/schemas';
 import { CheckCircle2, Circle, Sparkles, TrendingUp } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -7,12 +15,12 @@ import { Card } from '@/components/ui/card';
 import type { ProfileTabId } from './ProfileNavTabs';
 
 interface ProfileCompletenessProps {
-  personal: any;
-  experiences: any[];
-  projects: any[];
-  skills: any[];
-  educations: any[];
-  certifications: any[];
+  personal?: CandidatePersonal | null;
+  experiences?: Experience[];
+  projects?: Project[];
+  skills?: Skill[];
+  educations?: Education[];
+  certifications?: Certification[];
   onNavigateTab: (tab: ProfileTabId) => void;
 }
 
@@ -25,7 +33,7 @@ interface ChecklistItem {
 }
 
 export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
-  personal = {},
+  personal,
   experiences = [],
   projects = [],
   skills = [],
@@ -34,14 +42,14 @@ export const ProfileCompletenessCard: React.FC<ProfileCompletenessProps> = ({
   onNavigateTab,
 }) => {
   const checklist: ChecklistItem[] = useMemo(() => {
-    const hasName = Boolean(personal.name?.trim());
-    const hasTitle = Boolean(personal.title?.trim());
-    const hasEmail = Boolean(personal.contact?.email?.trim());
+    const hasName = Boolean(personal?.name?.trim());
+    const hasTitle = Boolean(personal?.title?.trim());
+    const hasEmail = Boolean(personal?.contact?.email?.trim());
     const hasLinksOrLocation = Boolean(
-      personal.location?.trim() ||
-        personal.links?.github ||
-        personal.links?.linkedin ||
-        personal.links?.portfolio,
+      personal?.location?.trim() ||
+        personal?.links?.github ||
+        personal?.links?.linkedin ||
+        personal?.links?.portfolio,
     );
 
     const hasOneExp = experiences.length >= 1;

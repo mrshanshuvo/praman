@@ -1,5 +1,6 @@
 'use client';
 
+import type { CandidatePersonal, UpdateCandidatePersonal } from '@praman/schemas';
 import { Award, Check, CheckCircle2, Edit2, RefreshCw, User } from 'lucide-react';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -18,25 +19,25 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 interface PersonalTabProps {
-  personal: any;
-  onUpdate?: (personal: any) => Promise<void>;
+  personal?: CandidatePersonal | null;
+  onUpdate?: (personal: UpdateCandidatePersonal) => Promise<void>;
 }
 
-export function PersonalTab({ personal = {}, onUpdate }: PersonalTabProps) {
+export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [form, setForm] = useState({
-    summary: personal.summary || '',
-    achievements: (personal.achievements || []).join('\n'),
-    languages: (personal.languages || []).join(', '),
+    summary: personal?.summary || '',
+    achievements: (personal?.achievements || []).join('\n'),
+    languages: (personal?.languages || []).join(', '),
   });
 
   const handleOpenEdit = () => {
     setForm({
-      summary: personal.summary || '',
-      achievements: (personal.achievements || []).join('\n'),
-      languages: (personal.languages || []).join(', '),
+      summary: personal?.summary || '',
+      achievements: (personal?.achievements || []).join('\n'),
+      languages: (personal?.languages || []).join(', '),
     });
     setIsEditOpen(true);
   };
@@ -57,6 +58,7 @@ export function PersonalTab({ personal = {}, onUpdate }: PersonalTabProps) {
 
       await onUpdate({
         ...personal,
+        name: personal?.name || '',
         summary: form.summary,
         achievements,
         languages,
@@ -95,11 +97,11 @@ export function PersonalTab({ personal = {}, onUpdate }: PersonalTabProps) {
           Professional Summary
         </h3>
         <p className="text-sm text-foreground/90 leading-relaxed font-sans">
-          {personal.summary || 'No summary registered.'}
+          {personal?.summary || 'No summary registered.'}
         </p>
       </Card>
 
-      {personal.achievements && personal.achievements.length > 0 && (
+      {personal?.achievements && personal.achievements.length > 0 && (
         <Card className="rounded-xl border-border bg-card/80 p-6 gap-0">
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <Award className="w-4 h-4 text-brand-pink" />
@@ -119,7 +121,7 @@ export function PersonalTab({ personal = {}, onUpdate }: PersonalTabProps) {
         </Card>
       )}
 
-      {personal.languages && (
+      {personal?.languages && (
         <Card className="rounded-xl border-border bg-card/80 p-6 gap-0">
           <h3 className="text-sm font-semibold text-foreground mb-3">Languages</h3>
           <div className="flex flex-wrap gap-2">
