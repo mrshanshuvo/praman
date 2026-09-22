@@ -48,7 +48,7 @@ function getJobMatchScore(jd: any): number {
 
 function JobsListSkeleton() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
       <Skeleton className="h-14 w-72 bg-muted/60" />
       <Skeleton className="h-10 w-full bg-muted/40" />
       <div className="space-y-4">
@@ -137,7 +137,7 @@ function JobsListContent() {
   }, [filteredAndSortedJds, validPage, pageSize, viewMode]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>

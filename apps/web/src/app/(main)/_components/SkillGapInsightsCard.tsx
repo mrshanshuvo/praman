@@ -13,9 +13,9 @@ interface SkillGapInsightsCardProps {
 }
 
 export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs, profile }) => {
-  // Extract all missing skills across jobs that have analysis
-  const missingSkillFrequency: Record<string, number> = {};
-  const inDemandSkillFrequency: Record<string, number> = {};
+  // Case-insensitive normalization maps: key is lowercase, value is { display: string, count: number }
+  const missingSkillMap = new Map<string, { display: string; count: number }>();
+  const inDemandSkillMap = new Map<string, { display: string; count: number }>();
   let totalAnalyzedJobs = 0;
   let totalStrongMatches = 0;
   let totalMissingRequirements = 0;
@@ -27,9 +27,20 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
       ...(j.structured?.mustHave || []),
     ];
     structuredSkills.forEach((skill) => {
-      const normalized = skill.trim();
-      if (normalized) {
-        inDemandSkillFrequency[normalized] = (inDemandSkillFrequency[normalized] || 0) + 1;
+      const trimmed = skill.trim();
+      if (!trimmed) return;
+      const key = trimmed.toLowerCase();
+      const existing = inDemandSkillMap.get(key);
+      if (existing) {
+        existing.count += 1;
+        if (
+          existing.display === existing.display.toLowerCase() &&
+          trimmed !== trimmed.toLowerCase()
+        ) {
+          existing.display = trimmed;
+        }
+      } else {
+        inDemandSkillMap.set(key, { display: trimmed, count: 1 });
       }
     });
 
@@ -44,9 +55,20 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
       totalMissingRequirements += missing.length;
 
       missing.forEach((item: string) => {
-        const normalized = item.trim();
-        if (normalized) {
-          missingSkillFrequency[normalized] = (missingSkillFrequency[normalized] || 0) + 1;
+        const trimmed = item.trim();
+        if (!trimmed) return;
+        const key = trimmed.toLowerCase();
+        const existing = missingSkillMap.get(key);
+        if (existing) {
+          existing.count += 1;
+          if (
+            existing.display === existing.display.toLowerCase() &&
+            trimmed !== trimmed.toLowerCase()
+          ) {
+            existing.display = trimmed;
+          }
+        } else {
+          missingSkillMap.set(key, { display: trimmed, count: 1 });
         }
       });
     }
@@ -58,19 +80,19 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
     totalRequirements > 0 ? Math.round((totalStrongMatches / totalRequirements) * 100) : 0;
 
   // Sort missing skills by frequency (descending)
-  const topMissingSkills = Object.entries(missingSkillFrequency)
-    .sort(([, a], [, b]) => b - a)
+  const topMissingSkills = Array.from(missingSkillMap.values())
+    .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
   // Sort in-demand skills by frequency (descending)
-  const topInDemandSkills = Object.entries(inDemandSkillFrequency)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
+  const topInDemandSkills = Array.from(inDemandSkillMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
 
   const candidateSkillNames = new Set((profile?.skills || []).map((s) => s.name.toLowerCase()));
 
   return (
-    <Card className="p-6 rounded-2xl border-border bg-card shadow-xs space-y-5">
+    <Card className="p-6 rounded-2xl border-border bg-card shadow-xs space-y-5 h-full flex flex-col justify-between">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-status-neutral/10 text-status-neutral flex items-center justify-center">
@@ -118,7 +140,7 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
               Most Requested Technologies:
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {topInDemandSkills.map(([skill, count]) => {
+              {topInDemandSkills.map(({ display: skill, count }) => {
                 const isPossessed = candidateSkillNames.has(skill.toLowerCase());
                 return (
                   <Badge
@@ -126,8 +148,8 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
                     variant="outline"
                     className={`text-xs py-0.5 px-2.5 gap-1.5 ${
                       isPossessed
-                        ? 'border-success/30 bg-success/10 text-success'
-                        : 'border-border bg-muted/30 text-foreground/80'
+                        ? 'border-success/40 bg-success/10 text-success font-medium'
+                        : 'border-border bg-muted/40 text-foreground'
                     }`}
                   >
                     {isPossessed && <CheckCircle2 className="w-3 h-3 text-success" />}
@@ -141,14 +163,14 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
 
           {/* High-Impact Skill Gaps */}
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2.5">
               <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5 text-warning" />
                 <span>High-Impact Skill Gaps:</span>
               </span>
               <Link
                 href="/profile"
-                className="text-xs text-brand-cyan hover:underline flex items-center gap-0.5"
+                className="text-xs text-brand-cyan hover:underline flex items-center gap-0.5 font-medium"
               >
                 <span>Update Profile Skills</span>
                 <ArrowUpRight className="w-3 h-3" />
@@ -161,21 +183,26 @@ export const SkillGapInsightsCard: React.FC<SkillGapInsightsCardProps> = ({ jobs
               </p>
             ) : (
               <div className="space-y-2">
-                {topMissingSkills.map(([skill, count]) => (
+                {topMissingSkills.map(({ display: skill, count }) => (
                   <div
                     key={skill}
-                    className="p-2.5 rounded-xl border border-warning/30 bg-warning/10 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl border border-border/80 bg-card hover:border-warning/50 hover:bg-muted/30 transition-all flex items-center justify-between text-xs group"
                   >
-                    <div className="space-y-0.5">
-                      <span className="font-semibold text-foreground block">{skill}</span>
-                      <span className="text-xs text-muted-foreground">
-                        Missing in {count} of your target position{count === 1 ? '' : 's'}
-                      </span>
+                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                      <span className="w-1.5 h-6 rounded-full bg-warning/80 shrink-0 group-hover:scale-y-110 transition-transform" />
+                      <div className="space-y-0.5 min-w-0">
+                        <span className="font-semibold text-foreground block truncate group-hover:text-warning transition-colors">
+                          {skill}
+                        </span>
+                        <span className="text-2xs text-muted-foreground block truncate">
+                          Missing in {count} target {count === 1 ? 'position' : 'positions'}
+                        </span>
+                      </div>
                     </div>
 
                     <Link
                       href="/profile"
-                      className="px-2.5 py-1 rounded-lg border border-warning/30 bg-warning/10 text-warning hover:bg-warning/20 font-semibold text-xs transition-colors shrink-0"
+                      className="px-2.5 py-1 rounded-lg border border-warning/40 bg-warning/10 text-warning hover:bg-warning hover:text-warning-foreground font-semibold text-xs transition-colors shrink-0 shadow-2xs"
                     >
                       Add Evidence
                     </Link>

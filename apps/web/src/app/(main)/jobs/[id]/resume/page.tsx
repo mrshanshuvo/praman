@@ -82,7 +82,7 @@ export default function ResumeAuditPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
         <Skeleton className="h-20 w-full rounded-2xl bg-card border border-border" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <Skeleton className="lg:col-span-7 h-150 rounded-2xl bg-card border border-border" />
@@ -115,7 +115,7 @@ export default function ResumeAuditPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
       <ResumeAuditHeader
         id={id}
         status={status}

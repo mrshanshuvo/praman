@@ -501,14 +501,14 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Code2 className="w-4 h-4 text-cyan-400" />
+                  <Code2 className="w-4 h-4 text-brand-cyan" />
                   <h4 className="text-sm font-semibold text-foreground">
                     Canonical ATS JSON (.json)
                   </h4>
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-2xs bg-cyan-500/10 border-cyan-500/30 text-cyan-400 font-mono"
+                  className="text-2xs bg-brand-cyan/10 border-brand-cyan/30 text-brand-cyan font-mono"
                 >
                   STANDARDIZED ATS TAXONOMY
                 </Badge>
@@ -539,8 +539,8 @@ Upload this .zip directly to [Overleaf](https://www.overleaf.com) via 'New Proje
               >
                 {copiedFormat === 'ats_json' ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="text-cyan-400 font-mono text-xs">Copied</span>
+                    <Check className="w-3.5 h-3.5 text-brand-cyan" />
+                    <span className="text-brand-cyan font-mono text-xs">Copied</span>
                   </>
                 ) : (
                   <>

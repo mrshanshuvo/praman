@@ -263,7 +263,7 @@ export function JobCard({ jd }: JobCardProps) {
             onClick={handleDelete}
             disabled={deleteJobMutation.isPending}
             title="Delete Job"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors"
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
           >
             {deleteJobMutation.isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

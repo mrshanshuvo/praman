@@ -172,20 +172,20 @@
   --secondary-foreground: #0f172a;
 
   --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted-foreground: #475569;
   --accent: #fff1f4;
   --accent-foreground: #ff2e63;
 
-  /* Status Feedback (light mode) */
-  --success: #059669;
+  /* Status Feedback (light mode - calibrated for WCAG AAA text contrast) */
+  --success: #047857;
   --success-foreground: #ffffff;
-  --warning: #d97706;
+  --warning: #b45309;
   --warning-foreground: #ffffff;
-  --info: #2563eb;
+  --info: #1d4ed8;
   --info-foreground: #ffffff;
-  --destructive: #ff2e63;
+  --destructive: #e11d48;
   --destructive-foreground: #ffffff;
-  --status-neutral: #7c3aed;
+  --status-neutral: #6d28d9;
 
   --border: #e2e8f0;
   --input: #e2e8f0;
@@ -201,12 +201,12 @@
 
   --sidebar: #ffffff;
   --sidebar-foreground: #0f172a;
-  --sidebar-primary: #08d9d6;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #fff1f4;
-  --sidebar-accent-foreground: #ff2e63;
+  --sidebar-primary: #0f766e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0fdfa;
+  --sidebar-accent-foreground: #0f766e;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #ff2e63;
+  --sidebar-ring: #0f766e;
 
   --scrollbar-thumb: rgba(15, 23, 42, 0.2);
   --scrollbar-thumb-hover: rgba(15, 23, 42, 0.4);

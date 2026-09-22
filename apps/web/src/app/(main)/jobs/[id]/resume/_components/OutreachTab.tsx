@@ -311,7 +311,7 @@ ${coverLetter.senderName}
                     </div>
 
                     {/* Right Pane: LaTeX Code Viewer */}
-                    <div className="p-4 rounded-lg border border-border/80 bg-slate-950 text-slate-200 font-mono text-xs max-h-120 overflow-y-auto">
+                    <div className="p-4 rounded-lg border border-border/80 bg-card text-foreground font-mono text-xs max-h-120 overflow-y-auto">
                       <pre
                         className={cn(
                           'tab-size-2',
@@ -325,7 +325,7 @@ ${coverLetter.senderName}
                     </div>
                   </div>
                 ) : coverLetterViewMode === 'latex' ? (
-                  <div className="p-4 rounded-lg border border-border/80 bg-slate-950 text-slate-200 font-mono text-xs max-h-120 overflow-y-auto">
+                  <div className="p-4 rounded-lg border border-border/80 bg-card text-foreground font-mono text-xs max-h-120 overflow-y-auto">
                     <pre
                       className={cn(
                         'tab-size-2',

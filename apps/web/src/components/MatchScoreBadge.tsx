@@ -30,7 +30,7 @@ function getTierStyles(tier: MatchAlignmentTier) {
         text: 'text-brand-cyan',
         bg: 'bg-brand-cyan/10',
         border: 'border-brand-cyan/30',
-        ringColor: '#00e5ff',
+        ringColor: 'var(--brand-cyan)',
       };
     case 'Strong':
       return {
@@ -39,7 +39,7 @@ function getTierStyles(tier: MatchAlignmentTier) {
         text: 'text-success',
         bg: 'bg-success/10',
         border: 'border-success/30',
-        ringColor: '#10b981',
+        ringColor: 'var(--success)',
       };
     case 'Moderate':
       return {
@@ -48,7 +48,7 @@ function getTierStyles(tier: MatchAlignmentTier) {
         text: 'text-warning',
         bg: 'bg-warning/10',
         border: 'border-warning/30',
-        ringColor: '#f59e0b',
+        ringColor: 'var(--warning)',
       };
     default:
       return {
@@ -58,7 +58,7 @@ function getTierStyles(tier: MatchAlignmentTier) {
         text: 'text-brand-pink',
         bg: 'bg-brand-pink/10',
         border: 'border-brand-pink/30',
-        ringColor: '#ff2a85',
+        ringColor: 'var(--brand-pink)',
       };
   }
 }

@@ -60,26 +60,26 @@ export const NOTE_TAGS: NoteTagMeta[] = [
   {
     tag: 'PREP',
     label: 'Interview Prep',
-    color: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
+    color: 'bg-info/10 text-info border-info/30',
   },
   {
     tag: 'INTERVIEW_FEEDBACK',
     label: 'Feedback / Debrief',
-    color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+    color: 'bg-success/10 text-success border-success/30',
   },
   {
     tag: 'SALARY_BENEFITS',
     label: 'Salary & Perks',
-    color: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+    color: 'bg-warning/10 text-warning border-warning/30',
   },
   {
     tag: 'RECRUITER_INTEL',
     label: 'Recruiter Intel',
-    color: 'bg-purple-500/10 text-purple-500 border-purple-500/30',
+    color: 'bg-status-neutral/10 text-status-neutral border-status-neutral/30',
   },
   {
     tag: 'FOLLOW_UP',
     label: 'Follow Up',
-    color: 'bg-pink-500/10 text-pink-500 border-pink-500/30',
+    color: 'bg-brand-pink/10 text-brand-pink border-brand-pink/30',
   },
 ];
