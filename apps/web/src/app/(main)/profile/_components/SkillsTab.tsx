@@ -4,7 +4,6 @@ import type { SkillLevel } from '@praman/schemas';
 import { Edit2, Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
-import { SkillLevelBadge } from '@/components/SkillLevelBadge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SkillLevelBadge } from './SkillLevelBadge';
 
 interface SkillsTabProps {
   skills: any[];

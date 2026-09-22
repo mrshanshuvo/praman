@@ -6,18 +6,21 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useCandidateProfile, useProfileMutations } from '@/hooks/usePramanApi';
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { CertificationsTab } from './_components/CertificationsTab';
-import { EducationTab } from './_components/EducationTab';
-import { ExperiencesTab } from './_components/ExperiencesTab';
-import { PersonalTab } from './_components/PersonalTab';
-import { ProfileCompletenessCard } from './_components/ProfileCompletenessCard';
-import { ProfileHeaderCard } from './_components/ProfileHeaderCard';
-import { ProfileNavTabs, type ProfileTabId } from './_components/ProfileNavTabs';
-import { ProfileNotificationBanner } from './_components/ProfileNotificationBanner';
-import { ProfileSkeleton } from './_components/ProfileSkeleton';
-import { ProjectsTab } from './_components/ProjectsTab';
-import { SkillsTab } from './_components/SkillsTab';
-import { useProfileActions } from './_components/useProfileActions';
+import {
+  CertificationsTab,
+  EducationTab,
+  ExperiencesTab,
+  PersonalTab,
+  ProfileCompletenessCard,
+  ProfileHeaderCard,
+  ProfileNavTabs,
+  ProfileNotificationBanner,
+  ProfileSkeleton,
+  type ProfileTabId,
+  ProjectsTab,
+  SkillsTab,
+  useProfileActions,
+} from './_components';
 
 const VALID_PROFILE_TABS: ProfileTabId[] = [
   'personal',

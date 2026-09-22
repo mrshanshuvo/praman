@@ -2,9 +2,9 @@ import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type React from 'react';
-import { AuthBackground } from '@/components/AuthBackground';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { buttonVariants } from '@/components/ui/button';
+import { AuthBackground } from './_components/AuthBackground';
 
 export const metadata: Metadata = {
   title: 'Authentication | Praman',

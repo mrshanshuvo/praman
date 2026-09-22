@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from 'cn';
 import { ArrowLeft, FileCode, GitCompare, Mail, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -24,12 +23,15 @@ import {
   useResumeVersions,
   useRunStage,
 } from '@/hooks/usePramanApi';
-import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
-import { LatexViewer } from './_components/LatexViewer';
-import { OutreachTab } from './_components/OutreachTab';
-import { ResumeAuditHeader } from './_components/ResumeAuditHeader';
-import { ResumeDiffViewer } from './_components/ResumeDiffViewer';
-import { ResumeViewer } from './_components/ResumeViewer';
+import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlParams';
+import { cn } from '@/lib/utils';
+import {
+  LatexViewer,
+  OutreachTab,
+  ResumeAuditHeader,
+  ResumeDiffViewer,
+  ResumeViewer,
+} from './_components';
 
 const VALID_TABS = ['latex', 'diff', 'outreach', 'preview'] as const;
 

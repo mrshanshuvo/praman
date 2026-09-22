@@ -10,14 +10,16 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePipelineStream } from '@/hooks/usePipelineStream';
 import { useJob, useRunStage } from '@/hooks/usePramanApi';
-import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlTab';
-import { JobDetailHeader } from './_components/JobDetailHeader';
-import { PipelineLiveLogs } from './_components/PipelineLiveLogs';
-import { Stage1Structured } from './_components/Stage1Structured';
-import { Stage2Match } from './_components/Stage2Match';
-import { Stage3Strategy } from './_components/Stage3Strategy';
-import { Stage4Resume } from './_components/Stage4Resume';
-import { JobTrackerHub } from './_components/tracker';
+import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlParams';
+import {
+  JobDetailHeader,
+  JobTrackerHub,
+  PipelineLiveLogs,
+  Stage1Structured,
+  Stage2Match,
+  Stage3Strategy,
+  Stage4Resume,
+} from './_components';
 
 const VALID_STAGES: PipelineStage[] = ['structured', 'match', 'strategy', 'resume'];
 
