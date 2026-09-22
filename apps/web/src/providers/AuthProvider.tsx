@@ -72,7 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.clear();
 
       if (typeof window !== 'undefined' && targetUrl) {
-        window.location.href = targetUrl;
+        const destUrl = new URL(targetUrl, window.location.origin);
+        window.location.replace(destUrl.href);
       }
     },
     [token, queryClient],

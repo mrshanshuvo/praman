@@ -48,7 +48,9 @@ async function refreshAccessToken(): Promise<string | null> {
           document.cookie = `${TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
           const currentPath = window.location.pathname;
           if (currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
-            window.location.href = `/login?from=${encodeURIComponent(currentPath + window.location.search)}`;
+            const loginUrl = new URL('/login', window.location.origin);
+            loginUrl.searchParams.set('from', currentPath + window.location.search);
+            window.location.replace(loginUrl.href);
           }
         }
         return null;
