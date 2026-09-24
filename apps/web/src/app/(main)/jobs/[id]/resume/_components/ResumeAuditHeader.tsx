@@ -209,7 +209,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
                     onChange={(e) => onSelectVersion?.(e.target.value)}
                     className="bg-transparent text-xs font-mono font-bold text-foreground focus:outline-none cursor-pointer"
                   >
-                    {versions.map((v: any) => (
+                    {versions.map((v) => (
                       <option
                         key={v.id}
                         value={v.version?.toString()}

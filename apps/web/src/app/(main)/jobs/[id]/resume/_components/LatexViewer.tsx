@@ -1,5 +1,6 @@
 'use client';
 
+import type { ResumeData } from '@praman/schemas';
 import { cn } from 'cn';
 import {
   Check,
@@ -59,7 +60,7 @@ interface LatexViewerProps {
   onSelectTemplate?: (templateId: string) => void;
   downloadUrl?: string | null;
   candidateName?: string;
-  resumeData?: any;
+  resumeData?: ResumeData;
   version?: string;
 }
 

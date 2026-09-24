@@ -1,5 +1,6 @@
 'use client';
 
+import type { ResumeData } from '@praman/schemas';
 import { cn } from 'cn';
 import {
   AlertCircle,
@@ -21,7 +22,7 @@ interface CompiledPdfPreviewProps {
   jobId: string;
   selectedTemplate?: string;
   version?: string;
-  resumeData: any;
+  resumeData?: ResumeData;
   candidateName?: string;
   recompileTrigger?: number;
   syncTarget?: SheetSyncTarget | null;

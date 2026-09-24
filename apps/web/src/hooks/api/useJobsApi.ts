@@ -1,4 +1,5 @@
 import type {
+  ApplicationStatus,
   JobDescriptionRecord,
   JobTelemetrySummary,
   PaginationMeta,
@@ -110,24 +111,29 @@ export function useDeleteJob() {
   });
 }
 
+export type JobListData =
+  | { items: JobDescriptionRecord[]; meta?: PaginationMeta }
+  | JobDescriptionRecord[];
+
 export function useUpdateJobStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) =>
-      fetcher<any>(`${API_URL}/job-descriptions/${id}/status`, {
+    mutationFn: ({ id, status }: { id: string; status: ApplicationStatus | string }) =>
+      fetcher<JobDescriptionRecord>(`${API_URL}/job-descriptions/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       }),
     onMutate: async ({ id, status }) => {
+      const appStatus = status as ApplicationStatus;
       // 1. Cancel in-flight queries so they don't overwrite optimistic update
       await queryClient.cancelQueries({ queryKey: queryKeys.jobs.lists() });
       await queryClient.cancelQueries({ queryKey: queryKeys.jobs.detail(id) });
 
       // 2. Snapshot current cache data for rollback
       const previousJob = queryClient.getQueryData<JobDescriptionRecord>(queryKeys.jobs.detail(id));
-      const previousLists = queryClient.getQueriesData<any>({
+      const previousLists = queryClient.getQueriesData<JobListData>({
         queryKey: queryKeys.jobs.lists(),
       });
 
@@ -135,27 +141,25 @@ export function useUpdateJobStatus() {
       if (previousJob) {
         queryClient.setQueryData<JobDescriptionRecord>(queryKeys.jobs.detail(id), {
           ...previousJob,
-          status: status as any,
+          status: appStatus,
         });
       }
 
       // 4. Optimistically update all job lists
-      queryClient.setQueriesData<any>({ queryKey: queryKeys.jobs.lists() }, (oldData: any) => {
+      queryClient.setQueriesData<JobListData>({ queryKey: queryKeys.jobs.lists() }, (oldData) => {
         if (!oldData) return oldData;
 
-        if (Array.isArray(oldData.items)) {
+        if ('items' in oldData && Array.isArray(oldData.items)) {
           return {
             ...oldData,
-            items: oldData.items.map((job: JobDescriptionRecord) =>
-              job.id === id ? { ...job, status: status as any } : job,
+            items: oldData.items.map((job) =>
+              job.id === id ? { ...job, status: appStatus } : job,
             ),
           };
         }
 
         if (Array.isArray(oldData)) {
-          return oldData.map((job: JobDescriptionRecord) =>
-            job.id === id ? { ...job, status: status as any } : job,
-          );
+          return oldData.map((job) => (job.id === id ? { ...job, status: appStatus } : job));
         }
 
         return oldData;
@@ -163,7 +167,7 @@ export function useUpdateJobStatus() {
 
       return { previousJob, previousLists, id };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       // 5. Rollback cache on error
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(context.id), context.previousJob);
@@ -187,7 +191,7 @@ export function useRunStage(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (stage: 'match' | 'strategy' | 'resume') =>
-      fetcher<any>(`${API_URL}/job-descriptions/${id}/${stage}`, {
+      fetcher<unknown>(`${API_URL}/job-descriptions/${id}/${stage}`, {
         method: 'POST',
       }),
     onSuccess: () => {
@@ -200,9 +204,12 @@ export function useRunFullPipeline(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>
-      fetcher<any>(`${API_URL}/job-descriptions/${id}/run-pipeline`, {
-        method: 'POST',
-      }),
+      fetcher<{ success: boolean; message?: string }>(
+        `${API_URL}/job-descriptions/${id}/run-pipeline`,
+        {
+          method: 'POST',
+        },
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
     },

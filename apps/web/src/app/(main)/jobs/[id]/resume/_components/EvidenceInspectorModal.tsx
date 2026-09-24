@@ -26,6 +26,19 @@ import {
 export type EvidenceType = 'experience' | 'project' | 'skill' | 'bullet' | 'education';
 export type EvidenceStatus = 'VERIFIED' | 'FLAGGED' | 'UNVERIFIED';
 
+export interface CandidateEvidenceRecord {
+  company?: string;
+  title?: string;
+  name?: string;
+  level?: string;
+  evidence?: string | null;
+  achievements?: string[];
+  responsibilities?: string[];
+  outcomes?: string[];
+  technologies?: string[];
+  [key: string]: unknown;
+}
+
 export interface InspectedEvidence {
   type: EvidenceType;
   claim: string;
@@ -34,7 +47,7 @@ export interface InspectedEvidence {
   validationStatus: EvidenceStatus;
   flagReason?: string;
   flaggedNumbers?: string[];
-  candidateRecord?: any;
+  candidateRecord?: CandidateEvidenceRecord | null;
 }
 
 interface EvidenceInspectorModalProps {
@@ -221,57 +234,63 @@ export const EvidenceInspectorModal: React.FC<EvidenceInspectorModalProps> = ({
                 )}
 
                 {/* Raw Achievements or Responsibilities */}
-                {evidence.candidateRecord.achievements?.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase">
-                      Raw Achievements:
-                    </span>
-                    <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
-                      {evidence.candidateRecord.achievements.map((ach: string, i: number) => (
-                        <li key={i}>{ach}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {evidence.candidateRecord.responsibilities?.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase">
-                      Raw Responsibilities:
-                    </span>
-                    <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
-                      {evidence.candidateRecord.responsibilities.map((resp: string, i: number) => (
-                        <li key={i}>{resp}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {evidence.candidateRecord.outcomes?.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase">
-                      Project Outcomes:
-                    </span>
-                    <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
-                      {evidence.candidateRecord.outcomes.map((out: string, i: number) => (
-                        <li key={i}>{out}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {evidence.candidateRecord.technologies?.length > 0 && (
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {evidence.candidateRecord.technologies.map((t: string, i: number) => (
-                      <span
-                        key={i}
-                        className="px-1.5 py-0.5 rounded text-2xs font-mono bg-muted text-muted-foreground"
-                      >
-                        {t}
+                {Array.isArray(evidence.candidateRecord.achievements) &&
+                  evidence.candidateRecord.achievements.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase">
+                        Raw Achievements:
                       </span>
-                    ))}
-                  </div>
-                )}
+                      <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
+                        {evidence.candidateRecord.achievements.map((ach: string, i: number) => (
+                          <li key={i}>{ach}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                {Array.isArray(evidence.candidateRecord.responsibilities) &&
+                  evidence.candidateRecord.responsibilities.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase">
+                        Raw Responsibilities:
+                      </span>
+                      <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
+                        {evidence.candidateRecord.responsibilities.map(
+                          (resp: string, i: number) => (
+                            <li key={i}>{resp}</li>
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                {Array.isArray(evidence.candidateRecord.outcomes) &&
+                  evidence.candidateRecord.outcomes.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase">
+                        Project Outcomes:
+                      </span>
+                      <ul className="pl-4 list-disc space-y-1 text-muted-foreground">
+                        {evidence.candidateRecord.outcomes.map((out: string, i: number) => (
+                          <li key={i}>{out}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                {Array.isArray(evidence.candidateRecord.technologies) &&
+                  evidence.candidateRecord.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {evidence.candidateRecord.technologies.map((t: string, i: number) => (
+                        <span
+                          key={i}
+                          className="px-1.5 py-0.5 rounded text-2xs font-mono bg-muted text-muted-foreground"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
               </div>
             ) : (
               <div className="p-3 rounded-lg bg-background/80 border border-border/80 text-xs text-muted-foreground italic text-center py-6">

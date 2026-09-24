@@ -1,6 +1,13 @@
 'use client';
 
-import type { CandidateProfile, ResumeData, ValidationReport } from '@praman/schemas';
+import type {
+  CandidateProfile,
+  ResumeData,
+  ResumeEducationItem,
+  ResumeExperienceItem,
+  ResumeProjectItem,
+  ValidationReport,
+} from '@praman/schemas';
 import { cn } from 'cn';
 import {
   AlertTriangle,
@@ -80,7 +87,7 @@ export function ResumeViewer({
             {resume.personal?.name}
           </h2>
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-1.5">
-            {Object.entries(resume.personal?.contact || {}).map(([k, v]: [string, any]) => (
+            {Object.entries(resume.personal?.contact || {}).map(([k, v]: [string, string]) => (
               <span key={k}>
                 <span className="capitalize text-muted-foreground/80">{k}:</span> {v}
               </span>
@@ -120,7 +127,7 @@ export function ResumeViewer({
                   (c) => c.skill.toLowerCase() === sk.trim().toLowerCase(),
                 );
                 const candidateSkill = candidateProfile?.skills?.find(
-                  (s: any) => s.name?.toLowerCase() === sk.trim().toLowerCase(),
+                  (s) => s.name?.toLowerCase() === sk.trim().toLowerCase(),
                 );
                 const isAllowed = check ? check.isAllowed : true;
                 const isSelected =
@@ -191,9 +198,9 @@ export function ResumeViewer({
               </span>
             </div>
 
-            {resume.experience.map((exp: any, i: number) => {
+            {resume.experience.map((exp: ResumeExperienceItem, i: number) => {
               const matchedCandidateExp = candidateProfile?.experiences?.find(
-                (ce: any) => ce.id === exp.sourceExperienceId,
+                (ce) => ce.id === exp.sourceExperienceId,
               );
               const isSourceSelected =
                 (activeTarget?.type === 'source' && activeTarget.key === exp.sourceExperienceId) ||
@@ -342,9 +349,9 @@ export function ResumeViewer({
               </span>
             </div>
 
-            {resume.projects.map((proj: any, i: number) => {
+            {resume.projects.map((proj: ResumeProjectItem, i: number) => {
               const matchedCandidateProj = candidateProfile?.projects?.find(
-                (cp: any) => cp.id === proj.sourceProjectId,
+                (cp) => cp.id === proj.sourceProjectId,
               );
               const isSourceSelected =
                 (activeTarget?.type === 'source' && activeTarget.key === proj.sourceProjectId) ||
@@ -479,7 +486,7 @@ export function ResumeViewer({
             <h3 className="text-xs font-semibold text-brand-cyan uppercase tracking-wider mb-2">
               Education
             </h3>
-            {resume.education.map((edu: any, i: number) => (
+            {resume.education.map((edu: ResumeEducationItem, i: number) => (
               <div key={i} className="text-xs text-foreground/90">
                 <span className="font-semibold text-foreground">{edu.degree}</span>
                 {edu.institution && <span> — {edu.institution}</span>}

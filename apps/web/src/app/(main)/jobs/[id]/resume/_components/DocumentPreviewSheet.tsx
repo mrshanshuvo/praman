@@ -1,3 +1,9 @@
+import type {
+  ResumeData,
+  ResumeEducationItem,
+  ResumeExperienceItem,
+  ResumeProjectItem,
+} from '@praman/schemas';
 import { cn } from 'cn';
 import { Printer, ZoomIn, ZoomOut } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -12,7 +18,7 @@ export interface SheetSyncTarget {
 }
 
 interface DocumentPreviewSheetProps {
-  resume: any;
+  resume?: ResumeData | null;
   syncTarget?: SheetSyncTarget | null;
   onSyncToEditor?: (target: { section?: string; query?: string; timestamp: number }) => void;
 }
@@ -54,9 +60,11 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
     }
   }, [syncTarget]);
 
-  const personal = resume?.personal || {};
+  const personal = (resume?.personal as
+    | (NonNullable<ResumeData['personal']> & { location?: string })
+    | undefined) || { name: '', contact: {} };
   const contact = personal.contact || {};
-  const links = personal.links || {};
+  const links = (personal as unknown as { links?: Record<string, string> }).links || {};
 
   return (
     <div id="sheet-scroll-viewport" className="flex flex-col items-center space-y-4 w-full">
@@ -144,7 +152,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                 {contact.email && <span>{contact.email}</span>}
                 {contact.phone && <span>• {contact.phone}</span>}
                 {personal.location && <span>• {personal.location}</span>}
-                {Object.entries(links).map(([k, v]: [string, any]) => (
+                {Object.entries(links).map(([k, v]: [string, string]) => (
                   <span key={k}>
                     • <span className="capitalize">{k}:</span> {v}
                   </span>
@@ -228,7 +236,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                 <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Work Experience
                 </h2>
-                {resume.experience.map((exp: any, i: number) => (
+                {resume.experience.map((exp: ResumeExperienceItem, i: number) => (
                   <div
                     key={i}
                     className="space-y-1"
@@ -293,7 +301,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                 <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Featured Projects
                 </h2>
-                {resume.projects.map((proj: any, i: number) => (
+                {resume.projects.map((proj: ResumeProjectItem, i: number) => (
                   <div
                     key={i}
                     className="space-y-1"
@@ -353,7 +361,7 @@ export const DocumentPreviewSheet: React.FC<DocumentPreviewSheetProps> = ({
                 <h2 className="text-xs font-bold uppercase tracking-widest text-resume-accent border-b border-paper-border pb-1 mb-2">
                   Education
                 </h2>
-                {resume.education.map((edu: any, i: number) => (
+                {resume.education.map((edu: ResumeEducationItem, i: number) => (
                   <div key={i} className="text-xs text-paper-foreground/90">
                     <span className="font-bold text-paper-foreground">{edu.degree}</span>
                     {edu.institution && (

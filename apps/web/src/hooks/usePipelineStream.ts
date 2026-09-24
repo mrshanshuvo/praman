@@ -1,5 +1,10 @@
 'use client';
 
+import type {
+  CandidateJdAnalysisRecord,
+  JobDescriptionRecord,
+  ResumeRecord,
+} from '@praman/schemas';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 import type { PipelineStage } from '@/components/PipelineStepper';
@@ -22,7 +27,11 @@ export interface PipelineStreamEvent {
   stage: 'match' | 'strategy' | 'resume' | 'pipeline';
   status: 'started' | 'completed' | 'failed' | 'complete';
   message: string;
-  data?: any;
+  data?:
+    | CandidateJdAnalysisRecord
+    | NonNullable<CandidateJdAnalysisRecord['strategy']>
+    | ResumeRecord
+    | unknown;
   timestamp: string;
 }
 
@@ -161,10 +170,13 @@ export function usePipelineStream(jobId: string, options?: UsePipelineStreamOpti
               } else if (event.status === 'completed') {
                 setStageStatuses((prev) => ({ ...prev, match: 'completed' }));
                 if (event.data) {
-                  queryClient.setQueryData(['jobs', jobId], (old: any) => {
-                    if (!old) return old;
-                    return { ...old, analysis: event.data };
-                  });
+                  queryClient.setQueryData<JobDescriptionRecord>(
+                    queryKeys.jobs.detail(jobId),
+                    (old) => {
+                      if (!old) return old;
+                      return { ...old, analysis: event.data as CandidateJdAnalysisRecord };
+                    },
+                  );
                 }
               }
             } else if (event.stage === 'strategy') {
@@ -175,17 +187,22 @@ export function usePipelineStream(jobId: string, options?: UsePipelineStreamOpti
               } else if (event.status === 'completed') {
                 setStageStatuses((prev) => ({ ...prev, strategy: 'completed' }));
                 if (event.data) {
-                  queryClient.setQueryData(['jobs', jobId], (old: any) => {
-                    if (!old) return old;
-                    const existingAnalysis = old.analysis || {};
-                    return {
-                      ...old,
-                      analysis: {
-                        ...existingAnalysis,
-                        strategy: event.data,
-                      },
-                    };
-                  });
+                  queryClient.setQueryData<JobDescriptionRecord>(
+                    queryKeys.jobs.detail(jobId),
+                    (old) => {
+                      if (!old) return old;
+                      const existingAnalysis = old.analysis ?? ({} as CandidateJdAnalysisRecord);
+                      return {
+                        ...old,
+                        analysis: {
+                          ...existingAnalysis,
+                          strategy: event.data as NonNullable<
+                            CandidateJdAnalysisRecord['strategy']
+                          >,
+                        },
+                      };
+                    },
+                  );
                 }
               }
             } else if (event.stage === 'resume') {
@@ -201,21 +218,24 @@ export function usePipelineStream(jobId: string, options?: UsePipelineStreamOpti
               } else if (event.status === 'completed') {
                 setStageStatuses((prev) => ({ ...prev, resume: 'completed' }));
                 if (event.data) {
-                  queryClient.setQueryData(['jobs', jobId], (old: any) => {
-                    if (!old) return old;
-                    const existingAnalysis = old.analysis || {};
-                    const existingStrategy = existingAnalysis.strategy || {};
-                    return {
-                      ...old,
-                      analysis: {
-                        ...existingAnalysis,
-                        strategy: {
-                          ...existingStrategy,
-                          resume: event.data,
+                  queryClient.setQueryData<JobDescriptionRecord>(
+                    queryKeys.jobs.detail(jobId),
+                    (old) => {
+                      if (!old) return old;
+                      const existingAnalysis = old.analysis;
+                      if (!existingAnalysis?.strategy) return old;
+                      return {
+                        ...old,
+                        analysis: {
+                          ...existingAnalysis,
+                          strategy: {
+                            ...existingAnalysis.strategy,
+                            resume: event.data as ResumeRecord,
+                          },
                         },
-                      },
-                    };
-                  });
+                      };
+                    },
+                  );
                 }
               }
             } else if (event.stage === 'pipeline') {
@@ -253,11 +273,12 @@ export function usePipelineStream(jobId: string, options?: UsePipelineStreamOpti
 
       setIsStreaming(false);
       setActiveStage(null);
-    } catch (streamError: any) {
-      if (streamError.name === 'AbortError') {
+    } catch (streamError: unknown) {
+      const err = streamError as { name?: string; message?: string } | null;
+      if (err?.name === 'AbortError') {
         console.log('SSE Pipeline stream cancelled by client.');
       } else {
-        const errorMsg = streamError.message || 'Error occurred while streaming pipeline.';
+        const errorMsg = err?.message || 'Error occurred while streaming pipeline.';
         setError(errorMsg);
         options?.onError?.(errorMsg);
       }

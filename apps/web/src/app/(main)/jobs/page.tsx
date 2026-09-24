@@ -1,6 +1,6 @@
 'use client';
 
-import { calculateMatchScore } from '@praman/schemas';
+import { calculateMatchScore, type JobDescriptionRecord } from '@praman/schemas';
 import {
   AlertCircle,
   ArrowUpDown,
@@ -35,7 +35,7 @@ const STATUS_TABS = [
 
 const VALID_STATUSES = STATUS_TABS.map((t) => t.key);
 
-function getJobMatchScore(jd: any): number {
+function getJobMatchScore(jd: JobDescriptionRecord): number {
   if (jd.analysis?.matchScore != null) {
     return jd.analysis.matchScore;
   }

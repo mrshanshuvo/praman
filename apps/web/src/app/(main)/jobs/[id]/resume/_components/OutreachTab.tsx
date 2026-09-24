@@ -1,4 +1,5 @@
 'use client';
+import type { NumberFlag } from '@praman/schemas';
 import { cn } from 'cn';
 import {
   AlertTriangle,
@@ -256,15 +257,17 @@ ${coverLetter.senderName}
                           • {v}
                         </p>
                       ))}
-                      {outreach.coverLetterValidation.numberFlags?.map((f: any, i: number) => (
-                        <div
-                          key={i}
-                          className="text-xs text-warning/90 pl-5 flex items-center gap-1"
-                        >
-                          <Hash className="w-3 h-3 text-warning shrink-0" />
-                          <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
-                        </div>
-                      ))}
+                      {outreach.coverLetterValidation.numberFlags?.map(
+                        (f: NumberFlag, i: number) => (
+                          <div
+                            key={i}
+                            className="text-xs text-warning/90 pl-5 flex items-center gap-1"
+                          >
+                            <Hash className="w-3 h-3 text-warning shrink-0" />
+                            <span>Unconfirmed metrics: {f.flaggedNumbers?.join(', ')}</span>
+                          </div>
+                        ),
+                      )}
                     </div>
                   )}
 

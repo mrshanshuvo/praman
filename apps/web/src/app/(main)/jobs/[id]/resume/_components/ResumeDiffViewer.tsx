@@ -1,6 +1,11 @@
 'use client';
 
-import type { ResumeData, ResumeVersionSummary } from '@praman/schemas';
+import type {
+  ResumeData,
+  ResumeExperienceItem,
+  ResumeProjectItem,
+  ResumeVersionSummary,
+} from '@praman/schemas';
 import { cn } from 'cn';
 import {
   ArrowLeftRight,
@@ -29,6 +34,17 @@ import {
   diffWords,
   type WordDiffPart,
 } from '@/lib/diff';
+
+type DiffExperienceItem = ResumeExperienceItem & {
+  role?: string;
+  dates?: string;
+  duration?: string;
+};
+
+type DiffProjectItem = ResumeProjectItem & {
+  role?: string;
+  technologies?: string[];
+};
 
 interface ResumeDiffViewerProps {
   jobId: string;
@@ -119,8 +135,9 @@ export function ResumeDiffViewer({
 
   // 3. Diff Experiences
   const experienceDiffs = useMemo(() => {
-    const baseExps: any[] = baseResume?.experience || [];
-    const targetExps: any[] = targetResume?.experience || [];
+    const baseExps: DiffExperienceItem[] = (baseResume?.experience as DiffExperienceItem[]) || [];
+    const targetExps: DiffExperienceItem[] =
+      (targetResume?.experience as DiffExperienceItem[]) || [];
 
     const matchedPairs: {
       company: string;
@@ -138,7 +155,8 @@ export function ResumeDiffViewer({
         (bExp, idx) =>
           !usedBaseIndices.has(idx) &&
           bExp.company?.toLowerCase().trim() === tExp.company?.toLowerCase().trim() &&
-          bExp.role?.toLowerCase().trim() === tExp.role?.toLowerCase().trim(),
+          (bExp.role || bExp.title)?.toLowerCase().trim() ===
+            (tExp.role || tExp.title)?.toLowerCase().trim(),
       );
 
       // Fallback: match by company alone
@@ -158,7 +176,7 @@ export function ResumeDiffViewer({
 
         matchedPairs.push({
           company: tExp.company,
-          role: tExp.role,
+          role: tExp.role || tExp.title || '',
           dates: tExp.dates || tExp.duration,
           bullets: bulletsDiff,
           status: hasChanges ? 'modified' : 'unchanged',
@@ -167,7 +185,7 @@ export function ResumeDiffViewer({
         // Experience was newly added in target
         matchedPairs.push({
           company: tExp.company,
-          role: tExp.role,
+          role: tExp.role || tExp.title || '',
           dates: tExp.dates || tExp.duration,
           bullets: (tExp.bullets || []).map((b: string) => ({
             status: 'added',
@@ -183,7 +201,7 @@ export function ResumeDiffViewer({
       if (!usedBaseIndices.has(idx)) {
         matchedPairs.push({
           company: bExp.company,
-          role: bExp.role,
+          role: bExp.role || bExp.title || '',
           dates: bExp.dates || bExp.duration,
           bullets: (bExp.bullets || []).map((b: string) => ({
             status: 'removed',
@@ -199,8 +217,8 @@ export function ResumeDiffViewer({
 
   // 4. Diff Projects
   const projectDiffs = useMemo(() => {
-    const baseProjects: any[] = baseResume?.projects || [];
-    const targetProjects: any[] = targetResume?.projects || [];
+    const baseProjects: DiffProjectItem[] = (baseResume?.projects as DiffProjectItem[]) || [];
+    const targetProjects: DiffProjectItem[] = (targetResume?.projects as DiffProjectItem[]) || [];
 
     const matchedPairs: {
       name: string;

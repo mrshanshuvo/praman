@@ -4,11 +4,87 @@
  * and markdown documentation.
  */
 
+export interface ResumeLikeSkill {
+  name?: string;
+  category?: string;
+  level?: string;
+}
+
+export interface ResumeLikeExperience {
+  id?: string;
+  sourceExperienceId?: string;
+  company?: string;
+  title?: string;
+  role?: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  location?: string | null;
+  bullets?: string[];
+  responsibilities?: string[];
+  achievements?: string[];
+  highlights?: string[];
+  technologies?: string[];
+}
+
+export interface ResumeLikeProject {
+  id?: string;
+  sourceProjectId?: string;
+  name?: string;
+  role?: string | null;
+  description?: string | null;
+  technologies?: string[];
+  link?: string | null;
+  url?: string | null;
+  bullets?: string[];
+  outcomes?: string[];
+  highlights?: string[];
+}
+
+export interface ResumeLikeEducation {
+  id?: string;
+  sourceEducationId?: string;
+  institution?: string | null;
+  degree?: string | null;
+  field?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  details?: string | null;
+}
+
+export interface ResumeLikeCertification {
+  id?: string;
+  sourceCertificationId?: string;
+  name?: string | null;
+  issuer?: string | null;
+  date?: string | null;
+}
+
+export interface ResumeLikePersonal {
+  name?: string;
+  title?: string | null;
+  summary?: string | null;
+  location?: string | null;
+  contact?: Record<string, string>;
+  links?: Record<string, string>;
+}
+
+export interface ResumeInput {
+  personal?: ResumeLikePersonal;
+  summary?: string;
+  skills?: (string | ResumeLikeSkill)[];
+  experience?: ResumeLikeExperience[];
+  experiences?: ResumeLikeExperience[];
+  projects?: ResumeLikeProject[];
+  education?: ResumeLikeEducation[];
+  educations?: ResumeLikeEducation[];
+  certifications?: ResumeLikeCertification[];
+}
+
 /**
  * Converts structured ResumeData into clean, human-readable ASCII plain text
  * optimized for legacy ATS text submission fields and clipboard pasting.
  */
-export function generatePlainTextResume(resume: any): string {
+export function generatePlainTextResume(resume?: ResumeInput | null): string {
   if (!resume) return '';
 
   const personal = resume.personal || {};
@@ -25,8 +101,8 @@ export function generatePlainTextResume(resume: any): string {
   if (typeof contact === 'object') {
     if (contact.email) contactPieces.push(contact.email);
     if (contact.phone) contactPieces.push(contact.phone);
-    if (contact.location || personal.location)
-      contactPieces.push(contact.location || personal.location);
+    const loc = contact.location || personal.location;
+    if (loc) contactPieces.push(loc);
     if (contact.linkedin || links.linkedin)
       contactPieces.push(`LinkedIn: ${contact.linkedin || links.linkedin}`);
     if (contact.github || links.github)
@@ -59,9 +135,14 @@ export function generatePlainTextResume(resume: any): string {
     } else {
       const byCategory: Record<string, string[]> = {};
       for (const s of skills) {
-        const cat = s.category || 'Core Technologies';
-        if (!byCategory[cat]) byCategory[cat] = [];
-        byCategory[cat].push(s.name || s);
+        if (typeof s === 'string') {
+          if (!byCategory['Core Technologies']) byCategory['Core Technologies'] = [];
+          byCategory['Core Technologies'].push(s);
+        } else {
+          const cat = s.category || 'Core Technologies';
+          if (!byCategory[cat]) byCategory[cat] = [];
+          if (s.name) byCategory[cat].push(s.name);
+        }
       }
       for (const [cat, items] of Object.entries(byCategory)) {
         lines.push(`${cat}: ${items.join(', ')}`);
@@ -159,7 +240,7 @@ export function generatePlainTextResume(resume: any): string {
 /**
  * Converts structured ResumeData into clean GitHub-flavored Markdown.
  */
-export function generateMarkdownResume(resume: any): string {
+export function generateMarkdownResume(resume?: ResumeInput | null): string {
   if (!resume) return '';
 
   const personal = resume.personal || {};
@@ -175,8 +256,8 @@ export function generateMarkdownResume(resume: any): string {
   if (typeof contact === 'object') {
     if (contact.email) contactPieces.push(`[${contact.email}](mailto:${contact.email})`);
     if (contact.phone) contactPieces.push(contact.phone);
-    if (contact.location || personal.location)
-      contactPieces.push(contact.location || personal.location);
+    const loc = contact.location || personal.location;
+    if (loc) contactPieces.push(loc);
     if (contact.linkedin || links.linkedin)
       contactPieces.push(`[LinkedIn](${contact.linkedin || links.linkedin})`);
     if (contact.github || links.github)
@@ -203,10 +284,14 @@ export function generateMarkdownResume(resume: any): string {
   if (skills.length > 0) {
     lines.push('## Technical Skills\n');
     if (typeof skills[0] === 'string') {
-      lines.push(skills.map((s: string) => `\`${s}\``).join(', '));
+      lines.push((skills as string[]).map((s: string) => `\`${s}\``).join(', '));
     } else {
       for (const s of skills) {
-        lines.push(`- **${s.name || s}**${s.category ? ` (${s.category})` : ''}`);
+        if (typeof s === 'string') {
+          lines.push(`- **${s}**`);
+        } else {
+          lines.push(`- **${s.name || ''}**${s.category ? ` (${s.category})` : ''}`);
+        }
       }
     }
     lines.push('');
@@ -281,7 +366,7 @@ export function generateMarkdownResume(resume: any): string {
 /**
  * Standardizes resume data into a clean, canonical ATS JSON representation.
  */
-export function generateAtsJsonResume(resume: any): Record<string, unknown> {
+export function generateAtsJsonResume(resume?: ResumeInput | null): Record<string, unknown> {
   if (!resume) return {};
 
   const personal = resume.personal || {};
@@ -303,9 +388,9 @@ export function generateAtsJsonResume(resume: any): Record<string, unknown> {
     },
     professionalSummary: resume.summary || personal.summary || '',
     coreCompetencies: Array.isArray(resume.skills)
-      ? resume.skills.map((s: any) => (typeof s === 'string' ? s : s.name || ''))
+      ? resume.skills.map((s) => (typeof s === 'string' ? s : (s as ResumeLikeSkill).name || ''))
       : [],
-    workHistory: (resume.experience || resume.experiences || []).map((exp: any) => ({
+    workHistory: (resume.experience || resume.experiences || []).map((exp) => ({
       company: exp.company || '',
       title: exp.title || exp.role || '',
       startDate: exp.startDate || '',
@@ -314,18 +399,18 @@ export function generateAtsJsonResume(resume: any): Record<string, unknown> {
       achievements: exp.bullets || exp.highlights || [],
       sourceId: exp.sourceExperienceId || exp.id || null,
     })),
-    projects: (resume.projects || []).map((proj: any) => ({
+    projects: (resume.projects || []).map((proj) => ({
       name: proj.name || '',
       url: proj.url || proj.link || '',
       highlights: proj.bullets || proj.highlights || [],
       sourceId: proj.sourceProjectId || proj.id || null,
     })),
-    education: (resume.education || resume.educations || []).map((edu: any) => ({
+    education: (resume.education || resume.educations || []).map((edu) => ({
       institution: edu.institution || '',
       degree: edu.degree || '',
       sourceId: edu.sourceEducationId || edu.id || null,
     })),
-    certifications: (resume.certifications || []).map((cert: any) => ({
+    certifications: (resume.certifications || []).map((cert) => ({
       name: cert.name || '',
       issuer: cert.issuer || '',
       sourceId: cert.sourceCertificationId || cert.id || null,

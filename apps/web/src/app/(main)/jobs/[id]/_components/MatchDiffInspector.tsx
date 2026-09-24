@@ -1,6 +1,13 @@
 'use client';
 
-import type { CandidateProfile, MatchAnalysis, Skill, StructuredJd } from '@praman/schemas';
+import type {
+  CandidateProfile,
+  Experience,
+  MatchAnalysis,
+  Project,
+  Skill,
+  StructuredJd,
+} from '@praman/schemas';
 import {
   AlertOctagon,
   AlertTriangle,
@@ -31,6 +38,17 @@ interface MatchDiffInspectorProps {
   onRunStage?: () => void;
   isRunning?: boolean;
 }
+
+type CandidateProfileExperience = Experience & {
+  role?: string;
+  current?: boolean;
+  bullets?: string[];
+};
+
+type CandidateProfileProject = Project & {
+  title?: string;
+  bullets?: string[];
+};
 
 type FilterMode = 'all' | 'matches' | 'gaps';
 
@@ -154,10 +172,10 @@ export function MatchDiffInspector({
 
   // Relevant candidate experiences
   const relevantExperiences = useMemo(() => {
-    const all = candidateProfile?.experiences || [];
+    const all = (candidateProfile?.experiences || []) as CandidateProfileExperience[];
     const relevantIds = new Set(analysis.relevantExperience || []);
     if (relevantIds.size > 0) {
-      const matched = all.filter((e: any) => relevantIds.has(e.id));
+      const matched = all.filter((e) => relevantIds.has(e.id));
       if (matched.length > 0) return matched;
     }
     return all.slice(0, 3);
@@ -165,10 +183,10 @@ export function MatchDiffInspector({
 
   // Relevant candidate projects
   const relevantProjects = useMemo(() => {
-    const all = candidateProfile?.projects || [];
+    const all = (candidateProfile?.projects || []) as CandidateProfileProject[];
     const relevantIds = new Set(analysis.relevantProjects || []);
     if (relevantIds.size > 0) {
-      const matched = all.filter((p: any) => relevantIds.has(p.id));
+      const matched = all.filter((p) => relevantIds.has(p.id));
       if (matched.length > 0) return matched;
     }
     return all.slice(0, 2);
@@ -489,7 +507,7 @@ export function MatchDiffInspector({
                 Target-Aligned Experience Records ({relevantExperiences.length})
               </span>
 
-              {relevantExperiences.map((exp: any) => {
+              {relevantExperiences.map((exp: CandidateProfileExperience) => {
                 const isItemFocused =
                   selectedSkill &&
                   (exp.technologies?.some((t: string) =>
@@ -508,21 +526,24 @@ export function MatchDiffInspector({
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <h5 className="text-xs font-semibold text-foreground truncate">
-                        {exp.role}{' '}
+                        {exp.role || exp.title}{' '}
                         <span className="text-muted-foreground font-normal">@ {exp.company}</span>
                       </h5>
                       <span className="text-2xs font-mono text-muted-foreground shrink-0">
-                        {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                        {exp.startDate} -{' '}
+                        {exp.current || exp.isCurrent ? 'Present' : exp.endDate || 'Present'}
                       </span>
                     </div>
 
                     <ul className="space-y-1 mb-2 text-xs text-muted-foreground">
-                      {exp.bullets?.slice(0, 2).map((bullet: string, bIdx: number) => (
-                        <li key={bIdx} className="leading-relaxed flex items-start gap-1.5">
-                          <span className="text-brand-cyan font-mono text-2xs mt-0.5">▸</span>
-                          <span>{highlightBullet(bullet)}</span>
-                        </li>
-                      ))}
+                      {(exp.bullets || exp.responsibilities || exp.achievements || [])
+                        .slice(0, 2)
+                        .map((bullet: string, bIdx: number) => (
+                          <li key={bIdx} className="leading-relaxed flex items-start gap-1.5">
+                            <span className="text-brand-cyan font-mono text-2xs mt-0.5">▸</span>
+                            <span>{highlightBullet(bullet)}</span>
+                          </li>
+                        ))}
                     </ul>
 
                     {/* Tech tokens */}
@@ -561,22 +582,26 @@ export function MatchDiffInspector({
                   <span>Aligned Portfolio Projects ({relevantProjects.length})</span>
                 </span>
 
-                {relevantProjects.map((proj: any) => (
+                {relevantProjects.map((proj: CandidateProfileProject) => (
                   <div
                     key={proj.id}
                     className="p-3 rounded-xl border border-border bg-muted/20 space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-semibold text-foreground">{proj.title}</h5>
+                      <h5 className="text-xs font-semibold text-foreground">
+                        {proj.title || proj.name}
+                      </h5>
                       <span className="text-2xs text-muted-foreground font-mono">{proj.role}</span>
                     </div>
                     <ul className="space-y-1 text-xs text-muted-foreground">
-                      {proj.bullets?.slice(0, 1).map((b: string, i: number) => (
-                        <li key={i} className="leading-relaxed flex items-start gap-1.5">
-                          <span className="text-success font-mono text-2xs mt-0.5">▸</span>
-                          <span>{highlightBullet(b)}</span>
-                        </li>
-                      ))}
+                      {(proj.bullets || proj.outcomes || [])
+                        .slice(0, 1)
+                        .map((b: string, i: number) => (
+                          <li key={i} className="leading-relaxed flex items-start gap-1.5">
+                            <span className="text-success font-mono text-2xs mt-0.5">▸</span>
+                            <span>{highlightBullet(b)}</span>
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 ))}

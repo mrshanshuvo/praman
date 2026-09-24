@@ -1,5 +1,6 @@
 'use client';
 
+import type { JobDescriptionRecord } from '@praman/schemas';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { JsonCard } from '@/components/JsonCard';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 interface JdResultViewProps {
-  createdJd: any;
+  createdJd: JobDescriptionRecord;
   onLaunchPipeline: () => void;
 }
 

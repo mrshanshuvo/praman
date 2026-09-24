@@ -53,7 +53,7 @@ export function useUpdateTrackerDossier(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }
@@ -109,7 +109,7 @@ export function useAddMilestone(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }
@@ -155,7 +155,7 @@ export function useUpdateMilestone(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }
@@ -197,7 +197,7 @@ export function useDeleteMilestone(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }
@@ -246,7 +246,7 @@ export function useAddJobNote(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }
@@ -286,7 +286,7 @@ export function useUpdateJobNote(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }
@@ -327,7 +327,7 @@ export function useDeleteJobNote(jobId: string) {
 
       return { previousJob };
     },
-    onError: (err: any, _, context) => {
+    onError: (err: Error, _, context) => {
       if (context?.previousJob) {
         queryClient.setQueryData(queryKeys.jobs.detail(jobId), context.previousJob);
       }

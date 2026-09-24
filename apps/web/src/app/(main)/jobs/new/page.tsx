@@ -1,5 +1,6 @@
 'use client';
 
+import type { JobDescriptionRecord } from '@praman/schemas';
 import { AlertCircle, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -11,11 +12,17 @@ import { Card } from '@/components/ui/card';
 import { useCreateJob } from '@/hooks/usePramanApi';
 import { JdIngestionForm, JdResultView } from './_components';
 
+export interface DuplicateJdInfo {
+  id: string | null;
+  jobTitle?: string | null;
+  matchScore?: number | null;
+}
+
 export default function NewJobPage() {
   const router = useRouter();
   const [rawText, setRawText] = useState('');
-  const [createdJd, setCreatedJd] = useState<any>(null);
-  const [duplicateInfo, setDuplicateInfo] = useState<any>(null);
+  const [createdJd, setCreatedJd] = useState<JobDescriptionRecord | null>(null);
+  const [duplicateInfo, setDuplicateInfo] = useState<DuplicateJdInfo | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const createJobMutation = useCreateJob();
@@ -34,11 +41,16 @@ export default function NewJobPage() {
     try {
       const data = await createJobMutation.mutateAsync({ rawText });
       setCreatedJd(data);
-    } catch (err: any) {
-      if (err.data?.code === 'DUPLICATE_JD' || err.status === 409) {
-        setDuplicateInfo(err.data?.existingJd || { id: null });
+    } catch (err: unknown) {
+      const error = err as {
+        data?: { code?: string; existingJd?: DuplicateJdInfo };
+        status?: number;
+        message?: string;
+      } | null;
+      if (error?.data?.code === 'DUPLICATE_JD' || error?.status === 409) {
+        setDuplicateInfo(error.data?.existingJd || { id: null });
       } else {
-        setActionError(err.message || 'An error occurred while analyzing the job description');
+        setActionError(error?.message || 'An error occurred while analyzing the job description');
       }
     }
   };
@@ -49,8 +61,9 @@ export default function NewJobPage() {
     try {
       const data = await createJobMutation.mutateAsync({ rawText, force: true });
       setCreatedJd(data);
-    } catch (err: any) {
-      setActionError(err.message || 'An error occurred while analyzing the job description');
+    } catch (err: unknown) {
+      const error = err as { message?: string } | null;
+      setActionError(error?.message || 'An error occurred while analyzing the job description');
     }
   };
 

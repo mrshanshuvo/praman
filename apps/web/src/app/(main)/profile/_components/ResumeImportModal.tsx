@@ -374,7 +374,9 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
               {/* Extracted Facts Review Tabs */}
               <Tabs
                 value={activeTab}
-                onValueChange={(v: any) => setActiveTab(v)}
+                onValueChange={(v) =>
+                  setActiveTab(v as 'experiences' | 'skills' | 'education' | 'personal')
+                }
                 className="w-full"
               >
                 <TabsList className="grid grid-cols-4 w-full bg-muted/40 p-1 rounded-xl">
