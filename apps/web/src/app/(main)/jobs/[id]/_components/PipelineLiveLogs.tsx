@@ -1,7 +1,17 @@
 'use client';
 
-import { CheckCircle2, ChevronDown, ChevronUp, Loader2, Terminal, XCircle } from 'lucide-react';
-import React, { useState } from 'react';
+import {
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  Loader2,
+  Terminal,
+  XCircle,
+} from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import type { PipelineStreamLog } from '@/hooks/usePipelineStream';
 
@@ -12,10 +22,34 @@ interface PipelineLiveLogsProps {
 
 export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStreaming }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new logs stream in
+  useEffect(() => {
+    if (isExpanded && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [logs.length, isExpanded]);
 
   if (logs.length === 0 && !isStreaming) return null;
 
   const latestLog = logs[logs.length - 1];
+
+  const handleCopyLogs = async () => {
+    if (logs.length === 0) return;
+    try {
+      const text = logs
+        .map((l) => `[${l.timestamp}] [${l.stage.toUpperCase()}] (${l.status}) ${l.message}`)
+        .join('\n');
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success('Pipeline logs copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy logs to clipboard');
+    }
+  };
 
   return (
     <Card className="w-full bg-card/95 border-border rounded-2xl p-4 sm:p-5 backdrop-blur-md shadow-xs space-y-3">
@@ -56,18 +90,48 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsExpanded((prev) => !prev)}
-          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label={isExpanded ? 'Collapse logs' : 'Expand logs'}
-        >
-          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
+        <div className="flex items-center gap-1">
+          {logs.length > 0 && (
+            <button
+              type="button"
+              onClick={handleCopyLogs}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              title="Copy all logs"
+              aria-label="Copy logs to clipboard"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-success" />
+                  <span className="text-2xs text-success font-medium">Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span className="text-2xs">Copy</span>
+                </>
+              )}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            aria-label={isExpanded ? 'Collapse logs' : 'Expand logs'}
+          >
+            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {isExpanded && (
-        <div className="rounded-xl bg-background/80 border border-border/80 p-3.5 font-mono text-xs max-h-56 overflow-y-auto space-y-2">
+        <div
+          ref={scrollContainerRef}
+          role="log"
+          aria-live="polite"
+          aria-atomic="false"
+          className="rounded-xl bg-background/80 border border-border/80 p-3.5 font-mono text-xs max-h-56 overflow-y-auto space-y-2 scroll-smooth"
+        >
           {logs.map((log, index) => {
             const hasSubsequentCompletionOrAdvance = logs
               .slice(index + 1)
