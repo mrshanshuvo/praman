@@ -111,7 +111,7 @@ export const PipelineFunnelCard: React.FC<PipelineFunnelCardProps> = ({ jobs }) 
                       {stage.label}
                     </span>
                     <span
-                      className={`text-xs font-mono font-bold px-1.5 py-0.2 rounded ${stage.color}`}
+                      className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${stage.color}`}
                     >
                       {stage.count}
                     </span>

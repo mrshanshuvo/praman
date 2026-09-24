@@ -102,7 +102,7 @@ export const PipelineLiveLogs: React.FC<PipelineLiveLogsProps> = ({ logs, isStre
                 </span>
 
                 <span
-                  className={`font-semibold uppercase text-2xs px-1.5 py-0.2 rounded shrink-0 ${
+                  className={`font-semibold uppercase text-2xs px-1.5 py-0.5 rounded shrink-0 ${
                     isRunning
                       ? 'bg-brand-cyan/20 text-brand-cyan'
                       : isCompleted

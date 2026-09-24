@@ -170,7 +170,7 @@ export function ResumeViewer({
                     <Award className="w-3.5 h-3.5 text-brand-cyan shrink-0" />
                     <span className="text-foreground">{sk}</span>
                     {check?.candidateLevel && (
-                      <span className="text-2xs px-1 py-0.2 rounded bg-background/80 text-muted-foreground border border-border">
+                      <span className="text-2xs px-1 py-0.5 rounded bg-background/80 text-muted-foreground border border-border">
                         {check.candidateLevel}
                       </span>
                     )}

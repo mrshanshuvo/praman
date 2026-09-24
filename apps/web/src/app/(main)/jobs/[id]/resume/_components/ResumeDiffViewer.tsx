@@ -880,7 +880,7 @@ function DiffText({ parts }: { parts: WordDiffPart[] }) {
           return (
             <mark
               key={idx}
-              className="bg-success/25 text-success font-medium px-1 py-0.2 rounded mx-0.5 inline-block"
+              className="bg-success/25 text-success font-medium px-1 py-0.5 rounded mx-0.5 inline-block"
             >
               {part.value}
             </mark>
@@ -890,7 +890,7 @@ function DiffText({ parts }: { parts: WordDiffPart[] }) {
           return (
             <del
               key={idx}
-              className="bg-destructive/25 text-destructive line-through px-1 py-0.2 rounded mx-0.5 inline-block opacity-80"
+              className="bg-destructive/25 text-destructive line-through px-1 py-0.5 rounded mx-0.5 inline-block opacity-80"
             >
               {part.value}
             </del>
