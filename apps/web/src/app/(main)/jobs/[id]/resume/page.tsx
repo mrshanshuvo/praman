@@ -67,7 +67,6 @@ function ResumeAuditContent() {
   const {
     data: resumeData,
     isLoading: loading,
-    isFetching,
     error: fetchError,
     refetch,
   } = useJobResume(id, selectedVersion);
@@ -130,9 +129,7 @@ function ResumeAuditContent() {
         latexCode={latex}
         templateId={selectedTemplate}
         matchAnalysis={jd?.analysis?.result ?? null}
-        isFetching={isFetching}
         isRegenerating={runStageMutation.isPending}
-        onRefresh={() => refetch()}
         onRegenerate={handleRegenerate}
         versions={versions}
         selectedVersion={selectedVersion}

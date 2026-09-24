@@ -21,9 +21,7 @@ interface JobDetailHeaderProps {
     durationMs?: number | null;
     aiModel?: string | null;
   } | null;
-  isFetching: boolean;
   isStreaming: boolean;
-  onRefresh: () => void;
   onRunPipeline: () => void;
   onCancelStream?: () => void;
 }
@@ -32,9 +30,7 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
   id,
   structured,
   telemetry,
-  isFetching,
   isStreaming,
-  onRefresh,
   onRunPipeline,
   onCancelStream,
 }) => {
@@ -67,18 +63,6 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2.5 w-full sm:w-auto">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={isFetching || isStreaming}
-          className="text-foreground border-border bg-card hover:bg-muted"
-          title="Refresh job data"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">Refresh</span>
-        </Button>
-
         {isStreaming ? (
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button

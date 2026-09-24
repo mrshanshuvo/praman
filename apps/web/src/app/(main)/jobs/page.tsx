@@ -10,7 +10,7 @@ import {
   LayoutGrid,
   List,
   PlusCircle,
-  RefreshCw,
+
   Search,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -74,7 +74,6 @@ function JobsListContent() {
   const {
     data: rawJds,
     isLoading: loading,
-    isFetching,
     error: fetchError,
     refetch,
   } = useJobs({ all: true });
@@ -176,16 +175,6 @@ function JobsListContent() {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="text-foreground border-border bg-card hover:bg-muted hover:border-brand-pink/40 hover:text-brand-pink dark:hover:border-border dark:hover:text-foreground transition-colors"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </Button>
           <Link
             href="/jobs/new"
             className={buttonVariants({

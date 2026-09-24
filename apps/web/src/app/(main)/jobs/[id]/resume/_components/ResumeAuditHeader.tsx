@@ -53,9 +53,7 @@ interface ResumeAuditHeaderProps {
   latexCode?: string;
   templateId?: string;
   matchAnalysis?: MatchAnalysis | null;
-  isFetching: boolean;
   isRegenerating: boolean;
-  onRefresh: () => void;
   onRegenerate: () => void;
   versions?: ResumeVersionSummary[];
   selectedVersion?: string;
@@ -74,9 +72,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
   latexCode = '',
   templateId = 'modern-developer',
   matchAnalysis,
-  isFetching,
   isRegenerating,
-  onRefresh,
   onRegenerate,
   versions,
   selectedVersion,
@@ -250,24 +246,6 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Tier 3: Utility Group (Icon-only with tooltips) */}
           <div className="flex items-center gap-1 border-r border-border pr-2 mr-0.5">
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onRefresh}
-                    disabled={isFetching || isRegenerating}
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
-                    aria-label="Refresh resume data"
-                  />
-                }
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-              </TooltipTrigger>
-              <TooltipContent>Refresh status & audit</TooltipContent>
-            </Tooltip>
-
             <Tooltip>
               <TooltipTrigger
                 render={

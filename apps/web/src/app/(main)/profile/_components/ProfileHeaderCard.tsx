@@ -20,14 +20,12 @@ import { ResumeImportModal } from './ResumeImportModal';
 
 interface ProfileHeaderCardProps {
   personal?: CandidatePersonal | null;
-  isFetching: boolean;
   onRefresh: () => void;
   onUpdatePersonal: (personal: UpdateCandidatePersonal) => Promise<void>;
 }
 
 export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   personal,
-  isFetching,
   onRefresh,
   onUpdatePersonal,
 }) => {
@@ -154,17 +152,6 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             >
               <Edit2 className="w-3.5 h-3.5" />
               <span>Edit Details</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefresh}
-              disabled={isFetching}
-              className="text-foreground border-border bg-card hover:bg-muted text-xs gap-1.5"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
             </Button>
           </div>
         </div>

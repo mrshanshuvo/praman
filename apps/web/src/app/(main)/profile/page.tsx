@@ -82,7 +82,6 @@ function ProfileContent() {
 
       <ProfileHeaderCard
         personal={personal}
-        isFetching={isFetching}
         onRefresh={refetch}
         onUpdatePersonal={actions.handleUpdatePersonal}
       />

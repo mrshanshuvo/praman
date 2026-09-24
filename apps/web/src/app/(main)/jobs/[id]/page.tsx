@@ -51,7 +51,7 @@ function JobDetailContent() {
     },
   );
 
-  const { data: jd, isLoading: loading, isFetching, error: fetchError, refetch } = useJob(id);
+  const { data: jd, isLoading: loading, error: fetchError, refetch } = useJob(id);
   const runStageMutation = useRunStage(id);
 
   const [hasAutoAdvanced, setHasAutoAdvanced] = useState<boolean>(() => {
@@ -160,9 +160,7 @@ function JobDetailContent() {
         id={id}
         structured={structured}
         telemetry={jobTelemetry}
-        isFetching={isFetching}
         isStreaming={isStreaming}
-        onRefresh={() => refetch()}
         onRunPipeline={startStream}
         onCancelStream={cancelStream}
       />
