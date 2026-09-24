@@ -72,13 +72,20 @@ function JobsListSkeleton() {
 
 function JobsListContent() {
   const {
-    data: jds = [],
+    data: rawJds,
     isLoading: loading,
     isFetching,
     error: fetchError,
     refetch,
   } = useJobs({ all: true });
   const error = fetchError ? (fetchError as Error).message : null;
+
+  // Defensively normalize: API may return a raw array OR a paginated { items, meta } object
+  const jds: JobDescriptionRecord[] = Array.isArray(rawJds)
+    ? (rawJds as JobDescriptionRecord[])
+    : Array.isArray((rawJds as unknown as { items?: JobDescriptionRecord[] })?.items)
+      ? (rawJds as unknown as { items: JobDescriptionRecord[] }).items
+      : [];
 
   const [viewMode = 'list', setViewMode] = useUrlQueryParam<'list' | 'board'>('view', 'list', {
     validValues: ['list', 'board'] as const,
