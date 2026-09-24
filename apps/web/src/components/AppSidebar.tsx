@@ -159,51 +159,84 @@ export function AppSidebar() {
             </span>
 
             {isJobsLoading ? (
-              <div className="space-y-1.5 px-2">
+              <div className="space-y-1 px-1">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="py-2 space-y-1.5">
+                  <div key={i} className="px-1.5 py-2 space-y-1.5">
                     <Skeleton className="h-3.5 w-4/5 rounded bg-muted/60" />
-                    <Skeleton className="h-2.5 w-1/2 rounded bg-muted/40" />
+                    <Skeleton className="h-2.5 w-3/5 rounded bg-muted/40" />
+                    <Skeleton className="h-2 w-2/5 rounded bg-muted/30" />
                   </div>
                 ))}
               </div>
             ) : recentJobs.length > 0 ? (
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {recentJobs.map((j) => {
-                  const score = j.analysis?.matchScore;
-                  const details = [j.structured?.seniority, j.structured?.locationOrWorkMode]
-                    .filter(Boolean)
-                    .join(' · ');
+                  const score =
+                    j.analysis?.matchScore != null ? j.analysis.matchScore : null;
+                  const company = j.structured?.company;
+                  const status = (j.status || 'SAVED').toUpperCase();
+                  const daysAgo = j.createdAt
+                    ? Math.floor(
+                        (Date.now() - new Date(j.createdAt).getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )
+                    : null;
+                  const relativeDate =
+                    daysAgo === null
+                      ? null
+                      : daysAgo === 0
+                        ? 'today'
+                        : daysAgo === 1
+                          ? '1d ago'
+                          : `${daysAgo}d ago`;
+
+                  const statusColor: Record<string, string> = {
+                    SAVED: 'bg-muted-foreground/60',
+                    APPLIED: 'bg-brand-cyan',
+                    INTERVIEWING: 'bg-yellow-400',
+                    OFFER: 'bg-green-400',
+                    REJECTED: 'bg-brand-pink',
+                  };
+
                   return (
                     <Link
                       key={j.id}
                       href={`/jobs/${j.id}`}
                       onClick={() => setIsMobileOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors group"
+                      className="flex items-center justify-between px-2 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors group"
                     >
-                      <div className="min-w-0 flex-1 pr-1.5">
-                        <p className="truncate font-medium text-foreground text-xs leading-snug group-hover:text-primary transition-colors">
+                      <div className="min-w-0 flex-1 pr-1">
+                        {/* Title */}
+                        <p className="truncate font-semibold text-foreground text-xs leading-snug group-hover:text-brand-cyan transition-colors">
                           {j.structured?.jobTitle || 'Target Position'}
                         </p>
+                        {/* Company + status dot */}
                         <p className="text-2xs text-muted-foreground truncate flex items-center gap-1.5 mt-0.5">
-                          <span className="capitalize">{j.status.toLowerCase()}</span>
-                          {details ? (
-                            <>
-                              <span>·</span>
-                              <span className="truncate">{details}</span>
-                            </>
-                          ) : null}
+                          <span
+                            className={`inline-block size-1.5 rounded-full shrink-0 ${statusColor[status] ?? 'bg-muted-foreground/60'}`}
+                          />
+                          <span className="truncate">
+                            {company || 'Unknown Company'}
+                          </span>
+                        </p>
+                        {/* Score + date */}
+                        <p className="text-2xs flex items-center gap-1.5 mt-0.5">
                           {score != null ? (
+                            <span className="font-mono font-bold text-brand-cyan">
+                              {score}%
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground/50 italic">no score</span>
+                          )}
+                          {relativeDate && (
                             <>
-                              <span>·</span>
-                              <span className="font-mono font-semibold text-brand-cyan">
-                                {score}%
-                              </span>
+                              <span className="text-muted-foreground/40">·</span>
+                              <span className="text-muted-foreground/60">{relativeDate}</span>
                             </>
-                          ) : null}
+                          )}
                         </p>
                       </div>
-                      <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
                     </Link>
                   );
                 })}
