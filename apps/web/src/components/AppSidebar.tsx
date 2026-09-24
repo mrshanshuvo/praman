@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -67,8 +67,15 @@ export function AppSidebar() {
     { href: '/profile', label: 'Candidate Profile', icon: User },
   ];
 
-  const renderNow = Date.now();
-  const recentJobs = jobs.slice(0, 3);
+  const recentJobs = useMemo(() => {
+    const now = Date.now();
+    return jobs.slice(0, 3).map((j) => ({
+      ...j,
+      _daysAgo: j.createdAt
+        ? Math.floor((now - new Date(j.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+        : null,
+    }));
+  }, [jobs]);
   const initials = user?.name ? user.name.slice(0, 1) : user?.email?.slice(0, 1) || 'U';
 
   const sidebarContent = (
@@ -175,11 +182,7 @@ export function AppSidebar() {
                   const score = j.analysis?.matchScore != null ? j.analysis.matchScore : null;
                   const company = j.structured?.company;
                   const status = (j.status || 'SAVED').toUpperCase();
-                  const daysAgo = j.createdAt
-                    ? Math.floor(
-                        (renderNow - new Date(j.createdAt).getTime()) / (1000 * 60 * 60 * 24),
-                      )
-                    : null;
+                  const daysAgo = j._daysAgo;
                   const relativeDate =
                     daysAgo === null
                       ? null
