@@ -2,7 +2,7 @@
 
 import { Briefcase, Plus, User, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthProvider';
 
 interface DashboardHeaderProps {
@@ -35,26 +35,28 @@ export function DashboardHeader({
       </div>
 
       <div className="flex items-center flex-wrap gap-2.5">
-        <Link href="/jobs">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs gap-1.5 border-border bg-card cursor-pointer"
-          >
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>Kanban Board</span>
-          </Button>
+        <Link
+          href="/jobs"
+          className={buttonVariants({
+            variant: 'outline',
+            size: 'sm',
+            className: 'text-xs gap-1.5 border-border bg-card cursor-pointer',
+          })}
+        >
+          <Briefcase className="w-3.5 h-3.5" />
+          <span>Kanban Board</span>
         </Link>
 
-        <Link href="/profile">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs gap-1.5 border-border bg-card cursor-pointer"
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>Edit Profile</span>
-          </Button>
+        <Link
+          href="/profile"
+          className={buttonVariants({
+            variant: 'outline',
+            size: 'sm',
+            className: 'text-xs gap-1.5 border-border bg-card cursor-pointer',
+          })}
+        >
+          <User className="w-3.5 h-3.5" />
+          <span>Edit Profile</span>
         </Link>
 
         {onOpenQuickIngest ? (
@@ -67,14 +69,16 @@ export function DashboardHeader({
             <span>Quick Ingest JD</span>
           </Button>
         ) : (
-          <Link href="/jobs/new">
-            <Button
-              size="sm"
-              className="text-xs gap-1.5 bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>New Application</span>
-            </Button>
+          <Link
+            href="/jobs/new"
+            className={buttonVariants({
+              size: 'sm',
+              className:
+                'text-xs gap-1.5 bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold shadow-xs cursor-pointer',
+            })}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Application</span>
           </Link>
         )}
       </div>

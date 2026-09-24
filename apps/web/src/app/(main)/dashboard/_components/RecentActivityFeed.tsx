@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 interface ActivityEvent {
@@ -146,15 +146,16 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
             </p>
           </div>
         </div>
-        <Link href="/jobs">
-          <Button
-            variant="ghost"
-            size="xs"
-            className="text-xs text-brand-cyan hover:text-brand-cyan/80 gap-1"
-          >
-            <span>All Applications</span>
-            <ExternalLink className="w-3 h-3" />
-          </Button>
+        <Link
+          href="/jobs"
+          className={buttonVariants({
+            variant: 'ghost',
+            size: 'sm',
+            className: 'text-xs text-brand-cyan hover:text-brand-cyan/80 gap-1 h-7 px-2',
+          })}
+        >
+          <span>All Applications</span>
+          <ExternalLink className="w-3 h-3" />
         </Link>
       </div>
 
@@ -187,15 +188,17 @@ export function RecentActivityFeed({ jobs = [] }: RecentActivityFeedProps) {
                   <p className="text-2xs text-muted-foreground truncate">{evt.subtitle}</p>
                 </div>
 
-                <Link href={evt.linkHref} className="shrink-0">
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-brand-cyan"
-                    title="View details"
-                  >
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Button>
+                <Link
+                  href={evt.linkHref}
+                  className={buttonVariants({
+                    variant: 'ghost',
+                    size: 'icon-sm',
+                    className:
+                      'opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-brand-cyan h-7 w-7 shrink-0',
+                  })}
+                  title="View details"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 interface ActionItem {
@@ -259,14 +259,17 @@ export function ActionCenterCard({ jobs = [], onOpenQuickIngest }: ActionCenterC
               </div>
 
               <div className="pt-2 border-t border-border/40 flex items-center justify-end">
-                <Link href={item.actionHref}>
-                  <Button
-                    size="xs"
-                    className="h-7 text-2xs bg-card hover:bg-muted text-foreground border border-border gap-1.5 font-medium cursor-pointer shadow-2xs"
-                  >
-                    <span>{item.actionLabel}</span>
-                    <ArrowRight className="w-3 h-3 text-brand-cyan" />
-                  </Button>
+                <Link
+                  href={item.actionHref}
+                  className={buttonVariants({
+                    variant: 'outline',
+                    size: 'sm',
+                    className:
+                      'h-7 text-2xs px-2.5 bg-card hover:bg-muted text-foreground border border-border gap-1.5 font-medium cursor-pointer shadow-2xs',
+                  })}
+                >
+                  <span>{item.actionLabel}</span>
+                  <ArrowRight className="w-3 h-3 text-brand-cyan" />
                 </Link>
               </div>
             </div>
