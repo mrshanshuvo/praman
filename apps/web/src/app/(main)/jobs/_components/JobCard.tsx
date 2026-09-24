@@ -1,9 +1,19 @@
 'use client';
 
 import type { JobDescriptionRecord } from '@praman/schemas';
-import { CheckCircle2, ChevronRight, FileText, Loader2, ShieldCheck, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  FileText,
+  Loader2,
+  ShieldCheck,
+  Trash2,
+} from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { toast } from 'sonner';
+import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -38,6 +48,7 @@ interface JobCardProps {
 }
 
 export function JobCard({ jd }: JobCardProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const structured = jd.structured || {};
   const analysis = jd.analysis;
   const matchData = analysis?.result;
@@ -54,20 +65,13 @@ export function JobCard({ jd }: JobCardProps) {
 
   const currentStatus = jd.status || 'SAVED';
 
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (
-      window.confirm(
-        `Are you sure you want to delete "${structured.jobTitle || 'this job'}" and all associated pipeline stages?`,
-      )
-    ) {
-      try {
-        await deleteJobMutation.mutateAsync(jd.id);
-        toast.success(`Deleted "${structured.jobTitle || 'Job'}"`);
-      } catch (err: unknown) {
-        toast.error((err as Error).message || 'Failed to delete job');
-      }
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteJobMutation.mutateAsync(jd.id);
+      toast.success(`Deleted "${structured.jobTitle || 'Job'}"`);
+      setIsDeleteDialogOpen(false);
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Failed to delete job');
     }
   };
 
@@ -136,9 +140,22 @@ export function JobCard({ jd }: JobCardProps) {
             )}
           </div>
 
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
-            {jd.rawText?.slice(0, 180)}...
-          </p>
+          {(() => {
+            const previewText =
+              structured.responsibilities?.[0] ||
+              (structured.requiredSkills?.length
+                ? `Key requirements: ${structured.requiredSkills.slice(0, 4).join(', ')}`
+                : null) ||
+              jd.rawText?.replace(/\s+/g, ' ').trim().slice(0, 160);
+
+            return (
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+                {previewText
+                  ? `${previewText}${previewText.length >= 160 && !structured.responsibilities?.[0] ? '...' : ''}`
+                  : 'No role description provided.'}
+              </p>
+            );
+          })()}
 
           {/* Skill tags preview: Cyan for Required, Pink for Preferred */}
           {((structured.requiredSkills?.length ?? 0) > 0 ||
@@ -167,12 +184,21 @@ export function JobCard({ jd }: JobCardProps) {
 
           {/* Stage Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <Badge
-              variant="outline"
-              className="gap-1.5 bg-brand-cyan/10 text-brand-cyan border-brand-cyan/40 text-xs font-medium px-2.5 py-0.5"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 text-brand-cyan" /> Stage 1: Analyzed
-            </Badge>
+            {structured.jobTitle || (structured.requiredSkills?.length ?? 0) > 0 ? (
+              <Badge
+                variant="outline"
+                className="gap-1.5 bg-brand-cyan/10 text-brand-cyan border-brand-cyan/40 text-xs font-medium px-2.5 py-0.5"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-brand-cyan" /> Stage 1: Analyzed
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="gap-1.5 bg-muted/70 text-muted-foreground border-border text-xs px-2.5 py-0.5"
+              >
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" /> Stage 1: Ingested
+              </Badge>
+            )}
 
             {hasAnalysis ? (
               <div className="flex items-center gap-1.5">
@@ -264,10 +290,14 @@ export function JobCard({ jd }: JobCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleDelete}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDeleteDialogOpen(true);
+            }}
             disabled={deleteJobMutation.isPending}
             title="Delete Job"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
           >
             {deleteJobMutation.isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -277,6 +307,14 @@ export function JobCard({ jd }: JobCardProps) {
           </Button>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        itemTitle={structured.jobTitle || 'Target Role'}
+        isDeleting={deleteJobMutation.isPending}
+        onConfirm={handleConfirmDelete}
+      />
     </Card>
   );
 }

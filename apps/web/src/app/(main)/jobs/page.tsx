@@ -18,6 +18,7 @@ import { Suspense, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlParams';
@@ -206,7 +207,7 @@ function JobsListContent() {
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`text-2xs px-1.5 py-0.2 rounded-full ${
+                    className={`text-2xs px-1.5 py-0.5 rounded-full ${
                       isActive
                         ? 'bg-background/20 text-background'
                         : 'bg-muted text-muted-foreground'
@@ -229,8 +230,8 @@ function JobsListContent() {
         {/* Search, Sort & View Switcher */}
         <div className="flex items-center gap-2.5">
           <div className="relative flex-1 md:w-56">
-            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-            <input
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <Input
               type="text"
               placeholder="Search jobs or companies..."
               value={searchQuery}
@@ -238,7 +239,7 @@ function JobsListContent() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand-cyan"
+              className="pl-8 text-xs h-8 bg-card"
             />
           </div>
 

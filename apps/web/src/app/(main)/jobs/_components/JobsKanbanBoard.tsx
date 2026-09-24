@@ -8,6 +8,7 @@ import {
   ChevronRight,
   FileCode,
   GripVertical,
+  Loader2,
   Trash2,
   Trophy,
   UserCheck,
@@ -15,6 +16,7 @@ import {
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -92,6 +94,8 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
   const deleteJobMutation = useDeleteJob();
   const [draggedJobId, setDraggedJobId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [updatingJobId, setUpdatingJobId] = useState<string | null>(null);
+  const [deletingJob, setDeletingJob] = useState<{ id: string; title: string } | null>(null);
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData('text/plain', id);
@@ -135,12 +139,19 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
     const colConfig = KANBAN_COLUMNS.find((c) => c.key === targetStatus);
     const targetTitle = targetJob.structured?.jobTitle || 'Job';
     setDraggedJobId(null);
+    setUpdatingJobId(id);
 
     updateStatusMutation.mutate(
       { id, status: targetStatus },
       {
         onSuccess: () => {
           toast.success(`"${targetTitle}" moved to ${colConfig?.label || targetStatus}`);
+        },
+        onError: (err: unknown) => {
+          toast.error((err as Error).message || 'Failed to move application status');
+        },
+        onSettled: () => {
+          setUpdatingJobId(null);
         },
       },
     );
@@ -150,6 +161,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
     const targetJob = jobs.find((j) => j.id === id);
     const colConfig = KANBAN_COLUMNS.find((c) => c.key === newStatus);
     const targetTitle = targetJob?.structured?.jobTitle || 'Job';
+    setUpdatingJobId(id);
 
     updateStatusMutation.mutate(
       { id, status: newStatus },
@@ -157,19 +169,24 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
         onSuccess: () => {
           toast.success(`"${targetTitle}" status updated to ${colConfig?.label || newStatus}`);
         },
+        onError: (err: unknown) => {
+          toast.error((err as Error).message || 'Failed to update application status');
+        },
+        onSettled: () => {
+          setUpdatingJobId(null);
+        },
       },
     );
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string, title: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (
-      window.confirm(
-        `Are you sure you want to delete "${title || 'this job'}" and all generated resume records?`,
-      )
-    ) {
-      await deleteJobMutation.mutateAsync(id);
+  const handleConfirmDelete = async () => {
+    if (!deletingJob) return;
+    try {
+      await deleteJobMutation.mutateAsync(deletingJob.id);
+      toast.success(`Deleted "${deletingJob.title}"`);
+      setDeletingJob(null);
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Failed to delete job');
     }
   };
 
@@ -232,16 +249,17 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                     const hasResume = !!resume?.resumeJson;
                     const isValidated = resume?.status === 'VALIDATED';
                     const isDragging = draggedJobId === jd.id;
+                    const isUpdating = updatingJobId === jd.id;
 
                     return (
                       <Card
                         key={jd.id}
-                        draggable
+                        draggable={!isUpdating}
                         onDragStart={(e) => handleDragStart(e, jd.id)}
                         onDragEnd={handleDragEnd}
                         className={`group p-3.5 border-border bg-card/90 hover:bg-card hover:border-brand-pink/50 dark:hover:border-brand-cyan/40 transition-all cursor-grab active:cursor-grabbing shadow-xs space-y-3 gap-0 ${
                           isDragging ? 'opacity-40 scale-95 border-dashed border-brand-cyan' : ''
-                        }`}
+                        } ${isUpdating ? 'opacity-60 pointer-events-none ring-1 ring-brand-cyan/50' : ''}`}
                       >
                         {/* Title & Drag Grip */}
                         <div className="flex items-start justify-between gap-1.5">
@@ -259,7 +277,11 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                               </p>
                             )}
                           </div>
-                          <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
+                          {isUpdating ? (
+                            <Loader2 className="w-3.5 h-3.5 text-brand-cyan animate-spin shrink-0 mt-0.5" />
+                          ) : (
+                            <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
+                          )}
                         </div>
 
                         {/* Upcoming Interview Chip */}
@@ -294,7 +316,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             <MatchScoreBadge analysis={analysis.result} variant="compact" />
                             {isValidated && (
                               <span
-                                className="text-2xs font-mono px-1.5 py-0.2 rounded border bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30 font-bold"
+                                className="text-2xs font-mono px-1.5 py-0.5 rounded border bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30 font-bold"
                                 title="Resume is validated against candidate evidence"
                               >
                                 VALIDATED
@@ -306,7 +328,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                         {/* Pipeline Stage Mini Badges */}
                         <div className="flex items-center gap-1 text-2xs font-mono pt-1">
                           <span
-                            className={`px-1.5 py-0.2 rounded border ${
+                            className={`px-1.5 py-0.5 rounded border ${
                               structured.jobTitle
                                 ? 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30'
                                 : 'bg-muted text-muted-foreground border-border'
@@ -316,7 +338,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             S1
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded border ${
+                            className={`px-1.5 py-0.5 rounded border ${
                               analysis
                                 ? 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30'
                                 : 'bg-muted text-muted-foreground border-border'
@@ -326,7 +348,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             S2
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded border ${
+                            className={`px-1.5 py-0.5 rounded border ${
                               strategy
                                 ? 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30'
                                 : 'bg-muted text-muted-foreground border-border'
@@ -336,7 +358,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             S3
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded border ${
+                            className={`px-1.5 py-0.5 rounded border ${
                               hasResume
                                 ? 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan/30'
                                 : 'bg-muted text-muted-foreground border-border'
@@ -381,9 +403,9 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                           <select
                             value={col.key}
                             onChange={(e) => handleStatusSelect(jd.id, e.target.value)}
-                            disabled={updateStatusMutation.isPending}
+                            disabled={updateStatusMutation.isPending || isUpdating}
                             aria-label="Move application status"
-                            className="h-7 text-2xs rounded border border-border bg-card px-1.5 text-foreground outline-none cursor-pointer hover:bg-muted/80"
+                            className="h-7 text-2xs rounded border border-border bg-card px-1.5 text-foreground outline-none cursor-pointer hover:bg-muted/80 disabled:opacity-50"
                           >
                             {KANBAN_COLUMNS.map((c) => (
                               <option key={c.key} value={c.key}>
@@ -394,8 +416,13 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
 
                           <button
                             type="button"
-                            onClick={(e) => handleDelete(e, jd.id, title)}
-                            className="w-7 h-7 rounded border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/40 cursor-pointer transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setDeletingJob({ id: jd.id, title });
+                            }}
+                            disabled={deleteJobMutation.isPending}
+                            className="w-7 h-7 rounded border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/40 cursor-pointer transition-colors disabled:opacity-50"
                             title="Delete job"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -410,6 +437,14 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
           );
         })}
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deletingJob}
+        onOpenChange={(open) => !open && setDeletingJob(null)}
+        itemTitle={deletingJob?.title}
+        isDeleting={deleteJobMutation.isPending}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
