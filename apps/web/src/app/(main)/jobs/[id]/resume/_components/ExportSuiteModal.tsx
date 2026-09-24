@@ -96,7 +96,7 @@ export const ExportSuiteModal: React.FC<ExportSuiteModalProps> = ({
     try {
       setIsGeneratingPdf(true);
       await downloadResumePdf(jobId, templateId, version, `${safeFilenameBase}_${templateId}.pdf`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to download PDF:', err);
       handlePrintPdf();
     } finally {

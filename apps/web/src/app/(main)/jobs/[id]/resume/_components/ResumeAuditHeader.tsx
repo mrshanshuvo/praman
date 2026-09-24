@@ -102,7 +102,7 @@ export const ResumeAuditHeader: React.FC<ResumeAuditHeaderProps> = ({
         selectedVersion,
         `${safeFilenameBase}_${templateId}.pdf`,
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to download PDF:', err);
     } finally {
       setIsDownloadingPdf(false);

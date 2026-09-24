@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { CoverLetter, RecruiterEmail } from './outreach.js';
 
 export const ResumeStatusEnum = z.enum(['DRAFT', 'VALIDATED', 'REJECTED']);
 export type ResumeStatus = z.infer<typeof ResumeStatusEnum>;
@@ -98,8 +99,8 @@ export interface ResumeRecord {
   status: ResumeStatus;
   version: number;
   isLatest: boolean;
-  coverLetterJson?: any;
-  recruiterEmailJson?: any;
+  coverLetterJson?: CoverLetter | null;
+  recruiterEmailJson?: RecruiterEmail | null;
   downloadUrl?: string | null;
   aiModel?: string | null;
   promptTokens?: number | null;

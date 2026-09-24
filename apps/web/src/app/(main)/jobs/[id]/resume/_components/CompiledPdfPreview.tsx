@@ -58,9 +58,9 @@ export const CompiledPdfPreview: React.FC<CompiledPdfPreviewProps> = ({
 
       const url = URL.createObjectURL(blob);
       setPdfBlobUrl(url);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load compiled PDF preview:', err);
-      setError(err?.message || 'Failed to render PDF preview');
+      setError((err as Error)?.message || 'Failed to render PDF preview');
     } finally {
       setIsLoading(false);
     }

@@ -137,7 +137,7 @@ export function triggerFileDownload(
   content: string | Uint8Array,
   mimeType = 'application/octet-stream',
 ): void {
-  const blob = new Blob([content as any], { type: mimeType });
+  const blob = new Blob([content as unknown as BlobPart], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

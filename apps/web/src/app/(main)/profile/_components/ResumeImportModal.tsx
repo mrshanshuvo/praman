@@ -141,8 +141,10 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
       const result = await parseMutation.mutateAsync({ rawText });
       setParsedData(result);
       setStep('review');
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to parse resume. Please check the text format.');
+    } catch (err: unknown) {
+      setErrorMessage(
+        (err as Error).message || 'Failed to parse resume. Please check the text format.',
+      );
     }
   };
 
@@ -177,8 +179,8 @@ export const ResumeImportModal: React.FC<ResumeImportModalProps> = ({
       await importMutation.mutateAsync(payload);
       handleClose();
       onSuccess?.();
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to import profile data.');
+    } catch (err: unknown) {
+      setErrorMessage((err as Error).message || 'Failed to import profile data.');
     }
   };
 

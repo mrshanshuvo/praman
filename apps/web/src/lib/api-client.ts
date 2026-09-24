@@ -95,7 +95,7 @@ export async function fetcher<T>(url: string, options: RequestInit = {}): Promis
     const message = Array.isArray(errorBody.message)
       ? errorBody.message.join(', ')
       : errorBody.message || `Request failed with status ${res.status}`;
-    const err = new Error(message) as Error & { status?: number; data?: any };
+    const err = new Error(message) as Error & { status?: number; data?: unknown };
     err.status = res.status;
     err.data = errorBody;
     throw err;

@@ -77,7 +77,7 @@ export default function ResumeAuditPage() {
   const handleRegenerate = async () => {
     try {
       await runStageMutation.mutateAsync('resume');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to regenerate resume:', err);
     }
   };

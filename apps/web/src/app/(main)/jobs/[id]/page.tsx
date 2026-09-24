@@ -111,8 +111,8 @@ function JobDetailContent() {
     try {
       await runStageMutation.mutateAsync(stage);
       setActiveTab(stage);
-    } catch (err: any) {
-      setManualActionError(err.message);
+    } catch (err: unknown) {
+      setManualActionError((err as Error).message);
     }
   };
 

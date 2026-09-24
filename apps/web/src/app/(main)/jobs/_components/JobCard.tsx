@@ -65,8 +65,8 @@ export function JobCard({ jd }: JobCardProps) {
       try {
         await deleteJobMutation.mutateAsync(jd.id);
         toast.success(`Deleted "${structured.jobTitle || 'Job'}"`);
-      } catch (err: any) {
-        toast.error(err.message || 'Failed to delete job');
+      } catch (err: unknown) {
+        toast.error((err as Error).message || 'Failed to delete job');
       }
     }
   };
@@ -78,8 +78,8 @@ export function JobCard({ jd }: JobCardProps) {
     try {
       await updateStatusMutation.mutateAsync({ id: jd.id, status: newStatus });
       toast.success(`Status updated to ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update status');
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Failed to update status');
     }
   };
 
