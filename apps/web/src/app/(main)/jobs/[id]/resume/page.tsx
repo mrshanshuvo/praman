@@ -1,9 +1,9 @@
 'use client';
 
-import { ArrowLeft, FileCode, GitCompare, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Database, FileCode, GitCompare, Mail, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
@@ -35,7 +35,19 @@ import {
 
 const VALID_TABS = ['latex', 'diff', 'outreach', 'preview'] as const;
 
-export default function ResumeAuditPage() {
+function ResumeAuditSkeleton() {
+  return (
+    <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
+      <Skeleton className="h-20 w-full rounded-2xl bg-card border border-border" />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <Skeleton className="lg:col-span-7 h-150 rounded-2xl bg-card border border-border" />
+        <Skeleton className="lg:col-span-5 h-150 rounded-2xl bg-card border border-border" />
+      </div>
+    </div>
+  );
+}
+
+function ResumeAuditContent() {
   const params = useParams();
   const id = params.id as string;
 
@@ -83,15 +95,7 @@ export default function ResumeAuditPage() {
   };
 
   if (loading) {
-    return (
-      <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
-        <Skeleton className="h-20 w-full rounded-2xl bg-card border border-border" />
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <Skeleton className="lg:col-span-7 h-150 rounded-2xl bg-card border border-border" />
-          <Skeleton className="lg:col-span-5 h-150 rounded-2xl bg-card border border-border" />
-        </div>
-      </div>
-    );
+    return <ResumeAuditSkeleton />;
   }
 
   if (error || !resume) {
@@ -158,7 +162,7 @@ export default function ResumeAuditPage() {
                 <GitCompare className="w-3.5 h-3.5 text-warning" />
                 <span>Version Diff</span>
                 {versions && versions.length > 1 && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-2xs font-bold bg-warning/20 text-warning border border-warning/30">
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full text-2xs font-bold bg-warning/20 text-warning border border-warning/30">
                     {versions.length}
                   </span>
                 )}
@@ -174,8 +178,8 @@ export default function ResumeAuditPage() {
                 value="preview"
                 className="text-xs px-4 flex items-center gap-1.5 cursor-pointer"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
-                <span>Raw Profile Data</span>
+                <Database className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Evidence & Profile</span>
               </TabsTrigger>
             </TabsList>
 
@@ -192,7 +196,7 @@ export default function ResumeAuditPage() {
               {status && (
                 <span
                   className={cn(
-                    'text-2xs font-mono px-1.5 py-0.2 rounded border uppercase font-bold',
+                    'text-2xs font-mono px-1.5 py-0.5 rounded border uppercase font-bold',
                     status === 'VALIDATED'
                       ? 'bg-brand-cyan/15 border-brand-cyan/30 text-brand-cyan'
                       : 'bg-muted border-border text-muted-foreground',
@@ -291,5 +295,13 @@ export default function ResumeAuditPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function ResumeAuditPage() {
+  return (
+    <Suspense fallback={<ResumeAuditSkeleton />}>
+      <ResumeAuditContent />
+    </Suspense>
   );
 }

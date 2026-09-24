@@ -121,13 +121,7 @@ function JobDetailContent() {
   const isAnyStageRunning = isStreaming || runStageMutation.isPending;
 
   if (loading) {
-    return (
-      <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
-        <Skeleton className="h-24 w-full rounded-2xl bg-card border border-border" />
-        <Skeleton className="h-16 w-full rounded-2xl bg-card border border-border" />
-        <Skeleton className="h-96 w-full rounded-2xl bg-card border border-border" />
-      </div>
-    );
+    return <JobDetailSkeleton />;
   }
 
   const jobTelemetry = jd
