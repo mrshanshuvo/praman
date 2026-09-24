@@ -23,7 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlParams';
 import { cn } from '@/lib/utils';
-import { JobCard, JobsEmptyState, JobsKanbanBoard } from './_components';
+import { JobCard, JobsEmptyState, JobsKanbanBoard, JobsKanbanSkeleton } from './_components';
 
 const STATUS_TABS = [
   { key: 'ALL', label: 'All Jobs' },
@@ -48,14 +48,24 @@ function getJobMatchScore(jd: JobDescriptionRecord): number {
 
 function JobsListSkeleton() {
   return (
-    <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
-      <Skeleton className="h-14 w-72 bg-muted/60" />
-      <Skeleton className="h-10 w-full bg-muted/40" />
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-32 w-full rounded-2xl bg-card border border-border" />
-        ))}
-      </div>
+    <div className="space-y-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="p-6 rounded-2xl border border-border bg-card/60 space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-56 bg-muted" />
+              <Skeleton className="h-4 w-36 bg-muted/60" />
+            </div>
+            <Skeleton className="h-6 w-20 rounded-full bg-muted" />
+          </div>
+          <Skeleton className="h-4 w-full bg-muted/40" />
+          <div className="flex gap-2 pt-2">
+            <Skeleton className="h-5 w-16 rounded bg-muted/50" />
+            <Skeleton className="h-5 w-20 rounded bg-muted/50" />
+            <Skeleton className="h-5 w-24 rounded bg-muted/50" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -323,27 +333,13 @@ function JobsListContent() {
         </Alert>
       )}
 
-      {/* Loading state: Zero-CLS Skeleton cards */}
+      {/* Loading state: Zero-CLS Skeleton matching active view mode */}
       {loading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="p-6 rounded-2xl border border-border bg-card/60 space-y-4">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-56 bg-muted" />
-                  <Skeleton className="h-4 w-36 bg-muted/60" />
-                </div>
-                <Skeleton className="h-6 w-20 rounded-full bg-muted" />
-              </div>
-              <Skeleton className="h-4 w-full bg-muted/40" />
-              <div className="flex gap-2 pt-2">
-                <Skeleton className="h-5 w-16 rounded bg-muted/50" />
-                <Skeleton className="h-5 w-20 rounded bg-muted/50" />
-                <Skeleton className="h-5 w-24 rounded bg-muted/50" />
-              </div>
-            </div>
-          ))}
-        </div>
+        viewMode === 'board' ? (
+          <JobsKanbanSkeleton />
+        ) : (
+          <JobsListSkeleton />
+        )
       ) : jds.length === 0 ? (
         <JobsEmptyState />
       ) : filteredAndSortedJds.length === 0 ? (
@@ -441,9 +437,45 @@ function JobsListContent() {
   );
 }
 
+function StaticJobsPageSkeleton() {
+  return (
+    <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
+      {/* Header Skeleton */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-64 bg-muted/60" />
+            <Skeleton className="h-5 w-16 rounded-full bg-muted/40" />
+          </div>
+          <Skeleton className="h-4 w-96 bg-muted/30" />
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Skeleton className="h-8 w-20 rounded-md bg-muted/40" />
+          <Skeleton className="h-8 w-36 rounded-md bg-muted/60" />
+        </div>
+      </div>
+
+      {/* Filter / Controls Skeleton */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-56 rounded-lg bg-muted/40" />
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Skeleton className="h-8 w-44 rounded-lg bg-muted/40" />
+          <Skeleton className="h-8 w-28 rounded-lg bg-muted/40" />
+          <Skeleton className="h-8 w-28 rounded-lg bg-muted/40" />
+        </div>
+      </div>
+
+      {/* Default List View Skeleton */}
+      <JobsListSkeleton />
+    </div>
+  );
+}
+
 export default function JobsListPage() {
   return (
-    <Suspense fallback={<JobsListSkeleton />}>
+    <Suspense fallback={<StaticJobsPageSkeleton />}>
       <JobsListContent />
     </Suspense>
   );
