@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -51,6 +51,12 @@ export function AppSidebar() {
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Captured after mount so Date.now() is never called during render
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(Date.now());
+  }, []);
 
   // Active upcoming interviews count across all jobs
   const upcomingCount = jobs.reduce((acc, job) => {
@@ -174,12 +180,19 @@ export function AppSidebar() {
                   const score = j.analysis?.matchScore != null ? j.analysis.matchScore : null;
                   const company = j.structured?.company;
                   const status = (j.status || 'SAVED').toUpperCase();
-                  const dateStr = j.createdAt
-                    ? new Date(j.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                      })
-                    : null;
+                  const dateStr = (() => {
+                    if (!j.createdAt || now === null) return null;
+                    const daysAgo = Math.floor(
+                      (now - new Date(j.createdAt).getTime()) / (1000 * 60 * 60 * 24),
+                    );
+                    if (daysAgo === 0) return 'today';
+                    if (daysAgo === 1) return '1d ago';
+                    if (daysAgo < 30) return `${daysAgo}d ago`;
+                    return new Date(j.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    });
+                  })();
 
                   const statusColor: Record<string, string> = {
                     SAVED: 'bg-muted-foreground/60',
