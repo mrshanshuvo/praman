@@ -1,5 +1,6 @@
 'use client';
 
+import type { JobDescriptionRecord } from '@praman/schemas';
 import {
   Briefcase,
   ChevronRight,
@@ -34,7 +35,19 @@ interface NavItem {
 export function AppSidebar() {
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
-  const { data: jobs = [], isLoading: isJobsLoading } = useJobs({ enabled: isAuthenticated });
+  const { data: rawJobs, isLoading: isJobsLoading } = useJobs({ enabled: isAuthenticated });
+
+  // Defensively extract jobs array across array payloads or paginated { items: [] } shapes
+  const jobs: JobDescriptionRecord[] = React.useMemo(() => {
+    if (Array.isArray(rawJobs)) return rawJobs;
+    if (
+      rawJobs &&
+      Array.isArray((rawJobs as unknown as { items?: JobDescriptionRecord[] }).items)
+    ) {
+      return (rawJobs as unknown as { items: JobDescriptionRecord[] }).items;
+    }
+    return [];
+  }, [rawJobs]);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);

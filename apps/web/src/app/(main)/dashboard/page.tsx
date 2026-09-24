@@ -19,7 +19,12 @@ export default function DashboardPage() {
   const [isQuickIngestOpen, setIsQuickIngestOpen] = useState(false);
 
   const { data: profile } = useCandidateProfile({ enabled: isAuthenticated });
-  const { data: jobs = [] } = useJobs({ enabled: isAuthenticated });
+  const { data: rawJobs } = useJobs({ enabled: isAuthenticated });
+  const jobs = Array.isArray(rawJobs)
+    ? rawJobs
+    : rawJobs && Array.isArray((rawJobs as any)?.items)
+      ? (rawJobs as any).items
+      : [];
 
   return (
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-8">
