@@ -98,9 +98,9 @@ export function AppSidebar() {
           const Icon = item.icon;
           const isActive =
             pathname === item.href ||
-            (item.href !== '/dashboard' &&
-              pathname?.startsWith(item.href) &&
-              item.href !== '/jobs');
+            (item.href === '/jobs'
+              ? pathname?.startsWith('/jobs') && pathname !== '/jobs/new'
+              : item.href !== '/dashboard' && pathname?.startsWith(item.href));
 
           return (
             <Link

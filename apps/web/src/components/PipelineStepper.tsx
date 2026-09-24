@@ -128,7 +128,10 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
               </div>
 
               {idx < STEPS.length - 1 && (
-                <div className="hidden lg:block w-4 h-px bg-border shrink-0" />
+                <>
+                  <div className="hidden sm:block w-3 lg:w-4 h-px bg-border shrink-0" />
+                  <div className="block sm:hidden w-px h-3 bg-border shrink-0 mx-auto" />
+                </>
               )}
             </React.Fragment>
           );
