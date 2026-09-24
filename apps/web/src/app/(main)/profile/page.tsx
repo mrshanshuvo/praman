@@ -35,7 +35,6 @@ function ProfileContent() {
   const {
     data: profile,
     isLoading: loading,
-    isFetching,
     error: fetchError,
     refetch,
   } = useCandidateProfile();

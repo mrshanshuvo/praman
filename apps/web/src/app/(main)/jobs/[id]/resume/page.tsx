@@ -68,7 +68,6 @@ function ResumeAuditContent() {
     data: resumeData,
     isLoading: loading,
     error: fetchError,
-    refetch,
   } = useJobResume(id, selectedVersion);
   const { data: latexData, isLoading: latexLoading } = useJobResumeLatex(
     id,
