@@ -44,7 +44,11 @@ async function bootstrap() {
     .map((url: string) => url.trim().replace(/\/+$/, ''))
     .filter(Boolean);
 
-  const allowedOrigins = new Set(['http://localhost:3000', ...configuredOrigins]);
+  const allowedOrigins = new Set([
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    ...configuredOrigins,
+  ]);
 
   app.enableCors({
     origin: (

@@ -257,9 +257,24 @@ export class AiService {
       }
 
       this.logger.error(
-        `LLM call failed (${response.status}) on final model [${currentAttemptModel}]: ${errText}`,
+        `LLM call failed (${response.status}) on final model [${currentAttemptModel}]: ${errText}. Falling back to deterministic engine.`,
       );
-      throw new Error(`LLM call failed with status ${response.status}: ${errText}`);
+      const fallbackData = this.fallbackDeterministicEngine(params);
+      const durationMs = Math.round(performance.now() - startTime);
+      const promptChars = params.systemPrompt.length + params.userPrompt.length;
+      const promptTokens = Math.max(1, Math.ceil(promptChars / 4));
+      const completionTokens = Math.max(1, Math.ceil(JSON.stringify(fallbackData).length / 4));
+      return {
+        data: fallbackData,
+        telemetry: {
+          model: 'deterministic-fallback',
+          promptTokens,
+          completionTokens,
+          totalTokens: promptTokens + completionTokens,
+          durationMs,
+          costUsd: 0,
+        },
+      };
     }
 
     const result = await response.json();
@@ -317,12 +332,48 @@ export class AiService {
         return this.callLlmWithRetry(params, 2, undefined, startTime);
       }
 
-      throw new Error(`LLM output failed schema validation: ${errors}`);
+      this.logger.error(
+        `LLM output failed schema validation on final model [${currentAttemptModel}]: ${errors}. Falling back to deterministic engine.`,
+      );
+      const fallbackData = this.fallbackDeterministicEngine(params);
+      const durationMs = Math.round(performance.now() - startTime);
+      const promptChars = params.systemPrompt.length + params.userPrompt.length;
+      const promptTokens = Math.max(1, Math.ceil(promptChars / 4));
+      const completionTokens = Math.max(1, Math.ceil(JSON.stringify(fallbackData).length / 4));
+      return {
+        data: fallbackData,
+        telemetry: {
+          model: 'deterministic-fallback',
+          promptTokens,
+          completionTokens,
+          totalTokens: promptTokens + completionTokens,
+          durationMs,
+          costUsd: 0,
+        },
+      };
     } catch (e: any) {
       if (remainingRetries > 0 && !e.message?.includes('schema validation')) {
         return this.callLlmWithRetry(params, remainingRetries - 1, e.message, startTime);
       }
-      throw e;
+      this.logger.error(
+        `Network or execution error on final model [${currentAttemptModel}]: ${e.message}. Falling back to deterministic engine.`,
+      );
+      const fallbackData = this.fallbackDeterministicEngine(params);
+      const durationMs = Math.round(performance.now() - startTime);
+      const promptChars = params.systemPrompt.length + params.userPrompt.length;
+      const promptTokens = Math.max(1, Math.ceil(promptChars / 4));
+      const completionTokens = Math.max(1, Math.ceil(JSON.stringify(fallbackData).length / 4));
+      return {
+        data: fallbackData,
+        telemetry: {
+          model: 'deterministic-fallback',
+          promptTokens,
+          completionTokens,
+          totalTokens: promptTokens + completionTokens,
+          durationMs,
+          costUsd: 0,
+        },
+      };
     }
   }
 

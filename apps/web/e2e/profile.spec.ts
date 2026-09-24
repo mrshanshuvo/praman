@@ -4,6 +4,7 @@ import { loginAsDemoUser } from './helpers';
 test.describe('Candidate Profile & Ground-Truth Ledger Suite', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsDemoUser(page);
+    await page.goto('/profile');
   });
 
   test('profile page renders with tabs and header card', async ({ page }) => {

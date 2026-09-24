@@ -13,9 +13,8 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
     await expect(page.locator('h1')).toContainText('Job Pipeline Inspector');
 
     // Verify New Job button
-    const newJobBtn = page.locator('a[href="/jobs/new"]');
+    const newJobBtn = page.getByRole('link', { name: 'New Job Analysis' });
     await expect(newJobBtn).toBeVisible();
-    await expect(newJobBtn).toContainText('New Job Analysis');
   });
 
   test('new job page renders ingestion form with validation elements', async ({ page }) => {
@@ -78,10 +77,7 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
       await expect(page).toHaveURL(/\/jobs\/[a-zA-Z0-9_-]+/);
 
       // Verify pipeline stage stepper exists
-      const matchStageTrigger = page
-        .locator('button')
-        .filter({ hasText: /Stage 2/i })
-        .first();
+      const matchStageTrigger = page.locator('text=2. Candidate Match').first();
       if (await matchStageTrigger.isVisible({ timeout: 3000 }).catch(() => false)) {
         await matchStageTrigger.click();
         // Check for Stage 2 header
@@ -116,10 +112,7 @@ test.describe('Jobs & Pipeline Workflow Suite', () => {
       .first();
     if (await inspectBtn.isVisible({ timeout: 4000 }).catch(() => false)) {
       await inspectBtn.click();
-      const matchStageTrigger = page
-        .locator('button')
-        .filter({ hasText: /Stage 2/i })
-        .first();
+      const matchStageTrigger = page.locator('text=2. Candidate Match').first();
       if (await matchStageTrigger.isVisible({ timeout: 3000 }).catch(() => false)) {
         await matchStageTrigger.click();
 

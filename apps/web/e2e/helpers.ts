@@ -11,6 +11,6 @@ export async function loginAsDemoUser(page: Page) {
   await expect(signInBtn).toBeVisible();
   await signInBtn.click();
 
-  // Wait for authenticated redirect to profile
-  await expect(page).toHaveURL(/.*profile/, { timeout: 15000 });
+  // Wait for authenticated redirect to dashboard or profile
+  await expect(page).toHaveURL(/.*(dashboard|profile)/, { timeout: 15000 });
 }

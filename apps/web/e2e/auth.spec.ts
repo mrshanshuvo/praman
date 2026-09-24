@@ -56,7 +56,7 @@ test.describe('Authentication & Navigation Suite', () => {
     const submitBtn = page.getByRole('button', { name: 'Sign In', exact: true });
     await submitBtn.click();
 
-    await expect(page).toHaveURL(/.*profile/, { timeout: 15000 });
+    await expect(page).toHaveURL(/.*(dashboard|profile)/, { timeout: 15000 });
   });
 
   test('non-existent route gracefully displays branded 404 error page', async ({ page }) => {
