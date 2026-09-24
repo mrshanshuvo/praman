@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -67,15 +67,7 @@ export function AppSidebar() {
     { href: '/profile', label: 'Candidate Profile', icon: User },
   ];
 
-  const recentJobs = useMemo(() => {
-    const now = Date.now();
-    return jobs.slice(0, 3).map((j) => ({
-      ...j,
-      _daysAgo: j.createdAt
-        ? Math.floor((now - new Date(j.createdAt).getTime()) / (1000 * 60 * 60 * 24))
-        : null,
-    }));
-  }, [jobs]);
+  const recentJobs = jobs.slice(0, 3);
   const initials = user?.name ? user.name.slice(0, 1) : user?.email?.slice(0, 1) || 'U';
 
   const sidebarContent = (
@@ -182,15 +174,12 @@ export function AppSidebar() {
                   const score = j.analysis?.matchScore != null ? j.analysis.matchScore : null;
                   const company = j.structured?.company;
                   const status = (j.status || 'SAVED').toUpperCase();
-                  const daysAgo = j._daysAgo;
-                  const relativeDate =
-                    daysAgo === null
-                      ? null
-                      : daysAgo === 0
-                        ? 'today'
-                        : daysAgo === 1
-                          ? '1d ago'
-                          : `${daysAgo}d ago`;
+                  const dateStr = j.createdAt
+                    ? new Date(j.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                    : null;
 
                   const statusColor: Record<string, string> = {
                     SAVED: 'bg-muted-foreground/60',
@@ -226,10 +215,10 @@ export function AppSidebar() {
                           ) : (
                             <span className="text-muted-foreground/50 italic">no score</span>
                           )}
-                          {relativeDate && (
+                          {dateStr && (
                             <>
                               <span className="text-muted-foreground/40">·</span>
-                              <span className="text-muted-foreground/60">{relativeDate}</span>
+                              <span className="text-muted-foreground/60">{dateStr}</span>
                             </>
                           )}
                         </p>
