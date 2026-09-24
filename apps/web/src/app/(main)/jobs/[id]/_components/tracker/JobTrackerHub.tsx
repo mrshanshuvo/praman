@@ -55,6 +55,7 @@ export const JobTrackerHub: React.FC<JobTrackerHubProps> = ({
           <MilestonesTimeline
             jobId={jobId}
             milestones={milestones}
+            jobTitle={jobTitle}
             onOpenAddRound={() => setIsAddMilestoneOpen(true)}
           />
         </div>

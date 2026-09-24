@@ -1,7 +1,18 @@
 'use client';
 
 import type { InterviewMilestone, MilestoneStatus } from '@praman/schemas';
-import { Calendar, ChevronDown, HelpCircle, Plus, Trash2, Users, Video } from 'lucide-react';
+import {
+  Calendar,
+  CalendarPlus,
+  ChevronDown,
+  ExternalLink,
+  FileDown,
+  HelpCircle,
+  Plus,
+  Trash2,
+  Users,
+  Video,
+} from 'lucide-react';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,9 +24,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { downloadIcsFile, getGoogleCalendarUrl } from '@/lib/calendar';
 
 interface MilestoneCardProps {
   milestone: InterviewMilestone;
+  jobTitle?: string | null;
+  companyName?: string | null;
   onStatusChange: (status: MilestoneStatus) => void;
   onDelete: () => void;
   onAddQuestion: (question: string) => void;
@@ -40,6 +54,8 @@ const STATUS_COLORS: Record<MilestoneStatus, string> = {
 
 export const MilestoneCard: React.FC<MilestoneCardProps> = ({
   milestone,
+  jobTitle,
+  companyName,
   onStatusChange,
   onDelete,
   onAddQuestion,
@@ -54,6 +70,31 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
     onAddQuestion(newQuestion.trim());
     setNewQuestion('');
   };
+
+  const handleDownloadIcs = () => {
+    if (!milestone.scheduledAt) return;
+    const summary = `${milestone.title}${jobTitle ? ` - ${jobTitle}` : ''}${companyName ? ` (${companyName})` : ''}`;
+    downloadIcsFile(
+      {
+        title: summary,
+        description: `Interview Round: ${milestone.title}\nStage: ${milestone.stage}\nInterviewer: ${milestone.interviewer || 'N/A'}\nMeeting Link: ${milestone.meetingLink || 'N/A'}`,
+        location: milestone.meetingLink || 'Virtual / Interview Call',
+        startDate: milestone.scheduledAt,
+        durationMinutes: 45,
+      },
+      `${milestone.title.toLowerCase().replace(/\s+/g, '_')}_interview.ics`,
+    );
+  };
+
+  const googleCalUrl = milestone.scheduledAt
+    ? getGoogleCalendarUrl({
+        title: `${milestone.title}${jobTitle ? ` - ${jobTitle}` : ''}${companyName ? ` (${companyName})` : ''}`,
+        description: `Interview Round: ${milestone.title}\nStage: ${milestone.stage}\nInterviewer: ${milestone.interviewer || 'N/A'}\nMeeting: ${milestone.meetingLink || 'N/A'}`,
+        location: milestone.meetingLink || 'Virtual / Interview Call',
+        startDate: milestone.scheduledAt,
+        durationMinutes: 45,
+      })
+    : null;
 
   return (
     <Card className="p-4 rounded-xl border-border bg-card shadow-2xs space-y-3">
@@ -119,6 +160,42 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {milestone.scheduledAt && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs px-2 gap-1 border-border bg-card cursor-pointer"
+                    title="Add to Calendar"
+                  >
+                    <CalendarPlus className="w-3.5 h-3.5 text-primary" />
+                    <span className="hidden sm:inline">Calendar</span>
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-44">
+                {googleCalUrl && (
+                  <DropdownMenuItem
+                    onClick={() => window.open(googleCalUrl, '_blank', 'noopener,noreferrer')}
+                    className="text-xs gap-2 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Google Calendar</span>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onClick={handleDownloadIcs}
+                  className="text-xs gap-2 cursor-pointer"
+                >
+                  <FileDown className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>Download .ics file</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           {milestone.meetingLink && (
             <a
