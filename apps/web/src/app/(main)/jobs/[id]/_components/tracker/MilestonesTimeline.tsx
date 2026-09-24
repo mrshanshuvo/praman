@@ -3,6 +3,7 @@
 import type { InterviewMilestone, MilestoneStatus } from '@praman/schemas';
 import { Calendar, Layers, Plus } from 'lucide-react';
 import React from 'react';
+import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -12,16 +13,19 @@ import { MilestoneCard } from './MilestoneCard';
 interface MilestonesTimelineProps {
   jobId: string;
   milestones: InterviewMilestone[];
+  jobTitle?: string | null;
   onOpenAddRound: () => void;
 }
 
 export const MilestonesTimeline: React.FC<MilestonesTimelineProps> = ({
   jobId,
   milestones,
+  jobTitle,
   onOpenAddRound,
 }) => {
   const updateMilestoneMutation = useUpdateMilestone(jobId);
   const deleteMilestoneMutation = useDeleteMilestone(jobId);
+  const [deletingMilestone, setDeletingMilestone] = React.useState<InterviewMilestone | null>(null);
 
   const handleUpdateStatus = (milestoneId: string, newStatus: MilestoneStatus) => {
     updateMilestoneMutation.mutate({
@@ -44,6 +48,16 @@ export const MilestonesTimeline: React.FC<MilestonesTimelineProps> = ({
       milestoneId: milestone.id,
       data: { questionsAsked: questions },
     });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingMilestone) return;
+    try {
+      await deleteMilestoneMutation.mutateAsync(deletingMilestone.id);
+      setDeletingMilestone(null);
+    } catch {
+      // Handled by mutation toast
+    }
   };
 
   return (
@@ -90,14 +104,37 @@ export const MilestonesTimeline: React.FC<MilestonesTimelineProps> = ({
             <MilestoneCard
               key={milestone.id}
               milestone={milestone}
+              jobTitle={jobTitle}
               onStatusChange={(newStatus) => handleUpdateStatus(milestone.id, newStatus)}
-              onDelete={() => deleteMilestoneMutation.mutate(milestone.id)}
+              onDelete={() => setDeletingMilestone(milestone)}
               onAddQuestion={(q) => handleAddQuestion(milestone, q)}
               onRemoveQuestion={(qIdx) => handleRemoveQuestion(milestone, qIdx)}
             />
           ))}
         </div>
       )}
+
+      {/* Milestone Deletion Safety Dialog */}
+      <ConfirmDeleteDialog
+        open={Boolean(deletingMilestone)}
+        onOpenChange={(open) => !open && setDeletingMilestone(null)}
+        title="Delete Interview Round"
+        itemTitle={deletingMilestone?.title}
+        description={
+          deletingMilestone && (
+            <>
+              Are you sure you want to remove the interview round{' '}
+              <span className="font-semibold text-foreground">
+                &ldquo;{deletingMilestone.title}&rdquo;
+              </span>
+              ? All logged interview questions and round details will be permanently removed.
+            </>
+          )
+        }
+        confirmLabel="Delete Round"
+        isDeleting={deleteMilestoneMutation.isPending}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };

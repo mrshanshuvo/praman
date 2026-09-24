@@ -3,6 +3,7 @@
 import type { ApplicationNote, NoteTag } from '@praman/schemas';
 import { Loader2, MessageSquare, Plus, Search } from 'lucide-react';
 import React, { useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -28,6 +29,7 @@ export const NotesJournal: React.FC<NotesJournalProps> = ({ jobId, notes }) => {
   const addNoteMutation = useAddJobNote(jobId);
   const updateNoteMutation = useUpdateJobNote(jobId);
   const deleteNoteMutation = useDeleteJobNote(jobId);
+  const [deletingNote, setDeletingNote] = useState<ApplicationNote | null>(null);
 
   const [newNoteContent, setNewNoteContent] = useState('');
   const [newNoteTag, setNewNoteTag] = useState<NoteTag>('GENERAL');
@@ -44,6 +46,16 @@ export const NotesJournal: React.FC<NotesJournalProps> = ({ jobId, notes }) => {
       isPinned: false,
     });
     setNewNoteContent('');
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingNote) return;
+    try {
+      await deleteNoteMutation.mutateAsync(deletingNote.id);
+      setDeletingNote(null);
+    } catch {
+      // Handled by mutation toast
+    }
   };
 
   const filteredNotes = notes.filter((n) => {
@@ -170,11 +182,36 @@ export const NotesJournal: React.FC<NotesJournalProps> = ({ jobId, notes }) => {
                   data: { isPinned: !note.isPinned },
                 })
               }
-              onDelete={() => deleteNoteMutation.mutate(note.id)}
+              onDelete={() => setDeletingNote(note)}
             />
           ))
         )}
       </div>
+
+      {/* Note Deletion Safety Dialog */}
+      <ConfirmDeleteDialog
+        open={Boolean(deletingNote)}
+        onOpenChange={(open) => !open && setDeletingNote(null)}
+        title="Delete Journal Note"
+        itemTitle={deletingNote ? `${deletingNote.tag} note` : 'Note'}
+        description={
+          deletingNote && (
+            <>
+              Are you sure you want to delete this{' '}
+              <span className="font-semibold text-foreground">[{deletingNote.tag}]</span> note?
+              &ldquo;
+              <span className="italic">
+                {deletingNote.content.slice(0, 80)}
+                {deletingNote.content.length > 80 ? '...' : ''}
+              </span>
+              &rdquo; This cannot be undone.
+            </>
+          )
+        }
+        confirmLabel="Delete Note"
+        isDeleting={deleteNoteMutation.isPending}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };
