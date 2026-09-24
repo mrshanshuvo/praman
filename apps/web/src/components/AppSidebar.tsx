@@ -67,6 +67,7 @@ export function AppSidebar() {
     { href: '/profile', label: 'Candidate Profile', icon: User },
   ];
 
+  const renderNow = Date.now();
   const recentJobs = jobs.slice(0, 3);
   const initials = user?.name ? user.name.slice(0, 1) : user?.email?.slice(0, 1) || 'U';
 
@@ -171,14 +172,12 @@ export function AppSidebar() {
             ) : recentJobs.length > 0 ? (
               <div className="space-y-0.5">
                 {recentJobs.map((j) => {
-                  const score =
-                    j.analysis?.matchScore != null ? j.analysis.matchScore : null;
+                  const score = j.analysis?.matchScore != null ? j.analysis.matchScore : null;
                   const company = j.structured?.company;
                   const status = (j.status || 'SAVED').toUpperCase();
                   const daysAgo = j.createdAt
                     ? Math.floor(
-                        (Date.now() - new Date(j.createdAt).getTime()) /
-                          (1000 * 60 * 60 * 24),
+                        (renderNow - new Date(j.createdAt).getTime()) / (1000 * 60 * 60 * 24),
                       )
                     : null;
                   const relativeDate =
@@ -215,16 +214,12 @@ export function AppSidebar() {
                           <span
                             className={`inline-block size-1.5 rounded-full shrink-0 ${statusColor[status] ?? 'bg-muted-foreground/60'}`}
                           />
-                          <span className="truncate">
-                            {company || 'Unknown Company'}
-                          </span>
+                          <span className="truncate">{company || 'Unknown Company'}</span>
                         </p>
                         {/* Score + date */}
                         <p className="text-2xs flex items-center gap-1.5 mt-0.5">
                           {score != null ? (
-                            <span className="font-mono font-bold text-brand-cyan">
-                              {score}%
-                            </span>
+                            <span className="font-mono font-bold text-brand-cyan">{score}%</span>
                           ) : (
                             <span className="text-muted-foreground/50 italic">no score</span>
                           )}
