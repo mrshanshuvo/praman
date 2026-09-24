@@ -2,6 +2,7 @@
 
 import { AlertCircle } from 'lucide-react';
 import { Suspense } from 'react';
+import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useCandidateProfile, useProfileMutations } from '@/hooks/usePramanApi';
@@ -137,6 +138,15 @@ function ProfileContent() {
       )}
       {activeTab === 'education' && <EducationTab educations={educations} />}
       {activeTab === 'certifications' && <CertificationsTab certifications={certifications} />}
+
+      <ConfirmDeleteDialog
+        open={!!actions.pendingDelete}
+        onOpenChange={(open) => !open && actions.setPendingDelete(null)}
+        title={actions.pendingDelete?.title}
+        itemTitle={actions.pendingDelete?.itemTitle}
+        isDeleting={actions.isDeleting}
+        onConfirm={actions.handleConfirmDelete}
+      />
     </div>
   );
 }
