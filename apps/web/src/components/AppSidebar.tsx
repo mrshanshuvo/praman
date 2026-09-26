@@ -1,7 +1,7 @@
 'use client';
 
 import type { JobDescriptionRecord } from '@praman/schemas';
-import { Briefcase, ChevronRight, LayoutDashboard, PlusCircle, User } from 'lucide-react';
+import { Briefcase, ChevronRight, LayoutDashboard, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -21,7 +21,7 @@ interface NavItem {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { data: rawJobs, isLoading: isJobsLoading } = useJobs({ enabled: isAuthenticated });
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
 
@@ -54,7 +54,6 @@ export function AppSidebar() {
   const navItems: NavItem[] = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/jobs', label: 'Applications', icon: Briefcase, badgeCount: upcomingCount },
-    { href: '/jobs/new', label: 'New Pipeline', icon: PlusCircle },
     { href: '/profile', label: 'Candidate Profile', icon: User },
   ];
 
@@ -205,21 +204,19 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Bottom Status Footer */}
-      <div className="border-t border-border/60 p-2.5">
-        <div
-          className={`flex items-center text-2xs text-muted-foreground ${
-            isCollapsed ? 'justify-center' : 'justify-between px-1'
+      {/* Bottom Logout Action */}
+      <div className="border-t border-border p-2">
+        <button
+          type="button"
+          onClick={() => logout()}
+          className={`flex items-center rounded-xl text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer w-full ${
+            isCollapsed ? 'size-10 justify-center mx-auto' : 'gap-3 px-3 py-2'
           }`}
+          title="Sign Out"
         >
-          {!isCollapsed && (
-            <span className="font-mono text-muted-foreground/70">Praman v0.2.1</span>
-          )}
-          <div className="flex items-center gap-1.5" title="Truth Engine Status: Active">
-            <span className="size-1.5 rounded-full bg-success animate-pulse shrink-0" />
-            {!isCollapsed && <span className="text-[11px] font-medium text-success">Verified</span>}
-          </div>
-        </div>
+          <LogOut className="w-4 h-4 shrink-0" />
+          {!isCollapsed && <span>Sign Out</span>}
+        </button>
       </div>
     </div>
   );

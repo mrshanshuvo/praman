@@ -15,7 +15,6 @@ import {
 import Link from 'next/link';
 import { Suspense, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -148,41 +147,6 @@ function JobsListContent() {
 
   return (
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Job Pipeline Inspector
-            </h1>
-            <Badge
-              variant="outline"
-              className="font-mono text-xs text-brand-pink bg-brand-pink/10 border-brand-pink/30 dark:bg-muted dark:text-muted-foreground dark:border-border px-2.5 py-0.5"
-            >
-              {jds.length} jobs
-            </Badge>
-          </div>
-          <p className="text-muted-foreground text-sm mt-1.5 leading-relaxed max-w-2xl">
-            Analyze target job descriptions, evaluate truthful candidate alignment, and generate
-            audit-verified resumes.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <Link
-            href="/jobs/new"
-            className={buttonVariants({
-              size: 'sm',
-              className:
-                'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20',
-            })}
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>New Job Analysis</span>
-          </Link>
-        </div>
-      </div>
-
       {/* Filter, Sort & View Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         {/* Status Tabs (List View) or Pipeline Helper (Board View) */}
@@ -298,6 +262,20 @@ function JobsListContent() {
               <LayoutGrid className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Board</span>
             </button>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/jobs/new"
+              className={buttonVariants({
+                size: 'sm',
+                className:
+                  'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20',
+              })}
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>New Job Analysis</span>
+            </Link>
           </div>
         </div>
       </div>
