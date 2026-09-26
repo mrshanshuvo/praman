@@ -1,12 +1,11 @@
 'use client';
 
 import type { JobDescriptionRecord } from '@praman/schemas';
-import { AlertCircle, AlertTriangle, ChevronLeft } from 'lucide-react';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useCreateJob } from '@/hooks/usePramanApi';
@@ -74,35 +73,7 @@ export default function NewJobPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
-      {/* Navigation & Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between gap-4 mb-2">
-          <button
-            type="button"
-            onClick={() => router.push('/jobs')}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span>Back to Applications</span>
-          </button>
-          <Badge
-            variant="outline"
-            className="text-primary bg-primary/10 border-primary/25 text-2xs font-mono px-2 py-0.5"
-          >
-            STAGE 1 • DETERMINISTIC EXTRACTION
-          </Badge>
-        </div>
-
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-          Target Job Description Ingestion
-        </h1>
-        <p className="text-muted-foreground text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-          Paste the target job posting. Our AI extractor decomposes it into verified structured
-          schema requirements (mandatory skills, responsibilities, seniority, and work mode).
-        </p>
-      </div>
-
+    <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
       {duplicateInfo && (
         <Card className="mb-6 p-5 border-amber-500/40 bg-amber-500/10 backdrop-blur-md rounded-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

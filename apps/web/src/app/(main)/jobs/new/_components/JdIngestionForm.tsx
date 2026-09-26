@@ -1,16 +1,6 @@
 'use client';
 
-import {
-  BookOpen,
-  CheckCircle2,
-  ClipboardPaste,
-  FileCheck2,
-  FileText,
-  Lightbulb,
-  RefreshCw,
-  Sparkles,
-  Trash2,
-} from 'lucide-react';
+import { CheckCircle2, ClipboardPaste, FileText, RefreshCw, Sparkles, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -23,14 +13,6 @@ interface JdIngestionFormProps {
   onTextChange: (text: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
-
-const EXTRACTED_FIELDS = [
-  { label: 'Job Title & Seniority', desc: 'Normalized title and seniority level' },
-  { label: 'Mandatory Skills', desc: 'Must-have hard requirements' },
-  { label: 'Bonus / Preferred Skills', desc: 'Nice-to-have qualifications' },
-  { label: 'Key Responsibilities', desc: 'Core day-to-day deliverables' },
-  { label: 'Work Mode & Location', desc: 'Remote, Hybrid, or On-site status' },
-];
 
 export function JdIngestionForm({
   rawText,
@@ -61,214 +43,118 @@ export function JdIngestionForm({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      {/* Left Column: Form & Editor (8 cols on lg) */}
-      <div className="lg:col-span-8">
-        <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
-          <Card className="border-border bg-card/70 p-5 sm:p-6 backdrop-blur-md shadow-xl rounded-2xl border">
-            {/* Editor Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-border/60">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <label
-                    htmlFor="jd-textarea"
-                    className="text-sm font-semibold text-foreground block"
-                  >
-                    Job Description Content
-                  </label>
-                  <span className="text-2xs text-muted-foreground">
-                    Paste raw text from LinkedIn, Greenhouse, Lever, or career pages
-                  </span>
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePasteFromClipboard}
-                  className="h-8 px-2.5 text-xs border-border bg-card hover:bg-muted text-foreground cursor-pointer gap-1.5"
-                  title="Paste from clipboard"
-                >
-                  <ClipboardPaste className="w-3.5 h-3.5 text-primary" />
-                  <span>{pasteSuccess ? 'Pasted!' : 'Paste Clipboard'}</span>
-                </Button>
-
-                {rawText.length > 0 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClear}
-                    disabled={loading}
-                    className="h-8 px-2.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer gap-1"
-                    title="Clear content"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Clear</span>
-                  </Button>
-                )}
-              </div>
+    <form ref={formRef} onSubmit={onSubmit} className="w-full space-y-4">
+      <Card className="border-border bg-card/70 p-5 sm:p-6 backdrop-blur-md shadow-xl rounded-2xl border">
+        {/* Editor Toolbar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-border/60">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+              <FileText className="w-4 h-4" />
             </div>
-
-            {/* Textarea */}
-            <Textarea
-              id="jd-textarea"
-              rows={15}
-              required
-              value={rawText}
-              onChange={(e) => onTextChange(e.target.value)}
-              onKeyDown={(e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && isReady && !loading) {
-                  e.preventDefault();
-                  formRef.current?.requestSubmit();
-                }
-              }}
-              placeholder="Paste the target job description here...&#10;&#10;Tip: Include role summary, responsibilities, required technical skills, qualifications, and company details for optimal analysis results."
-              className="w-full bg-background/50 border-border/80 rounded-xl p-4 text-xs sm:text-sm text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed min-h-85 resize-y"
-            />
-
-            {/* Editor Footer / Stats Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-3 border-t border-border/60 text-xs">
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <span className="font-mono">
-                  <strong className="text-foreground">{rawText.length}</strong> chars
-                </span>
-                <span className="text-border">•</span>
-                <span className="font-mono">
-                  <strong className="text-foreground">{wordCount}</strong> words
-                </span>
-                <span className="text-border">•</span>
-                {isReady ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-500 font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Ready</span>
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground/70">Min 10 characters required</span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  type="submit"
-                  size="default"
-                  disabled={loading || !isReady}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-md shadow-primary/20 text-xs sm:text-sm px-5 py-2 rounded-xl transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Extracting Schema (Stage 1)...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      <span>Analyze Job Description</span>
-                      <kbd className="hidden md:inline-flex items-center text-2xs bg-primary-foreground/20 text-primary-foreground px-1.5 py-0.5 rounded font-mono font-normal">
-                        ⌘↵
-                      </kbd>
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </form>
-      </div>
-
-      {/* Right Column: AI Pipeline Guide & Schema Inspector (4 cols on lg) */}
-      <div className="lg:col-span-4 space-y-5">
-        {/* Pipeline Execution Stages */}
-        <Card className="border-border bg-card/60 p-5 backdrop-blur-md rounded-2xl shadow-sm space-y-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5 text-primary" />
-            <span>Praman AI Pipeline</span>
-          </h3>
-
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                1
-              </div>
-              <div className="text-xs">
-                <span className="font-semibold text-foreground block">
-                  Deterministic Schema Extraction
-                </span>
-                <span className="text-muted-foreground">
-                  Separates required skills, preferred bonuses, seniority, and responsibilities.
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-2.5 rounded-xl border border-border/50 bg-card/40 opacity-75">
-              <div className="w-5 h-5 rounded-full bg-muted text-muted-foreground text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
-                2
-              </div>
-              <div className="text-xs">
-                <span className="font-medium text-foreground block">
-                  Semantic Candidate Scoring
-                </span>
-                <span className="text-muted-foreground">
-                  Evaluates your profile alignment and pinpoints missing keyword gaps.
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-2.5 rounded-xl border border-border/50 bg-card/40 opacity-75">
-              <div className="w-5 h-5 rounded-full bg-muted text-muted-foreground text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
-                3
-              </div>
-              <div className="text-xs">
-                <span className="font-medium text-foreground block">Targeted ATS Resume</span>
-                <span className="text-muted-foreground">
-                  Generates tailoring strategies and optimized bullet points for the role.
-                </span>
-              </div>
+            <div>
+              <label htmlFor="jd-textarea" className="text-sm font-semibold text-foreground block">
+                Job Description Content
+              </label>
+              <span className="text-2xs text-muted-foreground">
+                Paste raw text from LinkedIn, Greenhouse, Lever, or career pages
+              </span>
             </div>
           </div>
-        </Card>
 
-        {/* What Gets Extracted */}
-        <Card className="border-border bg-card/60 p-5 backdrop-blur-md rounded-2xl shadow-sm space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <FileCheck2 className="w-3.5 h-3.5 text-primary" />
-            <span>Extracted Schema Elements</span>
-          </h3>
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePasteFromClipboard}
+              className="h-8 px-2.5 text-xs border-border bg-card hover:bg-muted text-foreground cursor-pointer gap-1.5"
+              title="Paste from clipboard"
+            >
+              <ClipboardPaste className="w-3.5 h-3.5 text-primary" />
+              <span>{pasteSuccess ? 'Pasted!' : 'Paste Clipboard'}</span>
+            </Button>
 
-          <div className="space-y-2">
-            {EXTRACTED_FIELDS.map((item) => (
-              <div
-                key={item.label}
-                className="flex items-start gap-2.5 p-2 rounded-lg bg-card/80 border border-border/40 text-xs"
+            {rawText.length > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClear}
+                disabled={loading}
+                className="h-8 px-2.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer gap-1"
+                title="Clear content"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                <div>
-                  <span className="font-medium text-foreground block">{item.label}</span>
-                  <span className="text-2xs text-muted-foreground">{item.desc}</span>
-                </div>
-              </div>
-            ))}
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Clear</span>
+              </Button>
+            )}
           </div>
-        </Card>
-
-        {/* Pro Tips */}
-        <div className="p-4 rounded-xl border border-border/50 bg-card/40 text-xs text-muted-foreground space-y-1.5">
-          <div className="flex items-center gap-1.5 text-foreground font-semibold">
-            <Lightbulb className="w-3.5 h-3.5 text-primary" />
-            <span>Extraction Pro Tip</span>
-          </div>
-          <p className="leading-relaxed">
-            Praman automatically filters out company marketing fluff and isolates actionable
-            qualification requirements.
-          </p>
         </div>
-      </div>
-    </div>
+
+        {/* Textarea */}
+        <Textarea
+          id="jd-textarea"
+          rows={16}
+          required
+          value={rawText}
+          onChange={(e) => onTextChange(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && isReady && !loading) {
+              e.preventDefault();
+              formRef.current?.requestSubmit();
+            }
+          }}
+          placeholder="Paste the target job description here...&#10;&#10;Tip: Include role summary, responsibilities, required technical skills, qualifications, and company details for optimal analysis results."
+          className="w-full bg-background/50 border-border/80 rounded-xl p-4 text-xs sm:text-sm text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed min-h-85 resize-y"
+        />
+
+        {/* Editor Footer / Stats Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-3 border-t border-border/60 text-xs">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <span className="font-mono">
+              <strong className="text-foreground">{rawText.length}</strong> chars
+            </span>
+            <span className="text-border">•</span>
+            <span className="font-mono">
+              <strong className="text-foreground">{wordCount}</strong> words
+            </span>
+            <span className="text-border">•</span>
+            {isReady ? (
+              <span className="inline-flex items-center gap-1 text-emerald-500 font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Ready</span>
+              </span>
+            ) : (
+              <span className="text-muted-foreground/70">Min 10 characters required</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              type="submit"
+              size="default"
+              disabled={loading || !isReady}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-md shadow-primary/20 text-xs sm:text-sm px-5 py-2 rounded-xl transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed gap-2"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Extracting Schema (Stage 1)...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Analyze Job Description</span>
+                  <kbd className="hidden md:inline-flex items-center text-2xs bg-primary-foreground/20 text-primary-foreground px-1.5 py-0.5 rounded font-mono font-normal">
+                    ⌘↵
+                  </kbd>
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </form>
   );
 }
