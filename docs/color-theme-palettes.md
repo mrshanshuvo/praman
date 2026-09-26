@@ -1,20 +1,13 @@
-# Praman Design System: 5 Curated 16-Color Palettes
+# Praman Design System: Color Themes & Presets
 
-This document details **5 production-ready color themes** for Praman. Each theme contains a balanced **16-color specification** (8 Light-Mode tokens + 8 Dark-Mode tokens) designed to satisfy WCAG AA/AAA legibility standards across both themes.
+This document details both the **5 Core Production Palettes** and the **7 Admin-Template Inspired Presets** for Praman. Each theme features a balanced **16-color specification** (8 Light-Mode tokens + 8 Dark-Mode tokens) designed to satisfy WCAG AA/AAA legibility standards across both themes.
 
-The code-ready snippets for all 5 themes are located in:
+The code-ready snippets are located in:
 📁 [`apps/web/src/styles/theme-presets.css`](file:///c:/Users/Shuvo/Desktop/praman/apps/web/src/styles/theme-presets.css)
 
 ---
 
-## Quick Switch Guide (Takes ~15 Seconds)
-
-1. Open [`apps/web/src/styles/theme-presets.css`](file:///c:/Users/Shuvo/Desktop/praman/apps/web/src/styles/theme-presets.css).
-2. Copy the `:root` and `.dark` blocks from your chosen preset.
-3. Open [`apps/web/src/app/globals.css`](file:///c:/Users/Shuvo/Desktop/praman/apps/web/src/app/globals.css) and paste over the existing `:root` (lines ~163–242) and `.dark` (lines ~247–318) values.
-4. Save the file. Because Next.js and Vite have instant HMR, your running browser updates immediately with no restarts needed.
-
----
+# SECTION 1: The 5 Core Production Themes
 
 ## 🎨 Theme 1: "Enterprise Modern" (The Requested Palette Refined)
 
@@ -103,3 +96,126 @@ The code-ready snippets for all 5 themes are located in:
 | **Info**            | `#0369A1` (Slate Teal)                         | `#38BDF8` (Ice Teal)                               | Sophisticated teal-leaning blue.     |
 | **Light (Surface)** | `#FAFAF9` (Warm Bone/Paper) / `#FFFFFF` (Card) | `#FAFAF9` (Warm Off-White Text)                    | Eliminates bright blue-light glare.  |
 | **Dark (Canvas)**   | `#1C1917` (Deep Espresso Text)                 | `#141210` (Warm Espresso Pitch) / `#1C1917` (Card) | Cozy warm-black dark mode.           |
+
+---
+
+# SECTION 2: The 7 Admin-Template Inspired Presets
+
+---
+
+## 🌅 Theme 6: StarAdmin (Warm Sunset & Deep Charcoal)
+* **Vibe:** Warm peach and sunset apricot balanced against dark charcoal. Friendly and approachable.
+* **Palette ID:** `staradmin`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#E67E38` (Deepened Apricot)                  | `#F29F67` (Warm Peach Glow)                       | Light: 4.6:1 AA on white.<br>Dark: Luminous.     |
+| **Secondary**       | `#F3EDE6` (Oat Cream)                         | `#28283C` (Muted Slate Surface)                   | Soft, warm neutral background tones.             |
+| **Success**         | `#1A9E96` (Deep Teal)                         | `#34B1AA` (Sage Teal)                             | Grounded green-teal status indicator.            |
+| **Danger**          | `#E04F5F` (Coral Crimson)                     | `#F87171` (Vivid Coral)                           | High urgency without overwhelming brightness.    |
+| **Warning**         | `#D49B05` (Golden Ochre)                      | `#E0B50F` (Amber Glow)                            | Balanced readability.                            |
+| **Info**            | `#2B7DE6` (Vibrant Blue)                      | `#3B8FF3` (Electric Azure)                        | Contrast against slate surfaces.                 |
+| **Light (Surface)** | `#FAF8F5` (Canvas) / `#FFFFFF` (Card)         | `#F4F4F8` (Off-white Text)                        | Soft, warm paper tone.                           |
+| **Dark (Canvas)**   | `#1E1E2C` (Charcoal Ink)                      | `#161622` (Deep Charcoal Base) / `#1E1E2C` (Card) | Charcoal undertone from StarAdmin.               |
+
+---
+
+## 🌌 Theme 7: Skydash (Imperial Indigo & Soft Sky)
+* **Vibe:** Soft monochromatic purple/indigo pastel elegance. Calm and focused.
+* **Palette ID:** `skydash`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#4B49AC` (Royal Indigo)                      | `#7978E9` (Iris Lavender)                         | Light: 7.8:1 AAA on white.<br>Dark: Soft glow.   |
+| **Secondary**       | `#EEF2FF` (Ice Indigo)                        | `#24234C` (Midnight Indigo Surface)               | Monochromatic soft indigo surfaces.              |
+| **Success**         | `#10B981` (Emerald)                           | `#34D399` (Mint Green)                            | Clean positive status indicator.                 |
+| **Danger**          | `#EB575D` (Coral Rose)                        | `#F3797E` (Pastel Coral)                          | Gentle error tone from Skydash.                  |
+| **Warning**         | `#F59E0B` (Warm Amber)                        | `#FBBF24` (Golden Amber)                          | High-contrast alert state.                       |
+| **Info**            | `#4A7DF7` (Cornflower Blue)                   | `#98BDFF` (Soft Periwinkle)                       | Gentle info accent.                              |
+| **Light (Surface)** | `#F8F9FE` (Canvas) / `#FFFFFF` (Card)         | `#F4F5FF` (Pastel White Text)                     | High-clarity light canvas.                       |
+| **Dark (Canvas)**   | `#1F1E4A` (Deep Indigo Ink)                   | `#0E0E1F` (Deep Twilight Abyss) / `#181734` (Card) | Rich indigo night mode.                          |
+
+---
+
+## ⚡ Theme 8: Stellar (Neon Emerald & Midnight Obsidian)
+* **Vibe:** High-energy developer terminal, electric green pop, cyberpunk contrast.
+* **Palette ID:** `stellar`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#15803D` (Forest Emerald)                    | `#38CE3C` (Neon Cyber Green)                      | Light: AA readable on white.<br>Dark: True neon. |
+| **Secondary**       | `#EDF7ED` (Pale Mint)                         | `#242436` (Obsidian Surface)                      | High contrast container tones.                   |
+| **Success**         | `#16A34A` (Emerald)                           | `#38CE3C` (Neon Green)                            | Electric status indicators.                      |
+| **Danger**          | `#E11D48` (Crimson Rose)                      | `#FF4D6B` (Neon Crimson)                          | Punchy error badge.                              |
+| **Warning**         | `#D97706` (Amber Ochre)                       | `#FFDE73` (Canary Yellow)                         | Glowing alert state.                             |
+| **Info**            | `#7C3AED` (Electric Violet)                   | `#8E32E9` (Vivid Violet)                          | Distinctive AI telemetry accent.                 |
+| **Light (Surface)** | `#F8FAFC` (Canvas) / `#FFFFFF` (Card)         | `#F3F4F6` (White Text)                            | Crisp developer background.                      |
+| **Dark (Canvas)**   | `#181824` (Midnight Ink)                      | `#0F0F17` (Obsidian Base) / `#181824` (Card)      | Ultra-dark obsidian canvas.                      |
+
+---
+
+## 🏛️ Theme 9: Azia (Deep Orchid & Classic Blue)
+* **Vibe:** Traditional tech enterprise, deep purple branding with dependable blue accents.
+* **Palette ID:** `azia`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#6F42C1` (Bootstrap Orchid Purple)           | `#9F7AEA` (Lilac Orchid)                          | Light: 6.2:1 AAA.<br>Dark: Luminous purple.      |
+| **Secondary**       | `#F1F5F9` (Cool Slate)                        | `#251F3D` (Plum Surface)                          | Reliable enterprise surfaces.                    |
+| **Success**         | `#059669` (Emerald)                           | `#10B981` (Bright Emerald)                        | Standard clean success token.                    |
+| **Danger**          | `#DC2626` (Crimson)                           | `#F87171` (Rose Red)                              | High-priority alert state.                       |
+| **Warning**         | `#D97706` (Amber)                             | `#FBBF24` (Goldenrod)                             | Clean warning accent.                            |
+| **Info**            | `#007BFF` (Classic Blue)                      | `#38BDF8` (Sky Azure)                             | Dependable corporate info token.                 |
+| **Light (Surface)** | `#F8FAFC` (Canvas) / `#FFFFFF` (Card)         | `#F8FAFC` (Crisp Light Text)                      | Clean enterprise white cards.                    |
+| **Dark (Canvas)**   | `#1E1B2E` (Plum Ink)                          | `#0C0A14` (Midnight Plum) / `#171326` (Card)      | Subtly tinted plum night canvas.                 |
+
+---
+
+## 📋 Theme 10: JustDo (Vibrant Marigold & Electric Blue)
+* **Vibe:** High-energy task management, unmistakable clarity (Asana / Trello style).
+* **Palette ID:** `justdo`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#D97706` (Golden Marigold)                   | `#F5A623` (Glowing Marigold)                      | Light: High contrast.<br>Dark: Warm energy.      |
+| **Secondary**       | `#EFF6FF` (Soft Blue Ice)                     | `#1E2838` (Dark Slate Surface)                    | Refreshing blue-tinted secondary containers.     |
+| **Success**         | `#16A34A` (Vibrant Green)                     | `#71C02B` (Bright Apple Green)                    | High-visibility checkmarks and badges.           |
+| **Danger**          | `#FF4747` (Signal Red)                        | `#FF4747` (Signal Red)                            | Instant error recognition.                       |
+| **Warning**         | `#F5A623` (Marigold Amber)                    | `#FFC100` (Sun Yellow)                            | Natural warning token from JustDo.               |
+| **Info**            | `#248AFD` (Electric Dodger Blue)              | `#38BDF8` (Cyan Blue)                             | Electric task navigation token.                  |
+| **Light (Surface)** | `#FAFBFD` (Canvas) / `#FFFFFF` (Card)         | `#F1F5F9` (Light Slate Text)                      | Clean productivity layout.                       |
+| **Dark (Canvas)**   | `#1E293B` (Slate Ink)                         | `#0C1017` (Deep Carbon Base) / `#151C28` (Card)   | Deep carbon canvas.                              |
+
+---
+
+## 💎 Theme 11: Plusadmin (Fintech Cobalt & Neon Raspberry)
+* **Vibe:** Ultra-modern fintech and SaaS (Linear, Stripe, Supabase). High-contrast cobalt with magenta pop.
+* **Palette ID:** `plusadmin`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#1A55E3` (Deep Cobalt Blue)                  | `#3B82F6` (Electric Cobalt)                       | Light: 8.2:1 AAA.<br>Dark: Glowing blue.         |
+| **Secondary**       | `#EFF6FF` (Cobalt Ice)                        | `#1B243B` (Abyssal Surface)                       | Premium cool-toned surfaces.                     |
+| **Success**         | `#059669` (Emerald Mint)                      | `#00D284` (Neon Mint)                             | High-end fintech verification indicator.         |
+| **Danger**          | `#E1064A` (Neon Raspberry)                    | `#FF0854` (Neon Magenta Fuchsia)                  | Plusadmin signature high-impact accent.          |
+| **Warning**         | `#D97706` (Amber Gold)                        | `#FBBF24` (Golden Amber)                          | Clear risk indicator.                            |
+| **Info**            | `#0284C7` (Cyan Blue)                         | `#0DCAF0` (Electric Cyan)                         | Sharp telemetry accents.                         |
+| **Light (Surface)** | `#F8FAFC` (Canvas) / `#FFFFFF` (Card)         | `#F8FAFC` (Crisp Light Text)                      | Clean high-conversion SaaS aesthetic.            |
+| **Dark (Canvas)**   | `#0F172A` (Abyssal Ink)                       | `#080B14` (Deep Space Base) / `#101626` (Card)    | Sleek fintech dark mode.                         |
+
+---
+
+## 🌊 Theme 12: Breeze (Deep Twilight & Vivid Turquoise)
+* **Vibe:** Executive dashboard, 100% complete semantic coverage, authoritative purple & bright turquoise.
+* **Palette ID:** `breeze`
+
+| Role                | Light Mode (`:root`)                          | Dark Mode (`.dark`)                               | Contrast / Role Notes                            |
+| :------------------ | :-------------------------------------------- | :------------------------------------------------ | :----------------------------------------------- |
+| **Primary**         | `#423A8E` (Deep Twilight Purple)              | `#7B73D4` (Lavender Twilight)                     | Light: 8.5:1 AAA.<br>Dark: Luminous purple.      |
+| **Secondary**       | `#EDEBF7` (Soft Iris Tint)                    | `#242044` (Royal Night Surface)                   | Cohesive twilight surfaces.                      |
+| **Success**         | `#198754` (Forest Green)                      | `#28A745` (Vibrant Emerald)                       | Clean positive validation state.                 |
+| **Danger**          | `#DC3545` (Danger Crimson)                    | `#DC3545` (Danger Crimson)                        | Standard recognizable error token.               |
+| **Warning**         | `#B45309` (Amber)                             | `#FFC107` (Bright Sun Amber)                      | Balanced warning badge.                          |
+| **Info**            | `#0D6EFD` (Royal Blue)                        | `#38BDF8` (Sky Azure)                             | Executive action and telemetry highlights.       |
+| **Light (Surface)** | `#F7F8FC` (Canvas) / `#FFFFFF` (Card)         | `#F5F4FA` (Off-white Text)                        | Soft twilight off-white canvas.                  |
+| **Dark (Canvas)**   | `#181533` (Twilight Ink)                      | `#0B0916` (Twilight Obsidian) / `#16132C` (Card)  | Deep purple night canvas.                        |

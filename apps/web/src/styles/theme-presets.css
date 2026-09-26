@@ -1,11 +1,11 @@
 /* =============================================================================
-   PRAMAN THEME PRESETS: 5 Production-Ready 16-Color Palettes
+   PRAMAN THEME PRESETS: 12 Production-Ready 16-Color Palettes
+   (5 Core Architectural Palettes + 7 Admin-Template Inspired Palettes)
    Each theme provides 8 Light-Mode tokens (:root) + 8 Dark-Mode tokens (.dark).
    
    HOW TO SWITCH THEMES:
-   Simply copy the :root and .dark variable values from any preset below and 
-   paste them into apps/web/src/app/globals.css lines 163-242 and lines 247-318.
-   Next.js hot reload will immediately apply the new theme across all pages!
+   Either use the built-in interactive Theme Palette Picker in the web UI, or 
+   copy the :root and .dark variable values from any preset below into globals.css.
    ============================================================================= */
 
 /* =============================================================================
@@ -440,5 +440,614 @@
   --brand-pink: #fb7185;
   --brand-dark: #141210;
   --brand-light: #fafaf9;
+}
+*/
+
+/* =============================================================================
+   PRESET 6: "StarAdmin Sunset" (Warm Apricot / Charcoal)
+   Vibe: Creative, human-centric, warm apricot balanced with deep charcoal slate.
+   ============================================================================= */
+
+/* --- Preset 6: Light Mode --- */
+/*
+:root {
+  --background: #faf8f5;
+  --foreground: #1e1e2c;
+  --card: #ffffff;
+  --card-foreground: #1e1e2c;
+  --popover: #ffffff;
+  --popover-foreground: #1e1e2c;
+
+  --primary: #e67e38;
+  --primary-foreground: #ffffff;
+  --secondary: #f3ede6;
+  --secondary-foreground: #1e1e2c;
+
+  --muted: #f3ede6;
+  --muted-foreground: #6e6d7a;
+  --accent: #fdeee3;
+  --accent-foreground: #e67e38;
+
+  --success: #1a9e96;
+  --success-foreground: #ffffff;
+  --warning: #d49b05;
+  --warning-foreground: #ffffff;
+  --info: #2b7de6;
+  --info-foreground: #ffffff;
+  --destructive: #e04f5f;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #1e1e2c;
+
+  --border: #e8e2d8;
+  --input: #e8e2d8;
+  --ring: #e67e38;
+
+  --brand-cyan: #e67e38;
+  --brand-pink: #e04f5f;
+  --brand-dark: #1e1e2c;
+  --brand-light: #faf8f5;
+}
+*/
+
+/* --- Preset 6: Dark Mode --- */
+/*
+.dark {
+  --background: #161622;
+  --foreground: #f4f4f8;
+  --card: #1e1e2c;
+  --card-foreground: #f4f4f8;
+  --popover: #1e1e2c;
+  --popover-foreground: #f4f4f8;
+
+  --primary: #f29f67;
+  --primary-foreground: #161622;
+  --secondary: #28283c;
+  --secondary-foreground: #f4f4f8;
+
+  --muted: #28283c;
+  --muted-foreground: #9494a8;
+  --accent: #2f2826;
+  --accent-foreground: #f29f67;
+
+  --success: #34b1aa;
+  --success-foreground: #161622;
+  --warning: #e0b50f;
+  --warning-foreground: #161622;
+  --info: #3b8ff3;
+  --info-foreground: #161622;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #a78bfa;
+
+  --border: rgba(244, 244, 248, 0.1);
+  --input: rgba(244, 244, 248, 0.15);
+  --ring: #f29f67;
+
+  --brand-cyan: #f29f67;
+  --brand-pink: #f87171;
+  --brand-dark: #161622;
+  --brand-light: #f4f4f8;
+}
+*/
+
+/* =============================================================================
+   PRESET 7: "Skydash Royal" (Imperial Indigo & Soft Sky)
+   Vibe: Soft monochromatic purple/indigo pastel elegance. Calm and focused.
+   ============================================================================= */
+
+/* --- Preset 7: Light Mode --- */
+/*
+:root {
+  --background: #f8f9fe;
+  --foreground: #1f1e4a;
+  --card: #ffffff;
+  --card-foreground: #1f1e4a;
+  --popover: #ffffff;
+  --popover-foreground: #1f1e4a;
+
+  --primary: #4b49ac;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2ff;
+  --secondary-foreground: #1f1e4a;
+
+  --muted: #eef2ff;
+  --muted-foreground: #6b6999;
+  --accent: #e4ecfd;
+  --accent-foreground: #4b49ac;
+
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --info: #4a7df7;
+  --info-foreground: #ffffff;
+  --destructive: #eb575d;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #7978e9;
+
+  --border: #e0e4f5;
+  --input: #e0e4f5;
+  --ring: #4b49ac;
+
+  --brand-cyan: #4b49ac;
+  --brand-pink: #eb575d;
+  --brand-dark: #1f1e4a;
+  --brand-light: #f8f9fe;
+}
+*/
+
+/* --- Preset 7: Dark Mode --- */
+/*
+.dark {
+  --background: #0e0e1f;
+  --foreground: #f4f5ff;
+  --card: #181734;
+  --card-foreground: #f4f5ff;
+  --popover: #181734;
+  --popover-foreground: #f4f5ff;
+
+  --primary: #7978e9;
+  --primary-foreground: #0e0e1f;
+  --secondary: #24234c;
+  --secondary-foreground: #f4f5ff;
+
+  --muted: #24234c;
+  --muted-foreground: #9997c4;
+  --accent: #2a275e;
+  --accent-foreground: #98bdff;
+
+  --success: #34d399;
+  --success-foreground: #0e0e1f;
+  --warning: #fbbf24;
+  --warning-foreground: #0e0e1f;
+  --info: #98bdff;
+  --info-foreground: #0e0e1f;
+  --destructive: #f3797e;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #98bdff;
+
+  --border: rgba(244, 245, 255, 0.1);
+  --input: rgba(244, 245, 255, 0.15);
+  --ring: #7978e9;
+
+  --brand-cyan: #7978e9;
+  --brand-pink: #f3797e;
+  --brand-dark: #0e0e1f;
+  --brand-light: #f4f5ff;
+}
+*/
+
+/* =============================================================================
+   PRESET 8: "Stellar Obsidian" (Neon Emerald & Midnight Obsidian)
+   Vibe: High-energy developer terminal, electric green pop, cyberpunk contrast.
+   ============================================================================= */
+
+/* --- Preset 8: Light Mode --- */
+/*
+:root {
+  --background: #f8fafc;
+  --foreground: #181824;
+  --card: #ffffff;
+  --card-foreground: #181824;
+  --popover: #ffffff;
+  --popover-foreground: #181824;
+
+  --primary: #15803d;
+  --primary-foreground: #ffffff;
+  --secondary: #edf7ed;
+  --secondary-foreground: #181824;
+
+  --muted: #edf7ed;
+  --muted-foreground: #64748b;
+  --accent: #e2fbe4;
+  --accent-foreground: #15803d;
+
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #7c3aed;
+  --info-foreground: #ffffff;
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #8e32e9;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #15803d;
+
+  --brand-cyan: #15803d;
+  --brand-pink: #e11d48;
+  --brand-dark: #181824;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* --- Preset 8: Dark Mode --- */
+/*
+.dark {
+  --background: #0f0f17;
+  --foreground: #f3f4f6;
+  --card: #181824;
+  --card-foreground: #f3f4f6;
+  --popover: #181824;
+  --popover-foreground: #f3f4f6;
+
+  --primary: #38ce3c;
+  --primary-foreground: #0f0f17;
+  --secondary: #242436;
+  --secondary-foreground: #f3f4f6;
+
+  --muted: #242436;
+  --muted-foreground: #9494aa;
+  --accent: #1a2e1d;
+  --accent-foreground: #38ce3c;
+
+  --success: #38ce3c;
+  --success-foreground: #0f0f17;
+  --warning: #ffde73;
+  --warning-foreground: #0f0f17;
+  --info: #8e32e9;
+  --info-foreground: #ffffff;
+  --destructive: #ff4d6b;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #8e32e9;
+
+  --border: rgba(243, 244, 246, 0.09);
+  --input: rgba(243, 244, 246, 0.12);
+  --ring: #38ce3c;
+
+  --brand-cyan: #38ce3c;
+  --brand-pink: #ff4d6b;
+  --brand-dark: #0f0f17;
+  --brand-light: #f3f4f6;
+}
+*/
+
+/* =============================================================================
+   PRESET 9: "Azia Orchid" (Deep Orchid & Classic Blue)
+   Vibe: Traditional enterprise software, reliable purple and classic blue.
+   ============================================================================= */
+
+/* --- Preset 9: Light Mode --- */
+/*
+:root {
+  --background: #f8fafc;
+  --foreground: #1e1b2e;
+  --card: #ffffff;
+  --card-foreground: #1e1b2e;
+  --popover: #ffffff;
+  --popover-foreground: #1e1b2e;
+
+  --primary: #6f42c1;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e1b2e;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f3eefa;
+  --accent-foreground: #6f42c1;
+
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #007bff;
+  --info-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #00cccc;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #6f42c1;
+
+  --brand-cyan: #007bff;
+  --brand-pink: #6f42c1;
+  --brand-dark: #1e1b2e;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* --- Preset 9: Dark Mode --- */
+/*
+.dark {
+  --background: #0c0a14;
+  --foreground: #f8fafc;
+  --card: #171326;
+  --card-foreground: #f8fafc;
+  --popover: #171326;
+  --popover-foreground: #f8fafc;
+
+  --primary: #9f7aea;
+  --primary-foreground: #0c0a14;
+  --secondary: #251f3d;
+  --secondary-foreground: #f8fafc;
+
+  --muted: #251f3d;
+  --muted-foreground: #9d94b8;
+  --accent: #2e224f;
+  --accent-foreground: #00cccc;
+
+  --success: #10b981;
+  --success-foreground: #0c0a14;
+  --warning: #fbbf24;
+  --warning-foreground: #0c0a14;
+  --info: #38bdf8;
+  --info-foreground: #0c0a14;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #00cccc;
+
+  --border: rgba(248, 250, 252, 0.09);
+  --input: rgba(248, 250, 252, 0.12);
+  --ring: #9f7aea;
+
+  --brand-cyan: #38bdf8;
+  --brand-pink: #9f7aea;
+  --brand-dark: #0c0a14;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* =============================================================================
+   PRESET 10: "JustDo Marigold" (Vibrant Marigold & Electric Blue)
+   Vibe: High-energy task management, unmistakable clarity (Asana / Trello style).
+   ============================================================================= */
+
+/* --- Preset 10: Light Mode --- */
+/*
+:root {
+  --background: #fafbfd;
+  --foreground: #1e293b;
+  --card: #ffffff;
+  --card-foreground: #1e293b;
+  --popover: #ffffff;
+  --popover-foreground: #1e293b;
+
+  --primary: #d97706;
+  --primary-foreground: #ffffff;
+  --secondary: #eff6ff;
+  --secondary-foreground: #1e293b;
+
+  --muted: #eff6ff;
+  --muted-foreground: #64748b;
+  --accent: #fef3c7;
+  --accent-foreground: #d97706;
+
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --warning: #f5a623;
+  --warning-foreground: #ffffff;
+  --info: #248afd;
+  --info-foreground: #ffffff;
+  --destructive: #ff4747;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #6366f1;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #d97706;
+
+  --brand-cyan: #248afd;
+  --brand-pink: #ff4747;
+  --brand-dark: #1e293b;
+  --brand-light: #fafbfd;
+}
+*/
+
+/* --- Preset 10: Dark Mode --- */
+/*
+.dark {
+  --background: #0c1017;
+  --foreground: #f1f5f9;
+  --card: #151c28;
+  --card-foreground: #f1f5f9;
+  --popover: #151c28;
+  --popover-foreground: #f1f5f9;
+
+  --primary: #f5a623;
+  --primary-foreground: #0c1017;
+  --secondary: #1e2838;
+  --secondary-foreground: #f1f5f9;
+
+  --muted: #1e2838;
+  --muted-foreground: #8f9ba8;
+  --accent: #2e2417;
+  --accent-foreground: #f5a623;
+
+  --success: #71c02b;
+  --success-foreground: #0c1017;
+  --warning: #ffc100;
+  --warning-foreground: #0c1017;
+  --info: #38bdf8;
+  --info-foreground: #0c1017;
+  --destructive: #ff4747;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #818cf8;
+
+  --border: rgba(241, 245, 249, 0.09);
+  --input: rgba(241, 245, 249, 0.12);
+  --ring: #f5a623;
+
+  --brand-cyan: #38bdf8;
+  --brand-pink: #ff4747;
+  --brand-dark: #0c1017;
+  --brand-light: #f1f5f9;
+}
+*/
+
+/* =============================================================================
+   PRESET 11: "Plusadmin Cobalt" (Fintech Cobalt & Neon Raspberry)
+   Vibe: Ultra-modern fintech / top-tier SaaS (Linear / Stripe style).
+   ============================================================================= */
+
+/* --- Preset 11: Light Mode --- */
+/*
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #1a55e3;
+  --primary-foreground: #ffffff;
+  --secondary: #eff6ff;
+  --secondary-foreground: #0f172a;
+
+  --muted: #eff6ff;
+  --muted-foreground: #64748b;
+  --accent: #fff0f5;
+  --accent-foreground: #e1064a;
+
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #0284c7;
+  --info-foreground: #ffffff;
+  --destructive: #e1064a;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #5e6eed;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #1a55e3;
+
+  --brand-cyan: #1a55e3;
+  --brand-pink: #ff0854;
+  --brand-dark: #0f172a;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* --- Preset 11: Dark Mode --- */
+/*
+.dark {
+  --background: #080b14;
+  --foreground: #f8fafc;
+  --card: #101626;
+  --card-foreground: #f8fafc;
+  --popover: #101626;
+  --popover-foreground: #f8fafc;
+
+  --primary: #3b82f6;
+  --primary-foreground: #080b14;
+  --secondary: #1b243b;
+  --secondary-foreground: #f8fafc;
+
+  --muted: #1b243b;
+  --muted-foreground: #8fa0ba;
+  --accent: #2b1220;
+  --accent-foreground: #ff0854;
+
+  --success: #00d284;
+  --success-foreground: #080b14;
+  --warning: #fbbf24;
+  --warning-foreground: #080b14;
+  --info: #0dcaf0;
+  --info-foreground: #080b14;
+  --destructive: #ff0854;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #5e6eed;
+
+  --border: rgba(248, 250, 252, 0.08);
+  --input: rgba(248, 250, 252, 0.12);
+  --ring: #3b82f6;
+
+  --brand-cyan: #3b82f6;
+  --brand-pink: #ff0854;
+  --brand-dark: #080b14;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* =============================================================================
+   PRESET 12: "Breeze Twilight" (Deep Twilight & Vivid Turquoise)
+   Vibe: Executive dashboard, complete semantic coverage, authoritative calm.
+   ============================================================================= */
+
+/* --- Preset 12: Light Mode --- */
+/*
+:root {
+  --background: #f7f8fc;
+  --foreground: #181533;
+  --card: #ffffff;
+  --card-foreground: #181533;
+  --popover: #ffffff;
+  --popover-foreground: #181533;
+
+  --primary: #423a8e;
+  --primary-foreground: #ffffff;
+  --secondary: #edebf7;
+  --secondary-foreground: #181533;
+
+  --muted: #edebf7;
+  --muted-foreground: #68648c;
+  --accent: #e2faf9;
+  --accent-foreground: #008b8c;
+
+  --success: #198754;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #0d6efd;
+  --info-foreground: #ffffff;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #008b8c;
+
+  --border: #e0deed;
+  --input: #e0deed;
+  --ring: #423a8e;
+
+  --brand-cyan: #008b8c;
+  --brand-pink: #dc3545;
+  --brand-dark: #181533;
+  --brand-light: #f7f8fc;
+}
+*/
+
+/* --- Preset 12: Dark Mode --- */
+/*
+.dark {
+  --background: #0b0916;
+  --foreground: #f5f4fa;
+  --card: #16132c;
+  --card-foreground: #f5f4fa;
+  --popover: #16132c;
+  --popover-foreground: #f5f4fa;
+
+  --primary: #7b73d4;
+  --primary-foreground: #0b0916;
+  --secondary: #242044;
+  --secondary-foreground: #f5f4fa;
+
+  --muted: #242044;
+  --muted-foreground: #9a94ba;
+  --accent: #102a2c;
+  --accent-foreground: #00cccd;
+
+  --success: #28a745;
+  --success-foreground: #0b0916;
+  --warning: #ffc107;
+  --warning-foreground: #0b0916;
+  --info: #38bdf8;
+  --info-foreground: #0b0916;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #00cccd;
+
+  --border: rgba(245, 244, 250, 0.08);
+  --input: rgba(245, 244, 250, 0.12);
+  --ring: #7b73d4;
+
+  --brand-cyan: #00cccd;
+  --brand-pink: #dc3545;
+  --brand-dark: #0b0916;
+  --brand-light: #f5f4fa;
 }
 */

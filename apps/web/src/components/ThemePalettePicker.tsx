@@ -136,10 +136,10 @@ export function ThemePalettePicker({
         {/* Color Palette Section */}
         <DropdownMenuLabel className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase px-2 py-1">
           <Palette className="w-3 h-3 text-primary" />
-          <span>Color Palette (10 Themes)</span>
+          <span>Color Palette ({palettes.length} Presets)</span>
         </DropdownMenuLabel>
 
-        <div className="space-y-0.5 mt-0.5">
+        <div className="space-y-0.5 mt-0.5 max-h-72 overflow-y-auto pr-1">
           {palettes.map((p) => {
             const isSelected = palette === p.id;
             return (

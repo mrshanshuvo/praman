@@ -2,7 +2,19 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-export type PaletteId = 'enterprise' | 'cyberpunk' | 'linear' | 'ocean' | 'editorial';
+export type PaletteId =
+  | 'enterprise'
+  | 'cyberpunk'
+  | 'linear'
+  | 'ocean'
+  | 'editorial'
+  | 'staradmin'
+  | 'skydash'
+  | 'stellar'
+  | 'azia'
+  | 'justdo'
+  | 'plusadmin'
+  | 'breeze';
 
 export interface PaletteMeta {
   id: PaletteId;
@@ -59,6 +71,69 @@ export const PALETTES: PaletteMeta[] = [
     accentColor: '#BE123C',
     lightBg: '#FAFAF9',
     darkBg: '#141210',
+  },
+  {
+    id: 'staradmin',
+    name: 'StarAdmin Sunset',
+    tagline: 'Warm Peach & Deep Charcoal',
+    primaryColor: '#F29F67',
+    accentColor: '#E04F5F',
+    lightBg: '#FAF8F5',
+    darkBg: '#161622',
+  },
+  {
+    id: 'skydash',
+    name: 'Skydash Royal',
+    tagline: 'Imperial Indigo & Soft Sky',
+    primaryColor: '#4B49AC',
+    accentColor: '#EB575D',
+    lightBg: '#F8F9FE',
+    darkBg: '#0E0E1F',
+  },
+  {
+    id: 'stellar',
+    name: 'Stellar Obsidian',
+    tagline: 'Neon Emerald & Midnight Obsidian',
+    primaryColor: '#38CE3C',
+    accentColor: '#FF4D6B',
+    lightBg: '#F8FAFC',
+    darkBg: '#0F0F17',
+  },
+  {
+    id: 'azia',
+    name: 'Azia Orchid',
+    tagline: 'Deep Orchid & Classic Blue',
+    primaryColor: '#6F42C1',
+    accentColor: '#00CCCC',
+    lightBg: '#F8FAFC',
+    darkBg: '#0C0A14',
+  },
+  {
+    id: 'justdo',
+    name: 'JustDo Marigold',
+    tagline: 'Vibrant Marigold & Electric Blue',
+    primaryColor: '#F5A623',
+    accentColor: '#248AFD',
+    lightBg: '#FAFBFD',
+    darkBg: '#0C1017',
+  },
+  {
+    id: 'plusadmin',
+    name: 'Plusadmin Cobalt',
+    tagline: 'Fintech Cobalt & Neon Raspberry',
+    primaryColor: '#1A55E3',
+    accentColor: '#FF0854',
+    lightBg: '#F8FAFC',
+    darkBg: '#080B14',
+  },
+  {
+    id: 'breeze',
+    name: 'Breeze Twilight',
+    tagline: 'Deep Twilight & Vivid Turquoise',
+    primaryColor: '#423A8E',
+    accentColor: '#00CCCD',
+    lightBg: '#F7F8FC',
+    darkBg: '#0B0916',
   },
 ];
 
