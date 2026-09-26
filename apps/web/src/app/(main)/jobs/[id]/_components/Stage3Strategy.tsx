@@ -44,6 +44,8 @@ export function Stage3Strategy({
           }
           ctaLabel={hasAnalysis ? 'Formulate Strategy Now' : undefined}
           onCta={hasAnalysis ? onRun : undefined}
+          isRunning={isRunning}
+          loadingMessage="Formulating strategic positioning and bullet point angles..."
         />
       ) : (
         <div className="space-y-4">

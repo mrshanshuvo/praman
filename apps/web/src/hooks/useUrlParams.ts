@@ -51,18 +51,23 @@ function updateBrowserUrl({
   // No-op guard: skip history manipulation if the search parameters have not changed
   if (currentSearch === nextSearch) return;
 
-  if (history === 'push') {
-    window.history.pushState(null, '', nextUrl);
-  } else {
-    window.history.replaceState(null, '', nextUrl);
-  }
+  // Defer history manipulation and popstate dispatch out of the synchronous React render cycle.
+  // This prevents React's "Cannot update a component (`Router`) while rendering a different component" error
+  // when state setters or initializations trigger URL synchronization.
+  queueMicrotask(() => {
+    if (history === 'push') {
+      window.history.pushState(null, '', nextUrl);
+    } else {
+      window.history.replaceState(null, '', nextUrl);
+    }
 
-  // Dispatch PopStateEvent so Next.js App Router and all hook instances update in sync
-  try {
-    window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
-  } catch {
-    window.dispatchEvent(new Event('popstate'));
-  }
+    // Dispatch PopStateEvent so Next.js App Router and all hook instances update in sync
+    try {
+      window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
+    } catch {
+      window.dispatchEvent(new Event('popstate'));
+    }
+  });
 }
 
 export interface UseUrlTabOptions<T extends string> {
@@ -133,20 +138,24 @@ export function useUrlTab<T extends string>({
       setActiveTabState((prev) => {
         const resolved =
           typeof newTabOrFn === 'function' ? (newTabOrFn as (prev: T) => T)(prev) : newTabOrFn;
-        const valid = getValidTab(resolved);
+        return getValidTab(resolved);
+      });
 
-        updateBrowserUrl({
-          key: paramName,
-          value: valid,
-          defaultValue,
-          omitDefault,
-          history,
-        });
-
-        return valid;
+      // Update URL outside the setState reducer function
+      const resolved =
+        typeof newTabOrFn === 'function'
+          ? (newTabOrFn as (prev: T) => T)(activeTab)
+          : newTabOrFn;
+      const valid = getValidTab(resolved);
+      updateBrowserUrl({
+        key: paramName,
+        value: valid,
+        defaultValue,
+        omitDefault,
+        history,
       });
     },
-    [paramName, defaultValue, omitDefault, history, getValidTab],
+    [activeTab, paramName, defaultValue, omitDefault, history, getValidTab],
   );
 
   // Sync state when URL searchParams change via Next.js router transitions
@@ -240,20 +249,19 @@ export function useUrlQueryParam<T extends string>(
           typeof newValueOrFn === 'function'
             ? (newValueOrFn as (prev: T | undefined) => T | undefined)(prev)
             : newValueOrFn;
-        const valid = resolved !== undefined ? getValidValue(resolved) : defaultValue;
+        return resolved !== undefined ? getValidValue(resolved) : defaultValue;
+      });
 
-        if (debounceMs > 0) {
-          if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-          debounceTimerRef.current = setTimeout(() => {
-            updateBrowserUrl({
-              key,
-              value: valid,
-              defaultValue,
-              omitDefault,
-              history,
-            });
-          }, debounceMs);
-        } else {
+      // Update URL outside the setState reducer function
+      const resolved =
+        typeof newValueOrFn === 'function'
+          ? (newValueOrFn as (prev: T | undefined) => T | undefined)(value)
+          : newValueOrFn;
+      const valid = resolved !== undefined ? getValidValue(resolved) : defaultValue;
+
+      if (debounceMs > 0) {
+        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = setTimeout(() => {
           updateBrowserUrl({
             key,
             value: valid,
@@ -261,12 +269,18 @@ export function useUrlQueryParam<T extends string>(
             omitDefault,
             history,
           });
-        }
-
-        return valid;
-      });
+        }, debounceMs);
+      } else {
+        updateBrowserUrl({
+          key,
+          value: valid,
+          defaultValue,
+          omitDefault,
+          history,
+        });
+      }
     },
-    [key, defaultValue, omitDefault, history, debounceMs, getValidValue],
+    [value, key, defaultValue, omitDefault, history, debounceMs, getValidValue],
   );
 
   // Clean up debounce timer on unmount
