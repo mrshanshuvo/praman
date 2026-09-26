@@ -72,6 +72,14 @@ export const UpdateJobStatusDtoSchema = z.object({
 });
 export type UpdateJobStatusDto = z.infer<typeof UpdateJobStatusDtoSchema>;
 
+export const UpdateJobMetaDtoSchema = z.object({
+  jobTitle: z.string().min(1).optional(),
+  company: z.string().nullable().optional(),
+  rawText: z.string().min(10).optional(),
+  reanalyze: z.boolean().optional(),
+});
+export type UpdateJobMetaDto = z.infer<typeof UpdateJobMetaDtoSchema>;
+
 export const InterviewStageEnum = z.enum([
   'SCREENING',
   'TECHNICAL',
