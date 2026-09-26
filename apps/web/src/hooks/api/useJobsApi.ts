@@ -3,6 +3,7 @@ import type {
   JobDescriptionRecord,
   JobTelemetrySummary,
   PaginationMeta,
+  UpdateJobMetaDto,
   UserAiUsageSummary,
 } from '@praman/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -181,6 +182,47 @@ export function useUpdateJobStatus() {
     },
     onSettled: (_, __, variables) => {
       // 6. Resync with backend
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(variables.id) });
+    },
+  });
+}
+
+export function useUpdateJobMeta() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateJobMetaDto }) =>
+      fetcher<JobDescriptionRecord>(`${API_URL}/job-descriptions/${id}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: (updatedJob, variables) => {
+      queryClient.setQueryData<JobDescriptionRecord>(
+        queryKeys.jobs.detail(variables.id),
+        updatedJob,
+      );
+
+      queryClient.setQueriesData<JobListData>({ queryKey: queryKeys.jobs.lists() }, (oldData) => {
+        if (!oldData) return oldData;
+
+        if ('items' in oldData && Array.isArray(oldData.items)) {
+          return {
+            ...oldData,
+            items: oldData.items.map((job) =>
+              job.id === variables.id ? { ...job, ...updatedJob } : job,
+            ),
+          };
+        }
+
+        if (Array.isArray(oldData)) {
+          return oldData.map((job) => (job.id === variables.id ? { ...job, ...updatedJob } : job));
+        }
+
+        return oldData;
+      });
+
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(variables.id) });
     },
