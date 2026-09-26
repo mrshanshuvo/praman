@@ -1,7 +1,7 @@
 'use client';
 
 import type { JobDescriptionRecord } from '@praman/schemas';
-import { AlertCircle, AlertTriangle } from 'lucide-react';
+import { AlertCircle, AlertTriangle, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
@@ -74,31 +74,40 @@ export default function NewJobPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+      {/* Navigation & Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-4 mb-2">
+          <button
+            type="button"
+            onClick={() => router.push('/jobs')}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            <span>Back to Applications</span>
+          </button>
           <Badge
             variant="outline"
-            className="text-brand-cyan bg-brand-cyan/10 border-brand-cyan/30 text-xs font-mono"
+            className="text-primary bg-primary/10 border-primary/25 text-2xs font-mono px-2 py-0.5"
           >
             STAGE 1 • DETERMINISTIC EXTRACTION
           </Badge>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
           Target Job Description Ingestion
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
           Paste the target job posting. Our AI extractor decomposes it into verified structured
-          schema requirements (mandatory skills, responsibilities, seniority, work mode).
+          schema requirements (mandatory skills, responsibilities, seniority, and work mode).
         </p>
       </div>
 
       {duplicateInfo && (
-        <Card className="mb-6 p-5 border-warning/40 bg-warning/10 backdrop-blur-md">
+        <Card className="mb-6 p-5 border-amber-500/40 bg-amber-500/10 backdrop-blur-md rounded-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-semibold text-foreground">
                   Duplicate Job Description Detected
@@ -120,7 +129,7 @@ export default function NewJobPage() {
                 <Button
                   size="sm"
                   onClick={() => router.push(`/jobs/${duplicateInfo.id}`)}
-                  className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark text-xs font-medium cursor-pointer"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium cursor-pointer"
                 >
                   View Existing Analysis
                 </Button>
@@ -142,10 +151,10 @@ export default function NewJobPage() {
       {error && !duplicateInfo && (
         <Alert
           variant="destructive"
-          className="mb-6 flex items-center gap-2 border-brand-pink/40 bg-brand-pink/10 text-brand-pink"
+          className="mb-6 flex items-center gap-2 border-destructive/40 bg-destructive/10 text-destructive rounded-xl"
         >
-          <AlertCircle className="w-4 h-4 text-brand-pink shrink-0" />
-          <AlertDescription className="text-xs text-brand-pink">{error}</AlertDescription>
+          <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
+          <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
 
