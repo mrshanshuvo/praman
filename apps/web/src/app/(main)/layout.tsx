@@ -1,11 +1,18 @@
 import type React from 'react';
 import { AppSidebar } from '@/components/AppSidebar';
+import { TopBar } from '@/components/TopBar';
+import { SidebarProvider } from '@/providers/SidebarProvider';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen flex flex-col md:flex-row overflow-hidden bg-background">
-      <AppSidebar />
-      <main className="flex-1 overflow-y-auto min-h-0 bg-background">{children}</main>
-    </div>
+    <SidebarProvider>
+      <div className="h-screen flex flex-col md:flex-row overflow-hidden bg-background">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+          <TopBar />
+          <main className="flex-1 overflow-y-auto min-h-0 bg-background">{children}</main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }

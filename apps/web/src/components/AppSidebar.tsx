@@ -5,25 +5,21 @@ import {
   Briefcase,
   ChevronRight,
   LayoutDashboard,
-  LogOut,
-  Menu,
   PanelLeftClose,
   PanelLeftOpen,
   PlusCircle,
   User,
-  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useAuth } from '@/providers/AuthProvider';
+import { useSidebar } from '@/providers/SidebarProvider';
 
 interface NavItem {
   href: string;
@@ -34,8 +30,9 @@ interface NavItem {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { user, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { data: rawJobs, isLoading: isJobsLoading } = useJobs({ enabled: isAuthenticated });
+  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
 
   // Defensively extract jobs array across array payloads or paginated { items: [] } shapes
   const jobs: JobDescriptionRecord[] = React.useMemo(() => {
@@ -48,9 +45,6 @@ export function AppSidebar() {
     }
     return [];
   }, [rawJobs]);
-
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   // Captured after mount so Date.now() is never called during render
   const [now, setNow] = useState<number | null>(null);
@@ -73,8 +67,7 @@ export function AppSidebar() {
     { href: '/profile', label: 'Candidate Profile', icon: User },
   ];
 
-  const recentJobs = jobs.slice(0, 3);
-  const initials = user?.name ? user.name.slice(0, 1) : user?.email?.slice(0, 1) || 'U';
+  const recentJobs = jobs.slice(0, 4);
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card/90 backdrop-blur-md border-r border-border select-none">
@@ -246,116 +239,27 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Bottom User Profile Section */}
-      <div
-        className={`border-t border-border ${
-          isCollapsed ? 'p-2 py-3 flex flex-col items-center gap-2.5' : 'p-3 space-y-2.5'
-        }`}
-      >
-        {isAuthLoading ? (
-          isCollapsed ? (
-            <div className="flex flex-col items-center gap-2.5">
-              <Skeleton className="size-9 rounded-full bg-muted/60" />
-              <Skeleton className="size-9 rounded-xl bg-muted/40" />
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2.5">
-                <Skeleton className="size-8 rounded-full bg-muted/60 shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <Skeleton className="h-3 w-3/4 rounded bg-muted/60" />
-                  <Skeleton className="h-2 w-1/2 rounded bg-muted/40" />
-                </div>
-              </div>
-              <div className="flex items-center justify-between pt-1.5 border-t border-border/40">
-                <Skeleton className="h-5 w-16 rounded bg-muted/40" />
-                <Skeleton className="h-6 w-16 rounded bg-muted/40" />
-              </div>
-            </div>
-          )
-        ) : isCollapsed ? (
-          <>
-            <div
-              className="relative group cursor-pointer"
-              title={user ? `${user.name || 'User'} (${user.email})` : 'Guest'}
-            >
-              <Avatar size="sm" className="size-9 shrink-0 ring-1 ring-border">
-                <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-xs font-bold text-brand-dark uppercase">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            <div
-              className="size-9 flex items-center justify-center rounded-xl hover:bg-muted/60 transition-colors"
-              title="Toggle Theme"
-            >
-              <ThemeToggle side="right" align="end" />
-            </div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => logout()}
-              className="size-9 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center gap-2.5 overflow-hidden">
-              <Avatar size="sm" className="size-8 shrink-0">
-                <AvatarFallback className="bg-linear-to-tr from-brand-cyan to-brand-pink text-xs font-bold text-brand-dark uppercase">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="truncate flex-1 min-w-0">
-                <p className="text-xs font-semibold text-foreground truncate leading-tight">
-                  {user?.name || user?.email?.split('@')[0]}
-                </p>
-                <p className="text-2xs text-muted-foreground truncate mt-0.5">{user?.email}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-1.5 border-t border-border/40">
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <ThemeToggle side="top" align="start" />
-                <span className="text-2xs font-medium text-muted-foreground">Theme</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => logout()}
-                className="h-7 px-2 text-2xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex items-center gap-1.5 cursor-pointer"
-                title="Sign Out"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
-              </Button>
-            </div>
-          </>
-        )}
+      {/* Bottom Status Footer */}
+      <div className="border-t border-border/60 p-2.5">
+        <div
+          className={`flex items-center text-2xs text-muted-foreground ${
+            isCollapsed ? 'justify-center' : 'justify-between px-1'
+          }`}
+        >
+          {!isCollapsed && (
+            <span className="font-mono text-muted-foreground/70">Praman v0.2.1</span>
+          )}
+          <div className="flex items-center gap-1.5" title="Truth Engine Status: Active">
+            <span className="size-1.5 rounded-full bg-success animate-pulse shrink-0" />
+            {!isCollapsed && <span className="text-[11px] font-medium text-success">Verified</span>}
+          </div>
+        </div>
       </div>
     </div>
   );
 
   return (
     <>
-      {/* Mobile Top Bar */}
-      <div className="md:hidden h-14 border-b border-border bg-card/90 backdrop-blur-md px-4 flex items-center justify-between sticky top-0 z-40">
-        <BrandLogo href="/dashboard" size="sm" />
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="p-1.5 h-8 w-8"
-        >
-          {isMobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-        </Button>
-      </div>
-
       {/* Mobile Drawer Overlay */}
       {isMobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex">

@@ -6,7 +6,6 @@ import { useAuth } from '@/providers/AuthProvider';
 import {
   ActionCenterCard,
   AiUsageCard,
-  DashboardHeader,
   PipelineFunnelCard,
   QuickIngestModal,
   RecentActivityFeed,
@@ -27,13 +26,7 @@ export default function DashboardPage() {
       : [];
 
   return (
-    <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-8">
-      <DashboardHeader
-        totalJobs={jobs.length}
-        candidateName={profile?.personal?.name}
-        onOpenQuickIngest={() => setIsQuickIngestOpen(true)}
-      />
-
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* 1. Prioritized Action Center: Urgent interviews, untailored high-match positions, stale follow-ups */}
       <ActionCenterCard jobs={jobs} onOpenQuickIngest={() => setIsQuickIngestOpen(true)} />
 
