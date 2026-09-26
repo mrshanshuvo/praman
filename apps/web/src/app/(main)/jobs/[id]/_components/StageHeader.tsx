@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 interface StageHeaderProps {
   title: string;
   subtitle: string;
-  runLabel: string;
+  runLabel?: string;
   rerunLabel: string;
   hasResult: boolean;
   isRunning: boolean;
@@ -17,7 +17,6 @@ interface StageHeaderProps {
 export function StageHeader({
   title,
   subtitle,
-  runLabel,
   rerunLabel,
   hasResult,
   isRunning,
@@ -31,19 +30,21 @@ export function StageHeader({
         <p className="text-xs text-muted-foreground">{subtitle}</p>
       </div>
 
-      <Button
-        size="sm"
-        onClick={onRun}
-        disabled={isDisabled}
-        className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20"
-      >
-        {isRunning ? (
-          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-        ) : (
-          <Play className="w-3.5 h-3.5 fill-brand-dark" />
-        )}
-        <span>{hasResult ? rerunLabel : runLabel}</span>
-      </Button>
+      {hasResult && (
+        <Button
+          size="sm"
+          onClick={onRun}
+          disabled={isDisabled || isRunning}
+          className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20 cursor-pointer"
+        >
+          {isRunning ? (
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Play className="w-3.5 h-3.5 fill-brand-dark" />
+          )}
+          <span>{rerunLabel}</span>
+        </Button>
+      )}
     </div>
   );
 }
