@@ -63,10 +63,6 @@ export function TopBar() {
     } else if (pathname === '/jobs') {
       crumbs.push({ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard });
       crumbs.push({ label: 'Applications', icon: Briefcase });
-    } else if (pathname === '/jobs/new') {
-      crumbs.push({ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard });
-      crumbs.push({ label: 'Applications', href: '/jobs', icon: Briefcase });
-      crumbs.push({ label: 'New Pipeline', icon: Plus });
     } else if (pathname.startsWith('/jobs/')) {
       crumbs.push({ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard });
       crumbs.push({ label: 'Applications', href: '/jobs', icon: Briefcase });

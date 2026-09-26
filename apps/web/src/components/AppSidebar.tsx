@@ -77,7 +77,7 @@ export function AppSidebar() {
           const isActive =
             pathname === item.href ||
             (item.href === '/jobs'
-              ? pathname?.startsWith('/jobs') && pathname !== '/jobs/new'
+              ? pathname?.startsWith('/jobs')
               : item.href !== '/dashboard' && pathname?.startsWith(item.href));
 
           return (
