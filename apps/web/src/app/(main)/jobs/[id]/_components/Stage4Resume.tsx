@@ -73,19 +73,21 @@ export function Stage4Resume({
             </Link>
           )}
 
-          <Button
-            size="sm"
-            onClick={onRun}
-            disabled={isDisabled || !hasStrategy}
-            className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20 flex-1 sm:flex-initial"
-          >
-            {isRunning ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Play className="w-3.5 h-3.5 fill-brand-dark" />
-            )}
-            <span>{resumeJson ? 'Regenerate Resume' : 'Run Stage 4'}</span>
-          </Button>
+          {resumeJson && (
+            <Button
+              size="sm"
+              onClick={onRun}
+              disabled={isDisabled || !hasStrategy || isRunning}
+              className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20 flex-1 sm:flex-initial cursor-pointer"
+            >
+              {isRunning ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Play className="w-3.5 h-3.5 fill-brand-dark" />
+              )}
+              <span>Regenerate Resume</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -98,6 +100,8 @@ export function Stage4Resume({
           }
           ctaLabel={hasStrategy ? 'Generate & Validate Resume Now' : undefined}
           onCta={hasStrategy ? onRun : undefined}
+          isRunning={isRunning}
+          loadingMessage="Generating tailored resume, compiling LaTeX, and verifying evidence..."
         />
       ) : (
         <Tabs

@@ -52,6 +52,8 @@ export function Stage2Match({
           message="Match analysis has not been executed yet for this job description."
           ctaLabel="Run Candidate Matcher Now"
           onCta={onRun}
+          isRunning={isRunning}
+          loadingMessage="Analyzing candidate profile against job description..."
         />
       ) : (
         <div className="space-y-5">

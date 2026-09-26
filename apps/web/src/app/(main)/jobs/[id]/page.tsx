@@ -254,7 +254,10 @@ function JobDetailContent() {
               <Stage2Match
                 analysis={analysis}
                 structured={structured}
-                isRunning={isStreaming || runStageMutation.isPending}
+                isRunning={
+                  stageStatuses.match === 'running' ||
+                  (runStageMutation.isPending && runStageMutation.variables === 'match')
+                }
                 isDisabled={isAnyStageRunning}
                 onRun={() => runStage('match')}
               />
@@ -263,7 +266,10 @@ function JobDetailContent() {
               <Stage3Strategy
                 strategy={strategy}
                 hasAnalysis={!!analysis}
-                isRunning={isStreaming || runStageMutation.isPending}
+                isRunning={
+                  stageStatuses.strategy === 'running' ||
+                  (runStageMutation.isPending && runStageMutation.variables === 'strategy')
+                }
                 isDisabled={isAnyStageRunning}
                 onRun={() => runStage('strategy')}
               />
@@ -276,7 +282,10 @@ function JobDetailContent() {
                 resumeStatus={resumeStatus}
                 resumeRecord={resumeRecord}
                 hasStrategy={!!strategy}
-                isRunning={isStreaming || runStageMutation.isPending}
+                isRunning={
+                  stageStatuses.resume === 'running' ||
+                  (runStageMutation.isPending && runStageMutation.variables === 'resume')
+                }
                 isDisabled={isAnyStageRunning}
                 onRun={() => runStage('resume')}
               />
