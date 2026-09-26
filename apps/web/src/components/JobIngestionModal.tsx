@@ -134,7 +134,7 @@ export function JobIngestionModal({ isOpen, onClose, defaultText }: JobIngestion
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => (!open ? handleClose() : null)}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] w-full flex flex-col bg-card border-border shadow-2xl p-6 rounded-2xl overflow-hidden">
+      <DialogContent className="sm:max-w-3xl md:max-w-4xl max-h-[85vh] w-full flex flex-col bg-card border-border shadow-2xl p-6 rounded-2xl overflow-hidden">
         <DialogHeader className="pb-3 border-b border-border/60 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
@@ -309,7 +309,7 @@ export function JobIngestionModal({ isOpen, onClose, defaultText }: JobIngestion
                     }
                   }}
                   placeholder="Paste the target job description here (responsibilities, technical skills, requirements)..."
-                  className="w-full flex-1 min-h-[220px] max-h-[46vh] bg-background/50 border-border/80 rounded-xl p-3.5 text-xs text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-none overflow-y-auto"
+                  className="w-full flex-1 min-h-55 max-h-[46vh] bg-background/50 border-border/80 rounded-xl p-3.5 text-xs text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-none overflow-y-auto"
                 />
               </div>
             </div>
