@@ -209,4 +209,156 @@ describe('JobDescriptionService', () => {
       expect(createMock).toHaveBeenCalled();
     });
   });
+
+  describe('updateMeta', () => {
+    it('throws NotFoundException if job description is not found', async () => {
+      mockPrisma.client.orm.public.JobDescription.where.mockReturnValue({
+        first: vi.fn().mockResolvedValue(null),
+      });
+
+      await expect(service.updateMeta('non-existent', { jobTitle: 'New Title' })).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('throws NotFoundException if job description belongs to another user', async () => {
+      mockPrisma.client.orm.public.JobDescription.where.mockReturnValue({
+        first: vi.fn().mockResolvedValue({ id: 'jd-1', userId: 'user-other' }),
+      });
+
+      await expect(
+        service.updateMeta('jd-1', { jobTitle: 'New Title' }, 'user-owner'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('updates jobTitle and company in structured and returns updated JD', async () => {
+      const mockJd = {
+        id: 'jd-1',
+        userId: 'user-1',
+        rawText: 'Original raw text description',
+        structured: {
+          jobTitle: 'Old Title',
+          company: 'Old Company',
+          requiredSkills: ['TypeScript'],
+        },
+      };
+
+      const updateMock = vi.fn().mockResolvedValue({});
+
+      mockPrisma.client.orm.public.JobDescription.where.mockImplementation(() => {
+        return {
+          first: vi.fn().mockResolvedValue(mockJd),
+          update: updateMock,
+          include: () => ({
+            first: vi.fn().mockResolvedValue({
+              ...mockJd,
+              structured: {
+                ...mockJd.structured,
+                jobTitle: 'Lead Engineer',
+                company: 'Acme Corp',
+              },
+            }),
+          }),
+        };
+      });
+
+      const updated = await service.updateMeta(
+        'jd-1',
+        { jobTitle: 'Lead Engineer', company: 'Acme Corp' },
+        'user-1',
+      );
+
+      expect(updateMock).toHaveBeenCalledWith({
+        structured: {
+          jobTitle: 'Lead Engineer',
+          company: 'Acme Corp',
+          requiredSkills: ['TypeScript'],
+        },
+      });
+      expect(updated.id).toBe('jd-1');
+    });
+
+    it('updates rawText when provided', async () => {
+      const mockJd = {
+        id: 'jd-1',
+        userId: 'user-1',
+        rawText: 'Original text',
+        structured: { jobTitle: 'Engineer' },
+      };
+
+      const updateMock = vi.fn().mockResolvedValue({});
+
+      mockPrisma.client.orm.public.JobDescription.where.mockImplementation(() => ({
+        first: vi.fn().mockResolvedValue(mockJd),
+        update: updateMock,
+        include: () => ({
+          first: vi.fn().mockResolvedValue({
+            ...mockJd,
+            rawText: 'Updated raw text here with enough length',
+          }),
+        }),
+      }));
+
+      await service.updateMeta(
+        'jd-1',
+        { rawText: 'Updated raw text here with enough length' },
+        'user-1',
+      );
+
+      expect(updateMock).toHaveBeenCalledWith({
+        rawText: 'Updated raw text here with enough length',
+      });
+    });
+
+    it('re-analyzes JD using AI when reanalyze is true', async () => {
+      const mockJd = {
+        id: 'jd-1',
+        userId: 'user-1',
+        rawText: 'Old raw text',
+        structured: { jobTitle: 'Old Title', requiredSkills: ['Java'] },
+      };
+
+      const reanalyzedData = {
+        jobTitle: 'AI Extracted Title',
+        company: 'AI Extracted Company',
+        requiredSkills: ['Rust', 'Distributed Systems'],
+      };
+
+      mockAiService.runStructuredCall.mockResolvedValue(reanalyzedData);
+
+      const updateMock = vi.fn().mockResolvedValue({});
+
+      mockPrisma.client.orm.public.JobDescription.where.mockImplementation(() => ({
+        first: vi.fn().mockResolvedValue(mockJd),
+        update: updateMock,
+        include: () => ({
+          first: vi.fn().mockResolvedValue({
+            ...mockJd,
+            rawText: 'New raw text for re-analysis',
+            structured: reanalyzedData,
+          }),
+        }),
+      }));
+
+      const updated = await service.updateMeta(
+        'jd-1',
+        { rawText: 'New raw text for re-analysis', reanalyze: true },
+        'user-1',
+      );
+
+      expect(mockAiService.runStructuredCall).toHaveBeenCalled();
+      expect(updateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rawText: 'New raw text for re-analysis',
+          structured: expect.objectContaining({
+            jobTitle: 'AI Extracted Title',
+            requiredSkills: ['Rust', 'Distributed Systems'],
+          }),
+        }),
+      );
+      expect(updated.id).toBe('jd-1');
+    });
+  });
 });
+
+

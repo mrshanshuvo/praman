@@ -12,6 +12,7 @@ import type {
   PaginationQueryDto,
   StructuredJd,
   UpdateApplicationTrackerDto,
+  UpdateJobMetaDto,
   UserAiUsageSummary,
 } from '@praman/schemas';
 import { StructuredJdSchema } from '@praman/schemas';
@@ -165,11 +166,7 @@ export class JobDescriptionService {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    // Truncate heavy rawText for list and board cards (preserves preview snippet while slimming payload >95%)
-    const items = jds.map((jd: any) => ({
-      ...jd,
-      rawText: jd.rawText ? jd.rawText.slice(0, 250) : '',
-    }));
+    const items = jds;
 
     // If no query parameters provided at all, return raw array for legacy callers
     if (!query) {
@@ -292,6 +289,104 @@ export class JobDescriptionService {
     });
 
     return updated;
+  }
+
+  async updateMeta(id: string, dto: UpdateJobMetaDto, targetUserId?: string) {
+    const jd = await this.prisma.client.orm.public.JobDescription.where({ id }).first();
+
+    if (!jd) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    if (targetUserId && jd.userId !== targetUserId) {
+      throw new NotFoundException(`Job description with ID ${id} not found`);
+    }
+
+    const updatePayload: Record<string, any> = {};
+
+    if (dto.rawText !== undefined) {
+      updatePayload.rawText = dto.rawText;
+    }
+
+    if (dto.reanalyze) {
+      const textToAnalyze = dto.rawText ?? jd.rawText;
+      const callResult =
+        typeof this.aiService.runStructuredCallWithTelemetry === 'function'
+          ? await this.aiService.runStructuredCallWithTelemetry<StructuredJd>({
+              systemPrompt: JD_ANALYZER_SYSTEM_PROMPT_V1,
+              userPrompt: JSON.stringify({ rawText: textToAnalyze }),
+              outputSchema: StructuredJdSchema,
+              schemaName: 'StructuredJd',
+            })
+          : {
+              data: await this.aiService.runStructuredCall<StructuredJd>({
+                systemPrompt: JD_ANALYZER_SYSTEM_PROMPT_V1,
+                userPrompt: JSON.stringify({ rawText: textToAnalyze }),
+                outputSchema: StructuredJdSchema,
+                schemaName: 'StructuredJd',
+              }),
+              telemetry: {
+                model: 'default',
+                promptTokens: 0,
+                completionTokens: 0,
+                totalTokens: 0,
+                durationMs: 0,
+                costUsd: 0,
+              },
+            };
+
+      const structured = { ...callResult.data } as Record<string, any>;
+
+      // Respect user's explicit title or company overrides if supplied
+      if (dto.jobTitle !== undefined) {
+        structured.jobTitle = dto.jobTitle;
+      }
+      if (dto.company !== undefined) {
+        structured.company = dto.company;
+      }
+
+      updatePayload.structured = structured;
+      updatePayload.aiModel = callResult.telemetry.model;
+      updatePayload.promptTokens = callResult.telemetry.promptTokens;
+      updatePayload.completionTokens = callResult.telemetry.completionTokens;
+      updatePayload.durationMs = callResult.telemetry.durationMs;
+      updatePayload.costUsd = callResult.telemetry.costUsd;
+
+      if (this.prisma.client.orm.public.AiGenerationLog?.create) {
+        await this.prisma.client.orm.public.AiGenerationLog.create({
+          userId: jd.userId,
+          jobDescriptionId: jd.id,
+          stage: 'structuring',
+          model: callResult.telemetry.model,
+          promptTokens: callResult.telemetry.promptTokens,
+          completionTokens: callResult.telemetry.completionTokens,
+          totalTokens: callResult.telemetry.totalTokens,
+          durationMs: callResult.telemetry.durationMs,
+          costUsd: callResult.telemetry.costUsd,
+        });
+      }
+    } else if (dto.jobTitle !== undefined || dto.company !== undefined) {
+      const existingStructured = (
+        jd.structured && typeof jd.structured === 'object'
+          ? { ...jd.structured }
+          : {}
+      ) as Record<string, any>;
+
+      if (dto.jobTitle !== undefined) {
+        existingStructured.jobTitle = dto.jobTitle;
+      }
+      if (dto.company !== undefined) {
+        existingStructured.company = dto.company;
+      }
+
+      updatePayload.structured = existingStructured;
+    }
+
+    if (Object.keys(updatePayload).length > 0) {
+      await this.prisma.client.orm.public.JobDescription.where({ id }).update(updatePayload);
+    }
+
+    return this.getJdById(id);
   }
 
   private ensureTracker(jd: any): ApplicationTracker {

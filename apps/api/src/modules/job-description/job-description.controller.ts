@@ -11,6 +11,8 @@ import {
   PaginationQuerySchema,
   type UpdateApplicationTrackerDto,
   UpdateApplicationTrackerDtoSchema,
+  type UpdateJobMetaDto,
+  UpdateJobMetaDtoSchema,
   type UpdateJobStatusDto,
   UpdateJobStatusDtoSchema,
   type UpdateMilestoneDto,
@@ -102,6 +104,19 @@ export class JobDescriptionController {
     @CurrentUser() user?: AuthUser,
   ) {
     return this.jdService.updateStatus(id, dto.status, user?.id);
+  }
+
+  @Patch(':id/meta')
+  @ApiOperation({ summary: 'Update job description metadata (title, company, rawText)' })
+  @ApiResponse({ status: 200, description: 'Job metadata updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid metadata provided' })
+  @ApiResponse({ status: 404, description: 'Job description not found' })
+  async updateMeta(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateJobMetaDtoSchema)) dto: UpdateJobMetaDto,
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.jdService.updateMeta(id, dto, user?.id);
   }
 
   // --- Tracker & Milestones Endpoints ---
