@@ -145,9 +145,48 @@ function JobsListContent() {
     return filteredAndSortedJds.slice(startIndex, startIndex + pageSize);
   }, [filteredAndSortedJds, validPage, pageSize, viewMode]);
 
+  if (error) {
+    return (
+      <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
+        <Alert
+          variant="destructive"
+          className="mb-6 flex items-center justify-between border-brand-pink/40 bg-brand-pink/10 text-brand-pink"
+        >
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-brand-pink shrink-0" />
+            <AlertDescription className="text-xs text-brand-pink">{error}</AlertDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="text-xs border-brand-pink/40 text-brand-pink hover:bg-brand-pink/20 hover:text-brand-light shrink-0"
+          >
+            Retry
+          </Button>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
+        {viewMode === 'board' ? <JobsKanbanSkeleton /> : <JobsListSkeleton />}
+      </div>
+    );
+  }
+
+  if (jds.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-6 w-full">
+        <JobsEmptyState />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
-      {/* Filter, Sort & View Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         {/* Status Tabs (List View) or Pipeline Helper (Board View) */}
         {viewMode === 'list' ? (
@@ -280,37 +319,8 @@ function JobsListContent() {
         </div>
       </div>
 
-      {/* Error state with retry */}
-      {error && (
-        <Alert
-          variant="destructive"
-          className="mb-6 flex items-center justify-between border-brand-pink/40 bg-brand-pink/10 text-brand-pink"
-        >
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-brand-pink shrink-0" />
-            <AlertDescription className="text-xs text-brand-pink">{error}</AlertDescription>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            className="text-xs border-brand-pink/40 text-brand-pink hover:bg-brand-pink/20 hover:text-brand-light shrink-0"
-          >
-            Retry
-          </Button>
-        </Alert>
-      )}
-
-      {/* Loading state: Zero-CLS Skeleton matching active view mode */}
-      {loading ? (
-        viewMode === 'board' ? (
-          <JobsKanbanSkeleton />
-        ) : (
-          <JobsListSkeleton />
-        )
-      ) : jds.length === 0 ? (
-        <JobsEmptyState />
-      ) : filteredAndSortedJds.length === 0 ? (
+      {/* Filtered empty state (jobs exist in DB, but filter/search matched 0) */}
+      {filteredAndSortedJds.length === 0 ? (
         <div className="p-12 text-center border border-dashed border-border rounded-xl bg-card/40">
           <Filter className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
           <p className="text-sm text-muted-foreground">

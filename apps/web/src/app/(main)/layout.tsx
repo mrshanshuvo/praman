@@ -10,7 +10,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
           <TopBar />
-          <main className="flex-1 overflow-y-auto min-h-0 bg-background">{children}</main>
+          <main className="flex-1 overflow-y-auto min-h-0 bg-background flex flex-col">
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>
