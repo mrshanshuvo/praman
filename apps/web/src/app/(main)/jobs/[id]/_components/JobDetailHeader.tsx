@@ -1,7 +1,9 @@
 'use client';
 
-import { Play, RefreshCw, Square } from 'lucide-react';
-import React from 'react';
+import type { JobDescriptionRecord } from '@praman/schemas';
+import { Building2, Pencil, Play, RefreshCw, Square } from 'lucide-react';
+import React, { useState } from 'react';
+import { EditJobMetaModal } from '@/components/EditJobMetaModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,8 +11,10 @@ import { AiTelemetryInspector } from './AiTelemetryInspector';
 
 interface JobDetailHeaderProps {
   id: string;
+  jd?: JobDescriptionRecord | null;
   structured?: {
     jobTitle?: string | null;
+    company?: string | null;
     seniority?: string | null;
     locationOrWorkMode?: string | null;
     yearsOfExperience?: string | null;
@@ -28,12 +32,14 @@ interface JobDetailHeaderProps {
 
 export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
   id,
+  jd,
   structured,
   telemetry,
   isStreaming,
   onRunPipeline,
   onCancelStream,
 }) => {
+  const [isEditOpen, setIsEditOpen] = useState(false);
   return (
     <Card className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 border-border bg-card/80 backdrop-blur-md">
       <div>
@@ -56,13 +62,29 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-1.5">
-          {structured?.seniority && <span>Level: {structured.seniority}</span>}
+          {structured?.company && (
+            <span className="font-semibold text-foreground flex items-center gap-1">
+              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
+              {structured.company}
+            </span>
+          )}
+          {structured?.seniority && <span>{structured.company ? '•' : ''} Level: {structured.seniority}</span>}
           {structured?.locationOrWorkMode && <span>• {structured.locationOrWorkMode}</span>}
           {structured?.yearsOfExperience && <span>• {structured.yearsOfExperience}</span>}
         </div>
       </div>
 
       <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setIsEditOpen(true)}
+          className="border-border hover:bg-muted text-foreground gap-1.5 cursor-pointer text-xs w-full sm:w-auto"
+        >
+          <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+          <span>Edit Info</span>
+        </Button>
+
         {isStreaming ? (
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button
@@ -97,6 +119,14 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
           </Button>
         )}
       </div>
+
+      {jd && (
+        <EditJobMetaModal
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          jd={jd}
+        />
+      )}
     </Card>
   );
 };

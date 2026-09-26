@@ -2,11 +2,13 @@
 
 import type { JobDescriptionRecord } from '@praman/schemas';
 import {
+  Building2,
   CheckCircle2,
   ChevronRight,
   Clock,
   FileText,
   Loader2,
+  Pencil,
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
@@ -14,6 +16,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
+import { EditJobMetaModal } from '@/components/EditJobMetaModal';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -49,6 +52,7 @@ interface JobCardProps {
 
 export function JobCard({ jd }: JobCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const structured = jd.structured || {};
   const analysis = jd.analysis;
   const matchData = analysis?.result;
@@ -124,6 +128,13 @@ export function JobCard({ jd }: JobCardProps) {
                 </option>
               </select>
             </div>
+
+            {structured.company && (
+              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5 bg-muted/60 px-2.5 py-0.5 rounded-full border border-border">
+                <Building2 className="w-3 h-3 text-muted-foreground" />
+                <span>{structured.company}</span>
+              </span>
+            )}
 
             {structured.seniority && (
               <Badge
@@ -293,6 +304,20 @@ export function JobCard({ jd }: JobCardProps) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              setIsEditDialogOpen(true);
+            }}
+            title="Edit Job Information"
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setIsDeleteDialogOpen(true);
             }}
             disabled={deleteJobMutation.isPending}
@@ -307,6 +332,12 @@ export function JobCard({ jd }: JobCardProps) {
           </Button>
         </div>
       </div>
+
+      <EditJobMetaModal
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        jd={jd}
+      />
 
       <ConfirmDeleteDialog
         open={isDeleteDialogOpen}

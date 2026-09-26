@@ -9,6 +9,7 @@ import {
   FileCode,
   GripVertical,
   Loader2,
+  Pencil,
   Trash2,
   Trophy,
   UserCheck,
@@ -17,6 +18,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
+import { EditJobMetaModal } from '@/components/EditJobMetaModal';
 import { MatchScoreBadge } from '@/components/MatchScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -96,6 +98,7 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const [updatingJobId, setUpdatingJobId] = useState<string | null>(null);
   const [deletingJob, setDeletingJob] = useState<{ id: string; title: string } | null>(null);
+  const [editingJob, setEditingJob] = useState<JobDescriptionRecord | null>(null);
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData('text/plain', id);
@@ -419,6 +422,19 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
+                              setEditingJob(jd);
+                            }}
+                            className="w-7 h-7 rounded border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border cursor-pointer transition-colors"
+                            title="Edit job information"
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               setDeletingJob({ id: jd.id, title });
                             }}
                             disabled={deleteJobMutation.isPending}
@@ -444,6 +460,12 @@ export function JobsKanbanBoard({ jobs }: JobsKanbanBoardProps) {
         itemTitle={deletingJob?.title}
         isDeleting={deleteJobMutation.isPending}
         onConfirm={handleConfirmDelete}
+      />
+
+      <EditJobMetaModal
+        open={!!editingJob}
+        onOpenChange={(open) => !open && setEditingJob(null)}
+        jd={editingJob}
       />
     </div>
   );

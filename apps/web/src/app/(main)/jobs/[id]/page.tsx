@@ -158,6 +158,7 @@ function JobDetailContent() {
     <div className="w-full px-6 sm:px-8 lg:px-10 py-8 space-y-6">
       <JobDetailHeader
         id={id}
+        jd={jd}
         structured={structured}
         telemetry={jobTelemetry}
         isStreaming={isStreaming}
