@@ -1,0 +1,444 @@
+/* =============================================================================
+   PRAMAN THEME PRESETS: 5 Production-Ready 16-Color Palettes
+   Each theme provides 8 Light-Mode tokens (:root) + 8 Dark-Mode tokens (.dark).
+   
+   HOW TO SWITCH THEMES:
+   Simply copy the :root and .dark variable values from any preset below and 
+   paste them into apps/web/src/app/globals.css lines 163-242 and lines 247-318.
+   Next.js hot reload will immediately apply the new theme across all pages!
+   ============================================================================= */
+
+/* =============================================================================
+   PRESET 1: "Enterprise Modern" (The Bootstrap / Modern SaaS Suite)
+   Vibe: Corporate, reliable, clean, high-authority (Atlassian / Salesforce style).
+   ============================================================================= */
+
+/* --- Preset 1: Light Mode --- */
+/*
+:root {
+  --background: #fbfbfb;
+  --foreground: #332d2d;
+  --card: #ffffff;
+  --card-foreground: #332d2d;
+  --popover: #ffffff;
+  --popover-foreground: #332d2d;
+
+  --primary: #3b71ca;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #332d2d;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #6c757d;
+  --accent: #eef2ff;
+  --accent-foreground: #3b71ca;
+
+  --success: #14a44d;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #0284c7;
+  --info-foreground: #ffffff;
+  --destructive: #dc4c64;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #6d28d9;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #3b71ca;
+
+  --brand-cyan: #3b71ca;
+  --brand-pink: #dc4c64;
+  --brand-dark: #332d2d;
+  --brand-light: #fbfbfb;
+}
+*/
+
+/* --- Preset 1: Dark Mode --- */
+/*
+.dark {
+  --background: #181515;
+  --foreground: #fbfbfb;
+  --card: #262222;
+  --card-foreground: #fbfbfb;
+  --popover: #262222;
+  --popover-foreground: #fbfbfb;
+
+  --primary: #5c93e8;
+  --primary-foreground: #181515;
+  --secondary: #332d2d;
+  --secondary-foreground: #fbfbfb;
+
+  --muted: #332d2d;
+  --muted-foreground: #9fa6b2;
+  --accent: #2c2525;
+  --accent-foreground: #5c93e8;
+
+  --success: #2ecc71;
+  --success-foreground: #181515;
+  --warning: #fbbf24;
+  --warning-foreground: #181515;
+  --info: #54b4d3;
+  --info-foreground: #181515;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #a78bfa;
+
+  --border: rgba(251, 251, 251, 0.12);
+  --input: rgba(251, 251, 251, 0.15);
+  --ring: #5c93e8;
+
+  --brand-cyan: #5c93e8;
+  --brand-pink: #f87171;
+  --brand-dark: #181515;
+  --brand-light: #fbfbfb;
+}
+*/
+
+/* =============================================================================
+   PRESET 2: "Cyber Obsidian" (Praman's Current Signature AI / Terminal Aesthetic)
+   Vibe: High-tech, futuristic proof-of-work, neon contrast, developer terminal.
+   ============================================================================= */
+
+/* --- Preset 2: Light Mode --- */
+/*
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #08d9d6;
+  --primary-foreground: #0f172a;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #fff1f4;
+  --accent-foreground: #ff2e63;
+
+  --success: #047857;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #1d4ed8;
+  --info-foreground: #ffffff;
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #6d28d9;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #ff2e63;
+
+  --brand-cyan: #08d9d6;
+  --brand-pink: #ff2e63;
+  --brand-dark: #090b10;
+  --brand-light: #ffffff;
+}
+*/
+
+/* --- Preset 2: Dark Mode --- */
+/*
+.dark {
+  --background: #090b10;
+  --foreground: #f1f5f9;
+  --card: #121620;
+  --card-foreground: #f1f5f9;
+  --popover: #121620;
+  --popover-foreground: #f1f5f9;
+
+  --primary: #08d9d6;
+  --primary-foreground: #090b10;
+  --secondary: #191f2c;
+  --secondary-foreground: #f1f5f9;
+
+  --muted: #191f2c;
+  --muted-foreground: #94a3b8;
+  --accent: #191f2c;
+  --accent-foreground: #08d9d6;
+
+  --success: #34d399;
+  --success-foreground: #090b10;
+  --warning: #fbbf24;
+  --warning-foreground: #090b10;
+  --info: #60a5fa;
+  --info-foreground: #090b10;
+  --destructive: #ff2e63;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #a78bfa;
+
+  --border: rgba(241, 245, 249, 0.09);
+  --input: rgba(241, 245, 249, 0.12);
+  --ring: #08d9d6;
+
+  --brand-cyan: #08d9d6;
+  --brand-pink: #ff2e63;
+  --brand-dark: #090b10;
+  --brand-light: #ffffff;
+}
+*/
+
+/* =============================================================================
+   PRESET 3: "Linear Stealth / Raycast Indigo" (Modern Developer Tool)
+   Vibe: Ultra-sleek, minimalist, high density, premium product engineer feel.
+   ============================================================================= */
+
+/* --- Preset 3: Light Mode --- */
+/*
+:root {
+  --background: #fafafa;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+
+  --primary: #5e6ad2;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f5f3ff;
+  --accent-foreground: #5e6ad2;
+
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #0284c7;
+  --info-foreground: #ffffff;
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #7c3aed;
+
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #5e6ad2;
+
+  --brand-cyan: #5e6ad2;
+  --brand-pink: #e11d48;
+  --brand-dark: #18181b;
+  --brand-light: #fafafa;
+}
+*/
+
+/* --- Preset 3: Dark Mode --- */
+/*
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #141417;
+  --card-foreground: #fafafa;
+  --popover: #141417;
+  --popover-foreground: #fafafa;
+
+  --primary: #818cf8;
+  --primary-foreground: #09090b;
+  --secondary: #222227;
+  --secondary-foreground: #fafafa;
+
+  --muted: #222227;
+  --muted-foreground: #a1a1aa;
+  --accent: #1e1b4b;
+  --accent-foreground: #818cf8;
+
+  --success: #10b981;
+  --success-foreground: #09090b;
+  --warning: #f59e0b;
+  --warning-foreground: #09090b;
+  --info: #38bdf8;
+  --info-foreground: #09090b;
+  --destructive: #fb7185;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #c084fc;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #818cf8;
+
+  --brand-cyan: #818cf8;
+  --brand-pink: #fb7185;
+  --brand-dark: #09090b;
+  --brand-light: #fafafa;
+}
+*/
+
+/* =============================================================================
+   PRESET 4: "Deep Oceanic / Tech Titan" (Stripe & Deep Abyssal Navy)
+   Vibe: High trust, institutional intelligence, deep blue oceanic focus.
+   ============================================================================= */
+
+/* --- Preset 4: Light Mode --- */
+/*
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #0284c7;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f9ff;
+  --secondary-foreground: #0369a1;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e0f2fe;
+  --accent-foreground: #0284c7;
+
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #4f46e5;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0284c7;
+
+  --brand-cyan: #0284c7;
+  --brand-pink: #f43f5e;
+  --brand-dark: #0f172a;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* --- Preset 4: Dark Mode --- */
+/*
+.dark {
+  --background: #080d1a;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+
+  --primary: #38bdf8;
+  --primary-foreground: #080d1a;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #0c4a6e;
+  --accent-foreground: #38bdf8;
+
+  --success: #4ade80;
+  --success-foreground: #080d1a;
+  --warning: #fb923c;
+  --warning-foreground: #080d1a;
+  --info: #60a5fa;
+  --info-foreground: #080d1a;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #818cf8;
+
+  --border: rgba(248, 250, 252, 0.08);
+  --input: rgba(248, 250, 252, 0.12);
+  --ring: #38bdf8;
+
+  --brand-cyan: #38bdf8;
+  --brand-pink: #fb7185;
+  --brand-dark: #080d1a;
+  --brand-light: #f8fafc;
+}
+*/
+
+/* =============================================================================
+   PRESET 5: "Warm Editorial / Notion Stone" (Calm, Fatigue-Free Focus)
+   Vibe: Organic, intellectual, warm paper, low eyestrain during long analysis.
+   ============================================================================= */
+
+/* --- Preset 5: Light Mode --- */
+/*
+:root {
+  --background: #fafaf9;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+
+  --primary: #b45309;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f4;
+  --secondary-foreground: #1c1917;
+
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --accent: #fef3c7;
+  --accent-foreground: #b45309;
+
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #0369a1;
+  --info-foreground: #ffffff;
+  --destructive: #be123c;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #6b21a8;
+
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --ring: #b45309;
+
+  --brand-cyan: #b45309;
+  --brand-pink: #be123c;
+  --brand-dark: #1c1917;
+  --brand-light: #fafaf9;
+}
+*/
+
+/* --- Preset 5: Dark Mode --- */
+/*
+.dark {
+  --background: #141210;
+  --foreground: #fafaf9;
+  --card: #1c1917;
+  --card-foreground: #fafaf9;
+  --popover: #1c1917;
+  --popover-foreground: #fafaf9;
+
+  --primary: #fbbf24;
+  --primary-foreground: #141210;
+  --secondary: #292524;
+  --secondary-foreground: #fafaf9;
+
+  --muted: #292524;
+  --muted-foreground: #a8a29e;
+  --accent: #451a03;
+  --accent-foreground: #fbbf24;
+
+  --success: #4ade80;
+  --success-foreground: #141210;
+  --warning: #fcd34d;
+  --warning-foreground: #141210;
+  --info: #38bdf8;
+  --info-foreground: #141210;
+  --destructive: #fb7185;
+  --destructive-foreground: #ffffff;
+  --status-neutral: #c084fc;
+
+  --border: rgba(250, 250, 249, 0.08);
+  --input: rgba(250, 250, 249, 0.12);
+  --ring: #fbbf24;
+
+  --brand-cyan: #fbbf24;
+  --brand-pink: #fb7185;
+  --brand-dark: #141210;
+  --brand-light: #fafaf9;
+}
+*/

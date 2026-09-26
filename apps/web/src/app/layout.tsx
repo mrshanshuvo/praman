@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { PaletteProvider } from '@/providers/PaletteProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 
 const inter = Inter({
@@ -71,15 +72,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${inter.variable} ${jetbrainsMono.variable} ${galada.variable} ${berkshireSwash.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Anti-FOUC palette pre-hydration script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var p=localStorage.getItem('praman-palette')||'enterprise';document.documentElement.dataset.palette=p;}catch(e){}})();",
+          }}
+        />
+      </head>
       <body
         suppressHydrationWarning
         className="min-h-full flex flex-col bg-background text-foreground font-sans selection:bg-brand-cyan/30 selection:text-brand-cyan transition-colors duration-150"
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <QueryProvider>
-            <AuthProvider>{children}</AuthProvider>
-            <Toaster richColors position="bottom-right" />
-          </QueryProvider>
+          <PaletteProvider>
+            <QueryProvider>
+              <AuthProvider>{children}</AuthProvider>
+              <Toaster richColors position="bottom-right" />
+            </QueryProvider>
+          </PaletteProvider>
         </ThemeProvider>
       </body>
     </html>

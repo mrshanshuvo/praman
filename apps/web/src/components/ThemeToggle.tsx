@@ -1,47 +1,17 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { ThemePalettePicker } from '@/components/ThemePalettePicker';
 
-export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+interface ThemeToggleProps {
+  align?: 'start' | 'center' | 'end';
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  className?: string;
+}
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        className="w-8 h-8 rounded-lg border border-border bg-card/40 text-muted-foreground"
-        aria-label="Toggle theme"
-      >
-        <div className="w-4 h-4" />
-      </Button>
-    );
-  }
-
-  const isDark = (resolvedTheme || theme) === 'dark';
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="w-8 h-8 rounded-lg border border-border bg-card/60 hover:bg-accent hover:text-accent-foreground text-foreground transition-all duration-200"
-      title={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
-      aria-label="Toggle theme"
-    >
-      {isDark ? (
-        <Sun className="w-4 h-4 text-brand-cyan transition-transform duration-300 hover:rotate-45" />
-      ) : (
-        <Moon className="w-4 h-4 text-brand-dark transition-transform duration-300 hover:-rotate-12" />
-      )}
-    </Button>
-  );
+/**
+ * Backward-compatible ThemeToggle component now backed by the Dynamic Theme Engine.
+ * Provides both 5-palette selection and Light/Dark/Auto mode switching.
+ */
+export function ThemeToggle({ align = 'end', side = 'top', className }: ThemeToggleProps) {
+  return <ThemePalettePicker align={align} side={side} className={className} />;
 }

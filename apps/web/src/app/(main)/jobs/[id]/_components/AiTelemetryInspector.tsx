@@ -54,17 +54,17 @@ const STAGE_CONFIG: Record<
   resume: {
     label: 'Resume Generation',
     icon: FileCode2,
-    color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    color: 'text-success bg-success/10 border-success/20',
   },
   cover_letter: {
     label: 'Cover Letter Outreach',
     icon: FileCheck,
-    color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+    color: 'text-info bg-info/10 border-info/20',
   },
   recruiter_email: {
     label: 'Recruiter Outreach',
     icon: Mail,
-    color: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
+    color: 'text-status-neutral bg-status-neutral/10 border-status-neutral/20',
   },
 };
 
@@ -100,7 +100,7 @@ export function AiTelemetryInspector({
         </span>
         <span className="text-muted-foreground">tkns</span>
         <span className="text-border">•</span>
-        <span className="text-emerald-400 font-medium">
+        <span className="text-success font-medium">
           ${totalCostUsd > 0 ? totalCostUsd.toFixed(4) : '0.0000'}
         </span>
       </Button>
@@ -144,10 +144,10 @@ export function AiTelemetryInspector({
 
             <div className="p-3 rounded-xl bg-muted/40 border border-border/70 space-y-1">
               <div className="flex items-center gap-1.5 text-2xs text-muted-foreground">
-                <Coins className="w-3.5 h-3.5 text-emerald-400" />
+                <Coins className="w-3.5 h-3.5 text-success" />
                 <span>LLM Cost</span>
               </div>
-              <div className="text-base sm:text-lg font-bold font-mono text-emerald-400">
+              <div className="text-base sm:text-lg font-bold font-mono text-success">
                 ${totalCostUsd.toFixed(4)}
               </div>
               <div className="text-2xs text-muted-foreground font-mono">USD estimated</div>
@@ -258,7 +258,7 @@ export function AiTelemetryInspector({
                         </div>
 
                         <div className="text-right min-w-15">
-                          <div className="text-xs font-bold text-emerald-400">
+                          <div className="text-xs font-bold text-success">
                             ${stage.costUsd.toFixed(4)}
                           </div>
                           <div className="text-2xs text-muted-foreground">USD</div>

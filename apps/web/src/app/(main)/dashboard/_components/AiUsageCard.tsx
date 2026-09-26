@@ -38,8 +38,8 @@ export const AiUsageCard: React.FC = () => {
     { key: 'structuring', label: 'Structuring', color: 'bg-brand-cyan' },
     { key: 'match', label: 'Matching', color: 'bg-brand-yellow' },
     { key: 'strategy', label: 'Strategy', color: 'bg-brand-pink' },
-    { key: 'resume', label: 'Resume', color: 'bg-emerald-400' },
-    { key: 'cover_letter', label: 'Outreach', color: 'bg-indigo-400' },
+    { key: 'resume', label: 'Resume', color: 'bg-success' },
+    { key: 'cover_letter', label: 'Outreach', color: 'bg-info' },
   ];
 
   return (
@@ -84,7 +84,7 @@ export const AiUsageCard: React.FC = () => {
 
           <div className="w-full h-2.5 rounded-full bg-muted overflow-hidden border border-border/60">
             <div
-              className="h-full bg-linear-to-r from-brand-cyan via-brand-yellow to-emerald-400 transition-all duration-500 rounded-full"
+              className="h-full bg-linear-to-r from-primary via-warning to-success transition-all duration-500 rounded-full"
               style={{ width: `${Math.max(2, Math.min(100, quotaUsedPercentage))}%` }}
             />
           </div>
@@ -101,10 +101,10 @@ export const AiUsageCard: React.FC = () => {
         <div className="grid grid-cols-3 gap-3">
           <div className="p-3 rounded-xl bg-muted/20 border border-border/60 space-y-0.5">
             <div className="flex items-center gap-1 text-2xs text-muted-foreground">
-              <Coins className="w-3 h-3 text-emerald-400" />
+              <Coins className="w-3 h-3 text-success" />
               <span>Total Cost</span>
             </div>
-            <div className="text-sm sm:text-base font-bold font-mono text-emerald-400">
+            <div className="text-sm sm:text-base font-bold font-mono text-success">
               ${totalCostUsd.toFixed(4)}
             </div>
             <div className="text-3xs text-muted-foreground font-mono">USD tracked</div>

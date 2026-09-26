@@ -196,10 +196,10 @@ export function AppSidebar() {
 
                   const statusColor: Record<string, string> = {
                     SAVED: 'bg-muted-foreground/60',
-                    APPLIED: 'bg-brand-cyan',
-                    INTERVIEWING: 'bg-yellow-400',
-                    OFFER: 'bg-green-400',
-                    REJECTED: 'bg-brand-pink',
+                    APPLIED: 'bg-primary',
+                    INTERVIEWING: 'bg-warning',
+                    OFFER: 'bg-success',
+                    REJECTED: 'bg-destructive',
                   };
 
                   return (
@@ -290,7 +290,7 @@ export function AppSidebar() {
               className="size-9 flex items-center justify-center rounded-xl hover:bg-muted/60 transition-colors"
               title="Toggle Theme"
             >
-              <ThemeToggle />
+              <ThemeToggle side="right" align="end" />
             </div>
 
             <Button
@@ -321,7 +321,7 @@ export function AppSidebar() {
 
             <div className="flex items-center justify-between pt-1.5 border-t border-border/40">
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <ThemeToggle />
+                <ThemeToggle side="top" align="start" />
                 <span className="text-2xs font-medium text-muted-foreground">Theme</span>
               </div>
               <Button

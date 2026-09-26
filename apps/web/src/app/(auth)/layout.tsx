@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Home</span>
         </Link>
-        <ThemeToggle />
+        <ThemeToggle side="bottom" align="end" />
       </header>
 
       {/* Centered Auth Card Container */}

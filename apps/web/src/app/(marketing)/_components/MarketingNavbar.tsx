@@ -16,7 +16,7 @@ export function MarketingNavbar() {
         <BrandLogo href={isAuthenticated ? '/dashboard' : '/'} size="md" />
 
         <div className="flex items-center gap-3">
-          <ThemeToggle />
+          <ThemeToggle side="bottom" align="end" />
 
           {isAuthenticated ? (
             <Link
