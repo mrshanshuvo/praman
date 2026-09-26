@@ -309,7 +309,7 @@ export function JobIngestionModal({ isOpen, onClose, defaultText }: JobIngestion
                   }
                 }}
                 placeholder="Paste the target job description here (responsibilities, technical skills, requirements)..."
-                className="w-full bg-background/50 border-border/80 rounded-xl p-3 text-xs text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-none min-h-[220px]"
+                className="w-full bg-background/50 border-border/80 rounded-xl p-3 text-xs text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-none min-h-55"
               />
             </div>
 
