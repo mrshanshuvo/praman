@@ -1,21 +1,12 @@
 'use client';
 
 import type { JobDescriptionRecord } from '@praman/schemas';
-import {
-  Briefcase,
-  ChevronRight,
-  LayoutDashboard,
-  PanelLeftClose,
-  PanelLeftOpen,
-  PlusCircle,
-  User,
-} from 'lucide-react';
+import { Briefcase, ChevronRight, LayoutDashboard, PlusCircle, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useAuth } from '@/providers/AuthProvider';
@@ -32,7 +23,7 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { data: rawJobs, isLoading: isJobsLoading } = useJobs({ enabled: isAuthenticated });
-  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
+  const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
 
   // Defensively extract jobs array across array payloads or paginated { items: [] } shapes
   const jobs: JobDescriptionRecord[] = React.useMemo(() => {
@@ -73,36 +64,11 @@ export function AppSidebar() {
     <div className="flex flex-col h-full bg-card/90 backdrop-blur-md border-r border-border select-none">
       {/* Brand Header */}
       <div
-        className={`h-16 flex items-center border-b border-border ${
-          isCollapsed ? 'justify-center px-1' : 'justify-between px-3.5'
+        className={`h-14 flex items-center border-b border-border ${
+          isCollapsed ? 'justify-center px-1' : 'px-4'
         }`}
       >
-        {isCollapsed ? (
-          <button
-            type="button"
-            onClick={() => setIsCollapsed(false)}
-            className="size-10 flex items-center justify-center rounded-xl hover:bg-muted/60 transition-colors group cursor-pointer relative"
-            title="Expand sidebar"
-          >
-            <div className="group-hover:opacity-0 transition-opacity">
-              <BrandLogo href={null} size="sm" showText={false} />
-            </div>
-            <PanelLeftOpen className="w-5 h-5 text-foreground absolute opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
-        ) : (
-          <>
-            <BrandLogo href="/dashboard" size="md" showText={true} />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsCollapsed(true)}
-              className="hidden md:flex p-1.5 h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
-              title="Collapse sidebar"
-            >
-              <PanelLeftClose className="w-4 h-4" />
-            </Button>
-          </>
-        )}
+        <BrandLogo href="/dashboard" size={isCollapsed ? 'sm' : 'md'} showText={!isCollapsed} />
       </div>
 
       {/* Main Nav Items */}
