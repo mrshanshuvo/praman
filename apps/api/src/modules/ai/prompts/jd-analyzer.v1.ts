@@ -11,6 +11,7 @@ HARD CONSTRAINTS:
 OUTPUT SCHEMA (JSON):
 {
   "jobTitle": string,
+  "company": string (optional, hiring company or organization name if specified),
   "seniority": string (optional, e.g. "Junior", "Mid", "Senior", "Lead"),
   "requiredSkills": string[] (mandatory core skills),
   "preferredSkills": string[] (bonus or preferred skills),
