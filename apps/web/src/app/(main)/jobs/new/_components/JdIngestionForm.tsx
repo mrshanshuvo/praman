@@ -1,16 +1,15 @@
 'use client';
 
 import {
-  ArrowRight,
   BookOpen,
   CheckCircle2,
   ClipboardPaste,
+  FileCheck2,
   FileText,
   Lightbulb,
   RefreshCw,
   Sparkles,
   Trash2,
-  Zap,
 } from 'lucide-react';
 import type React from 'react';
 import { useRef, useState } from 'react';
@@ -25,102 +24,12 @@ interface JdIngestionFormProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const SAMPLE_ROLES = [
-  {
-    id: 'fullstack',
-    title: 'Senior Full-Stack Engineer',
-    tags: ['Next.js', 'TypeScript', 'PostgreSQL'],
-    content: `Title: Senior Full-Stack Engineer
-Company: CloudScale AI
-Location: Remote (US / Global)
-Employment Type: Full-time
-Salary: $140,000 - $185,000 + Equity
-
-About the Role:
-We are looking for a Senior Full-Stack Engineer to architect and build our next-generation developer platform. You will work across modern web technologies, scalable backend services, and real-time data pipelines.
-
-Key Responsibilities:
-- Architect and develop high-performance web applications using Next.js, React, and TypeScript.
-- Design scalable REST and GraphQL APIs backed by PostgreSQL and Prisma ORM.
-- Optimize database queries, caching strategies (Redis), and background task queues.
-- Collaborate closely with product managers and designers to translate product vision into production-ready software.
-- Establish automated testing (unit, integration, and E2E) with Vitest and Playwright.
-
-Required Qualifications:
-- 5+ years of software engineering experience building web applications at scale.
-- Deep expertise in TypeScript, React, and Node.js ecosystems.
-- Strong proficiency in relational databases (PostgreSQL) and schema modeling.
-- Solid understanding of distributed systems, authentication, and RESTful API architecture.
-- Demonstrated ownership of end-to-end features from conception to production deployment.
-
-Preferred Qualifications:
-- Experience with Docker, Kubernetes, and AWS infrastructure.
-- Familiarity with TailwindCSS, Biome, and monorepo tooling (pnpm, Turborepo).
-- Previous background working at a fast-moving, venture-backed startup.`,
-  },
-  {
-    id: 'ai-ml',
-    title: 'AI Platform Engineer',
-    tags: ['Python', 'FastAPI', 'RAG / Vector DB'],
-    content: `Title: AI Platform & Infrastructure Engineer
-Company: Nexus Intelligence
-Location: Remote / Hybrid
-Employment Type: Full-time
-Salary: $160,000 - $210,000 + Stock Options
-
-About the Role:
-Nexus Intelligence is building enterprise generative AI orchestration systems. We are seeking an AI Platform Engineer to build scalable model serving infrastructure, evaluation frameworks, and retrieval-augmented generation (RAG) pipelines.
-
-Key Responsibilities:
-- Build high-throughput LLM inference pipelines, prompt caching layers, and vector retrieval pipelines.
-- Implement evaluation benchmarks to monitor model drift, hallucination rates, and latency.
-- Integrate vector databases (Pinecone, pgvector, Qdrant) with high-dimensional embedding search.
-- Design secure, multi-tenant API gateways connecting frontends to foundation models.
-- Deploy and manage containerized AI workloads on cloud clusters using Docker and Kubernetes.
-
-Required Qualifications:
-- 4+ years of experience with Python, FastAPI, and asynchronous backend development.
-- Hands-on experience developing with LLM APIs (OpenAI, Anthropic, Gemini) and embedding models.
-- Practical knowledge of vector search, embedding indexing, and RAG architectures.
-- Experience with PostgreSQL, Redis, and message brokers (Kafka or RabbitMQ).
-- Strong computer science fundamentals in algorithms, data structures, and system design.
-
-Preferred Qualifications:
-- Experience with PyTorch, vLLM, or model fine-tuning techniques (LoRA/QLoRA).
-- Background in high-scale ML pipelines or data engineering.
-- Contributions to open-source AI or developer tooling projects.`,
-  },
-  {
-    id: 'frontend',
-    title: 'Lead Frontend Architect',
-    tags: ['React 19', 'Design Systems', 'Performance'],
-    content: `Title: Lead Frontend Architect
-Company: Pulse Studio
-Location: Remote
-Employment Type: Full-time
-Salary: $150,000 - $195,000
-
-About the Role:
-Pulse Studio is seeking a Lead Frontend Architect to spearhead our web architecture, design system engineering, and frontend performance standards across multiple enterprise SaaS products.
-
-Key Responsibilities:
-- Lead the architectural vision for our Next.js and React 19 web applications.
-- Build and maintain our shared Design System token architecture and accessible UI component library.
-- Drive web performance optimization (Core Web Vitals, zero-layout-shift hydration, code splitting).
-- Mentor engineering teams on best practices for state management, accessibility (a11y), and responsive design.
-- Define CI/CD pipelines, code quality standards, and automated visual regression testing.
-
-Required Qualifications:
-- 7+ years of experience specializing in frontend web application development.
-- Master-level understanding of modern JavaScript/TypeScript, HTML5, and CSS architecture.
-- In-depth experience with React 19, Next.js App Router, and server components.
-- Proven track record of designing and scaling enterprise component libraries.
-- Strong passion for micro-animations, UX micro-interactions, and visual polish.
-
-Preferred Qualifications:
-- Experience with WebSockets, real-time collaboration, or Canvas/WebGL.
-- Familiarity with TailwindCSS, Radix UI, and modern build tooling.`,
-  },
+const EXTRACTED_FIELDS = [
+  { label: 'Job Title & Seniority', desc: 'Normalized title and seniority level' },
+  { label: 'Mandatory Skills', desc: 'Must-have hard requirements' },
+  { label: 'Bonus / Preferred Skills', desc: 'Nice-to-have qualifications' },
+  { label: 'Key Responsibilities', desc: 'Core day-to-day deliverables' },
+  { label: 'Work Mode & Location', desc: 'Remote, Hybrid, or On-site status' },
 ];
 
 export function JdIngestionForm({
@@ -221,7 +130,7 @@ export function JdIngestionForm({
                 }
               }}
               placeholder="Paste the target job description here...&#10;&#10;Tip: Include role summary, responsibilities, required technical skills, qualifications, and company details for optimal analysis results."
-              className="w-full bg-background/50 border-border/80 rounded-xl p-4 text-xs sm:text-sm text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed min-h-[340px] resize-y"
+              className="w-full bg-background/50 border-border/80 rounded-xl p-4 text-xs sm:text-sm text-foreground font-mono focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary leading-relaxed min-h-85 resize-y"
             />
 
             {/* Editor Footer / Stats Bar */}
@@ -273,48 +182,8 @@ export function JdIngestionForm({
         </form>
       </div>
 
-      {/* Right Column: AI Pipeline Guide & Sample Presets (4 cols on lg) */}
+      {/* Right Column: AI Pipeline Guide & Schema Inspector (4 cols on lg) */}
       <div className="lg:col-span-4 space-y-5">
-        {/* Sample Roles Selector */}
-        <Card className="border-border bg-card/60 p-5 backdrop-blur-md rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              <span>Load Sample JD</span>
-            </h3>
-            <span className="text-2xs text-muted-foreground">1-Click Test</span>
-          </div>
-
-          <div className="space-y-2">
-            {SAMPLE_ROLES.map((role) => (
-              <button
-                key={role.id}
-                type="button"
-                onClick={() => onTextChange(role.content)}
-                disabled={loading}
-                className="w-full text-left p-3 rounded-xl border border-border/70 bg-card hover:bg-muted/80 hover:border-primary/40 transition-all cursor-pointer group"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {role.title}
-                  </span>
-                  <ArrowRight className="w-3 h-3 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all opacity-0 group-hover:opacity-100" />
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {role.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-2xs font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </button>
-            ))}
-          </div>
-        </Card>
-
         {/* Pipeline Execution Stages */}
         <Card className="border-border bg-card/60 p-5 backdrop-blur-md rounded-2xl shadow-sm space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
@@ -362,6 +231,29 @@ export function JdIngestionForm({
                 </span>
               </div>
             </div>
+          </div>
+        </Card>
+
+        {/* What Gets Extracted */}
+        <Card className="border-border bg-card/60 p-5 backdrop-blur-md rounded-2xl shadow-sm space-y-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <FileCheck2 className="w-3.5 h-3.5 text-primary" />
+            <span>Extracted Schema Elements</span>
+          </h3>
+
+          <div className="space-y-2">
+            {EXTRACTED_FIELDS.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-start gap-2.5 p-2 rounded-lg bg-card/80 border border-border/40 text-xs"
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                <div>
+                  <span className="font-medium text-foreground block">{item.label}</span>
+                  <span className="text-2xs text-muted-foreground">{item.desc}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
 
