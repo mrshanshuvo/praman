@@ -68,7 +68,11 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
               {structured.company}
             </span>
           )}
-          {structured?.seniority && <span>{structured.company ? '•' : ''} Level: {structured.seniority}</span>}
+          {structured?.seniority && (
+            <span>
+              {structured.company ? '•' : ''} Level: {structured.seniority}
+            </span>
+          )}
           {structured?.locationOrWorkMode && <span>• {structured.locationOrWorkMode}</span>}
           {structured?.yearsOfExperience && <span>• {structured.yearsOfExperience}</span>}
         </div>
@@ -120,13 +124,7 @@ export const JobDetailHeader: React.FC<JobDetailHeaderProps> = ({
         )}
       </div>
 
-      {jd && (
-        <EditJobMetaModal
-          open={isEditOpen}
-          onOpenChange={setIsEditOpen}
-          jd={jd}
-        />
-      )}
+      {jd && <EditJobMetaModal open={isEditOpen} onOpenChange={setIsEditOpen} jd={jd} />}
     </Card>
   );
 };

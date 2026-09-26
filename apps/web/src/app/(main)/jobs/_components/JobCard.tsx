@@ -333,11 +333,7 @@ export function JobCard({ jd }: JobCardProps) {
         </div>
       </div>
 
-      <EditJobMetaModal
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        jd={jd}
-      />
+      <EditJobMetaModal open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} jd={jd} />
 
       <ConfirmDeleteDialog
         open={isDeleteDialogOpen}

@@ -10,7 +10,6 @@ import {
   LayoutGrid,
   List,
   PlusCircle,
-
   Search,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -71,12 +70,7 @@ function JobsListSkeleton() {
 }
 
 function JobsListContent() {
-  const {
-    data: rawJds,
-    isLoading: loading,
-    error: fetchError,
-    refetch,
-  } = useJobs({ all: true });
+  const { data: rawJds, isLoading: loading, error: fetchError, refetch } = useJobs({ all: true });
   const error = fetchError ? (fetchError as Error).message : null;
 
   // Defensively normalize: API may return a raw array OR a paginated { items, meta } object

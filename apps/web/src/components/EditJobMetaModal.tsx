@@ -28,7 +28,10 @@ interface FormInnerProps {
   onClose: () => void;
 }
 
-function extractCompany(structuredCompany?: string | null, rawText?: string | null): { value: string; isAutoDetected: boolean } {
+function extractCompany(
+  structuredCompany?: string | null,
+  rawText?: string | null,
+): { value: string; isAutoDetected: boolean } {
   if (structuredCompany?.trim()) {
     return { value: structuredCompany.trim(), isAutoDetected: false };
   }
@@ -78,9 +81,7 @@ function EditJobMetaForm({ jd, onClose }: FormInnerProps) {
         },
       });
       toast.success(
-        willReanalyze
-          ? 'Job details updated & re-analyzed with AI'
-          : 'Job details updated',
+        willReanalyze ? 'Job details updated & re-analyzed with AI' : 'Job details updated',
       );
       onClose();
     } catch (err: unknown) {
@@ -105,7 +106,10 @@ function EditJobMetaForm({ jd, onClose }: FormInnerProps) {
     >
       <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3.5">
         <div className="space-y-1.5">
-          <label htmlFor="edit-job-title" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+          <label
+            htmlFor="edit-job-title"
+            className="text-xs font-semibold text-foreground flex items-center gap-1.5"
+          >
             <Pencil className="w-3.5 h-3.5 text-brand-cyan" />
             Job Title <span className="text-destructive">*</span>
           </label>
@@ -121,7 +125,10 @@ function EditJobMetaForm({ jd, onClose }: FormInnerProps) {
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="edit-company-name" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+            <label
+              htmlFor="edit-company-name"
+              className="text-xs font-semibold text-foreground flex items-center gap-1.5"
+            >
               <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
               Company Name
             </label>
@@ -185,7 +192,8 @@ function EditJobMetaForm({ jd, onClose }: FormInnerProps) {
                       <span>Re-analyze structured requirements with AI</span>
                     </div>
                     <p className="text-[11px] text-muted-foreground leading-normal">
-                      Automatically extracts updated skills, responsibilities, and seniority tier from the new text.
+                      Automatically extracts updated skills, responsibilities, and seniority tier
+                      from the new text.
                     </p>
                   </div>
                 </label>
@@ -252,15 +260,12 @@ function EditJobMetaContainer({
           Edit Job Information
         </DialogTitle>
         <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-          Update the title, company, or job description details. Changes reflect across your tracker and resumes.
+          Update the title, company, or job description details. Changes reflect across your tracker
+          and resumes.
         </DialogDescription>
       </DialogHeader>
 
-      <EditJobMetaForm
-        key={`${jd.id}-${jd.rawText?.length || 0}`}
-        jd={jd}
-        onClose={onClose}
-      />
+      <EditJobMetaForm key={`${jd.id}-${jd.rawText?.length || 0}`} jd={jd} onClose={onClose} />
     </DialogContent>
   );
 }

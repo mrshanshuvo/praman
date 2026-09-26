@@ -32,12 +32,7 @@ const VALID_PROFILE_TABS: ProfileTabId[] = [
 ];
 
 function ProfileContent() {
-  const {
-    data: profile,
-    isLoading: loading,
-    error: fetchError,
-    refetch,
-  } = useCandidateProfile();
+  const { data: profile, isLoading: loading, error: fetchError, refetch } = useCandidateProfile();
   const muts = useProfileMutations();
   const actions = useProfileActions(muts);
 
