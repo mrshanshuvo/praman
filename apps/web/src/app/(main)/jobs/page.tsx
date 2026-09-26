@@ -12,15 +12,15 @@ import {
   PlusCircle,
   Search,
 } from 'lucide-react';
-import Link from 'next/link';
 import { Suspense, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useUrlQueryParam, useUrlTab } from '@/hooks/useUrlParams';
 import { cn } from '@/lib/utils';
+import { useJobIngestionModal } from '@/providers/JobIngestionModalProvider';
 import { JobCard, JobsEmptyState, JobsKanbanBoard, JobsKanbanSkeleton } from './_components';
 
 const STATUS_TABS = [
@@ -69,6 +69,7 @@ function JobsListSkeleton() {
 }
 
 function JobsListContent() {
+  const { openJobIngestionModal } = useJobIngestionModal();
   const { data: rawJds, isLoading: loading, error: fetchError, refetch } = useJobs({ all: true });
   const error = fetchError ? (fetchError as Error).message : null;
 
@@ -304,17 +305,14 @@ function JobsListContent() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Link
-              href="/jobs/new"
-              className={buttonVariants({
-                size: 'sm',
-                className:
-                  'bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-medium shadow-sm shadow-brand-cyan/20',
-              })}
+            <Button
+              size="sm"
+              onClick={() => openJobIngestionModal()}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm shadow-primary/20 cursor-pointer"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="w-4 h-4 mr-1.5" />
               <span>New Job Analysis</span>
-            </Link>
+            </Button>
           </div>
         </div>
       </div>

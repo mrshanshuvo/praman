@@ -1,11 +1,13 @@
 'use client';
 
 import { Briefcase, PlusCircle } from 'lucide-react';
-import Link from 'next/link';
-import { buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useJobIngestionModal } from '@/providers/JobIngestionModalProvider';
 
 export function JobsEmptyState() {
+  const { openJobIngestionModal } = useJobIngestionModal();
+
   return (
     <Card className="border-border bg-card/60 p-10 sm:p-12 text-center max-w-md w-full mx-auto backdrop-blur-md shadow-xl rounded-2xl border">
       <div className="p-0 flex flex-col items-center">
@@ -19,17 +21,14 @@ export function JobsEmptyState() {
           Add a job description to analyze requirements, evaluate alignment, and generate tailored
           resumes.
         </p>
-        <Link
-          href="/jobs/new"
-          className={buttonVariants({
-            size: 'default',
-            className:
-              'bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md shadow-primary/20 text-sm px-5 py-2.5 rounded-xl gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]',
-          })}
+        <Button
+          size="default"
+          onClick={() => openJobIngestionModal()}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md shadow-primary/20 text-sm px-5 py-2.5 rounded-xl gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Analyze Your First Job</span>
-        </Link>
+        </Button>
       </div>
     </Card>
   );

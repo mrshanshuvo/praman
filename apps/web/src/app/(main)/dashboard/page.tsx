@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { useCandidateProfile, useJobs } from '@/hooks/usePramanApi';
 import { useAuth } from '@/providers/AuthProvider';
+import { useJobIngestionModal } from '@/providers/JobIngestionModalProvider';
 import {
   ActionCenterCard,
   AiUsageCard,
   PipelineFunnelCard,
-  QuickIngestModal,
   RecentActivityFeed,
   SkillGapInsightsCard,
   UpcomingInterviewsCard,
@@ -15,7 +14,7 @@ import {
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();
-  const [isQuickIngestOpen, setIsQuickIngestOpen] = useState(false);
+  const { openJobIngestionModal } = useJobIngestionModal();
 
   const { data: profile } = useCandidateProfile({ enabled: isAuthenticated });
   const { data: rawJobs } = useJobs({ enabled: isAuthenticated });
@@ -28,7 +27,7 @@ export default function DashboardPage() {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* 1. Prioritized Action Center: Urgent interviews, untailored high-match positions, stale follow-ups */}
-      <ActionCenterCard jobs={jobs} onOpenQuickIngest={() => setIsQuickIngestOpen(true)} />
+      <ActionCenterCard jobs={jobs} onOpenQuickIngest={() => openJobIngestionModal()} />
 
       {/* 2. Upcoming Interview Horizon (High priority for active job seekers) */}
       <UpcomingInterviewsCard jobs={jobs} />
@@ -44,9 +43,6 @@ export default function DashboardPage() {
 
       {/* 5. Real-Time Pipeline Activity Timeline */}
       <RecentActivityFeed jobs={jobs} />
-
-      {/* Quick JD Ingest Modal */}
-      <QuickIngestModal isOpen={isQuickIngestOpen} onClose={() => setIsQuickIngestOpen(false)} />
     </div>
   );
 }

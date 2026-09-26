@@ -19,7 +19,7 @@ import React, { useMemo } from 'react';
 import { ThemePalettePicker } from '@/components/ThemePalettePicker';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,12 +29,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useJobs } from '@/hooks/usePramanApi';
 import { useAuth } from '@/providers/AuthProvider';
+import { useJobIngestionModal } from '@/providers/JobIngestionModalProvider';
 import { useSidebar } from '@/providers/SidebarProvider';
 
 export function TopBar() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
   const { isCollapsed, toggleCollapse, isMobileOpen, toggleMobile } = useSidebar();
+  const { openJobIngestionModal } = useJobIngestionModal();
   const { data: rawJobs } = useJobs({ enabled: isAuthenticated });
 
   const totalJobs = useMemo(() => {
@@ -157,17 +159,14 @@ export function TopBar() {
       {/* Right: Quick Action, Theme Switcher & User Profile Menu */}
       <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
         {/* Quick Ingest / New Pipeline CTA */}
-        <Link
-          href="/jobs/new"
-          className={buttonVariants({
-            size: 'sm',
-            className:
-              'h-8 px-2.5 sm:px-3 text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-2xs rounded-lg transition-all',
-          })}
+        <Button
+          size="sm"
+          onClick={() => openJobIngestionModal()}
+          className="h-8 px-2.5 sm:px-3 text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-2xs rounded-lg transition-all cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">New Pipeline</span>
-        </Link>
+        </Button>
 
         {/* Dynamic Theme & Palette Switcher */}
         <ThemePalettePicker side="bottom" align="end" />
