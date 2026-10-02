@@ -17,26 +17,26 @@ export const SkillLevelBadge: React.FC<SkillLevelBadgeProps> = ({
     switch (lvl) {
       case 'EXPERIENCED':
         return {
-          bg: 'bg-brand-cyan/15 border-brand-cyan/40 text-brand-cyan',
-          dot: 'bg-brand-cyan',
+          bg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
+          dot: 'bg-emerald-500 dark:bg-emerald-400',
           label: 'Experienced',
         };
       case 'WORKING_KNOWLEDGE':
         return {
-          bg: 'bg-brand-cyan/10 border-brand-cyan/25 text-brand-cyan/80',
-          dot: 'bg-brand-cyan/80',
+          bg: 'bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400',
+          dot: 'bg-sky-500 dark:bg-sky-400',
           label: 'Working Knowledge',
         };
       case 'LEARNING':
         return {
-          bg: 'bg-brand-pink/10 border-brand-pink/25 text-brand-pink/80',
-          dot: 'bg-brand-pink/80',
+          bg: 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400',
+          dot: 'bg-amber-500 dark:bg-amber-400',
           label: 'Learning (Gap)',
         };
       case 'NOT_LEARNED':
         return {
-          bg: 'bg-brand-pink/15 border-brand-pink/40 text-brand-pink',
-          dot: 'bg-brand-pink',
+          bg: 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400',
+          dot: 'bg-rose-500 dark:bg-rose-400',
           label: 'Not Learned (Forbidden)',
         };
       default:
