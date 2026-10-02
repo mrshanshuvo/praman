@@ -19,8 +19,10 @@ import {
   Mail,
   MapPin,
   Phone,
+  Plus,
   RefreshCw,
   Sparkles,
+  Trash2,
   TrendingUp,
 } from 'lucide-react';
 
@@ -140,6 +142,7 @@ function normalizeHref(key: string, rawUrl: string): string {
   }
   return `https://${trimmed}`;
 }
+
 import React, { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -184,6 +187,16 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const KNOWN_LINK_KEYS = [
+    'github',
+    'linkedin',
+    'portfolio',
+    'beecrowd',
+    'leetcode',
+    'twitter',
+    'x',
+  ];
+
   const [form, setForm] = useState({
     name: personal?.name || '',
     title: personal?.title || '',
@@ -193,41 +206,87 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     github: personal?.links?.github || '',
     linkedin: personal?.links?.linkedin || '',
     portfolio: personal?.links?.portfolio || '',
+    beecrowd: personal?.links?.beecrowd || '',
+    leetcode: personal?.links?.leetcode || '',
+    twitter: personal?.links?.twitter || personal?.links?.x || '',
+    customLinks: [] as { key: string; value: string }[],
   });
 
   const handleOpenEdit = () => {
+    const rawLinks = personal?.links || {};
+    const custom = Object.entries(rawLinks)
+      .filter(([k]) => !KNOWN_LINK_KEYS.includes(k.toLowerCase()))
+      .map(([key, value]) => ({ key, value }));
+
     setForm({
       name: personal?.name || '',
       title: personal?.title || '',
       location: personal?.location || '',
       email: personal?.contact?.email || '',
       phone: personal?.contact?.phone || '',
-      github: personal?.links?.github || '',
-      linkedin: personal?.links?.linkedin || '',
-      portfolio: personal?.links?.portfolio || '',
+      github: rawLinks.github || '',
+      linkedin: rawLinks.linkedin || '',
+      portfolio: rawLinks.portfolio || '',
+      beecrowd: rawLinks.beecrowd || '',
+      leetcode: rawLinks.leetcode || '',
+      twitter: rawLinks.twitter || rawLinks.x || '',
+      customLinks: custom,
     });
     setIsEditOpen(true);
+  };
+
+  const addCustomLink = () => {
+    setForm((prev) => ({
+      ...prev,
+      customLinks: [...prev.customLinks, { key: '', value: '' }],
+    }));
+  };
+
+  const removeCustomLink = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      customLinks: prev.customLinks.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateCustomLink = (index: number, field: 'key' | 'value', val: string) => {
+    setForm((prev) => {
+      const next = [...prev.customLinks];
+      next[index] = { ...next[index], [field]: val };
+      return { ...prev, customLinks: next };
+    });
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
+      const links: Record<string, string> = {};
+
+      if (form.github.trim()) links.github = form.github.trim();
+      if (form.linkedin.trim()) links.linkedin = form.linkedin.trim();
+      if (form.portfolio.trim()) links.portfolio = form.portfolio.trim();
+      if (form.beecrowd.trim()) links.beecrowd = form.beecrowd.trim();
+      if (form.leetcode.trim()) links.leetcode = form.leetcode.trim();
+      if (form.twitter.trim()) links.twitter = form.twitter.trim();
+
+      for (const item of form.customLinks) {
+        if (item.key.trim() && item.value.trim()) {
+          links[item.key.trim().toLowerCase()] = item.value.trim();
+        }
+      }
+
       const updatedPersonal: UpdateCandidatePersonal = {
         ...personal,
-        name: form.name,
-        title: form.title,
-        location: form.location,
+        name: form.name.trim(),
+        title: form.title.trim(),
+        location: form.location.trim(),
         contact: {
           ...personal?.contact,
-          email: form.email,
-          phone: form.phone,
+          email: form.email.trim(),
+          phone: form.phone.trim(),
         },
-        links: {
-          ...(form.github ? { github: form.github } : {}),
-          ...(form.linkedin ? { linkedin: form.linkedin } : {}),
-          ...(form.portfolio ? { portfolio: form.portfolio } : {}),
-        },
+        links,
       };
       await onUpdatePersonal(updatedPersonal);
       setIsEditOpen(false);
@@ -524,99 +583,240 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* Edit Personal Details Dialog */}
       <Dialog open={isEditOpen} onOpenChange={(open) => !open && setIsEditOpen(false)}>
-        <DialogContent className="sm:max-w-lg bg-card border-border p-6 gap-4">
+        <DialogContent className="sm:max-w-2xl md:max-w-3xl bg-card border-border p-6 sm:p-7 gap-5 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-foreground">
               Edit Candidate Identity & Details
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Update your primary identification records used across generated resumes.
+              Update your primary identification and profile facts used across tailored resumes.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Full Name *</label>
-                <Input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Shahid Hasan Shuvo"
-                  className="bg-muted/40 border-border text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">
-                  Professional Title
-                </label>
-                <Input
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="e.g. Senior Full-Stack Engineer"
-                  className="bg-muted/40 border-border text-xs"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Email</label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="name@example.com"
-                  className="bg-muted/40 border-border text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Phone</label>
-                <Input
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="+1 555-0199"
-                  className="bg-muted/40 border-border text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Location</label>
-                <Input
-                  value={form.location}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  placeholder="Dhaka, Bangladesh"
-                  className="bg-muted/40 border-border text-xs"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-2 border-t border-border">
-              <span className="text-xs font-semibold text-muted-foreground block">
-                Professional & Social Links
+          <form onSubmit={handleSave} className="space-y-5">
+            {/* Primary Identity Section */}
+            <div className="space-y-3">
+              <span className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+                Primary Identity
               </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Input
-                  value={form.github}
-                  onChange={(e) => setForm({ ...form, github: e.target.value })}
-                  placeholder="GitHub URL"
-                  className="bg-muted/40 border-border text-xs"
-                />
-                <Input
-                  value={form.linkedin}
-                  onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
-                  placeholder="LinkedIn URL"
-                  className="bg-muted/40 border-border text-xs"
-                />
-                <Input
-                  value={form.portfolio}
-                  onChange={(e) => setForm({ ...form, portfolio: e.target.value })}
-                  placeholder="Portfolio URL"
-                  className="bg-muted/40 border-border text-xs"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground block mb-1">
+                    Full Name *
+                  </label>
+                  <Input
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="e.g. Shahid Hasan Shuvo"
+                    className="bg-muted/40 border-border text-sm h-10"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground block mb-1">
+                    Professional Title
+                  </label>
+                  <Input
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    placeholder="e.g. Full-Stack Developer"
+                    className="bg-muted/40 border-border text-sm h-10"
+                  />
+                </div>
               </div>
             </div>
 
-            <DialogFooter showCloseButton={false}>
+            {/* Contact & Location Section */}
+            <div className="space-y-3 pt-3 border-t border-border">
+              <span className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+                Contact & Location
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground block mb-1">
+                    Email Address
+                  </label>
+                  <Input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="name@example.com"
+                    className="bg-muted/40 border-border text-sm h-10"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground block mb-1">
+                    Phone Number
+                  </label>
+                  <Input
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="+1 555-0199"
+                    className="bg-muted/40 border-border text-sm h-10"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground block mb-1">
+                    Location
+                  </label>
+                  <Input
+                    value={form.location}
+                    onChange={(e) => setForm({ ...form, location: e.target.value })}
+                    placeholder="Dhaka, Bangladesh"
+                    className="bg-muted/40 border-border text-sm h-10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Professional & Social Links Section */}
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+                  Professional & Coding Profiles
+                </span>
+                <span className="text-2xs text-muted-foreground">
+                  Enter full URLs or usernames
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <GithubIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>GitHub</span>
+                  </label>
+                  <Input
+                    value={form.github}
+                    onChange={(e) => setForm({ ...form, github: e.target.value })}
+                    placeholder="https://github.com/username or username"
+                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <LinkedinIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>LinkedIn</span>
+                  </label>
+                  <Input
+                    value={form.linkedin}
+                    onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
+                    placeholder="https://linkedin.com/in/username or username"
+                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Portfolio / Website</span>
+                  </label>
+                  <Input
+                    value={form.portfolio}
+                    onChange={(e) => setForm({ ...form, portfolio: e.target.value })}
+                    placeholder="https://yourportfolio.dev"
+                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <Code2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>BeeCrowd Profile</span>
+                  </label>
+                  <Input
+                    value={form.beecrowd}
+                    onChange={(e) => setForm({ ...form, beecrowd: e.target.value })}
+                    placeholder="https://judge.beecrowd.com/en/profile/... or username"
+                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <Code2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>LeetCode / Codeforces</span>
+                  </label>
+                  <Input
+                    value={form.leetcode}
+                    onChange={(e) => setForm({ ...form, leetcode: e.target.value })}
+                    placeholder="https://leetcode.com/username or username"
+                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
+                    <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Twitter / X</span>
+                  </label>
+                  <Input
+                    value={form.twitter}
+                    onChange={(e) => setForm({ ...form, twitter: e.target.value })}
+                    placeholder="https://x.com/username or @username"
+                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Links Section */}
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+                    Custom Platform Links
+                  </span>
+                  <p className="text-2xs text-muted-foreground">
+                    Add any other links (e.g. Kaggle, Substack, Medium, Blog)
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addCustomLink}
+                  className="text-xs h-7 gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Add Link</span>
+                </Button>
+              </div>
+
+              {form.customLinks.length > 0 && (
+                <div className="space-y-2">
+                  {form.customLinks.map((link, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Input
+                        value={link.key}
+                        onChange={(e) => updateCustomLink(idx, 'key', e.target.value)}
+                        placeholder="Platform (e.g. Kaggle)"
+                        className="bg-muted/40 border-border text-sm h-9 w-40 shrink-0"
+                      />
+                      <Input
+                        value={link.value}
+                        onChange={(e) => updateCustomLink(idx, 'value', e.target.value)}
+                        placeholder="https://..."
+                        className="bg-muted/40 border-border text-sm h-9 flex-1 font-mono text-xs"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeCustomLink(idx)}
+                        className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                        title="Remove link"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter showCloseButton={false} className="pt-2">
               <DialogClose render={<Button variant="outline" size="sm" type="button" />}>
                 Cancel
               </DialogClose>
