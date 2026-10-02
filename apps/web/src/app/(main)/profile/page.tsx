@@ -124,8 +124,22 @@ function ProfileContent() {
           onDelete={actions.handleDeleteSk}
         />
       )}
-      {activeTab === 'education' && <EducationTab educations={educations} />}
-      {activeTab === 'certifications' && <CertificationsTab certifications={certifications} />}
+      {activeTab === 'education' && (
+        <EducationTab
+          educations={educations}
+          onAdd={actions.handleAddEdu}
+          onUpdate={actions.handleUpdateEdu}
+          onDelete={actions.handleDeleteEdu}
+        />
+      )}
+      {activeTab === 'certifications' && (
+        <CertificationsTab
+          certifications={certifications}
+          onAdd={actions.handleAddCert}
+          onUpdate={actions.handleUpdateCert}
+          onDelete={actions.handleDeleteCert}
+        />
+      )}
 
       <ConfirmDeleteDialog
         open={!!actions.pendingDelete}

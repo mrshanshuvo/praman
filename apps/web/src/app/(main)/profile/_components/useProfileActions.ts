@@ -1,6 +1,8 @@
 'use client';
 
 import type {
+  CreateCertificationDto,
+  CreateEducationDto,
   CreateExperienceDto,
   CreateProjectDto,
   CreateSkillDto,
@@ -115,6 +117,42 @@ export function useProfileActions(muts: ProfileMutations) {
         name,
         () => muts.deleteSkill.mutateAsync(id),
         `Removed skill "${name}"`,
+      );
+    },
+    handleAddEdu: (data: CreateEducationDto) =>
+      runMutation(
+        () => muts.addEducation.mutateAsync(data),
+        `Education record at "${data.institution}" added`,
+      ),
+    handleUpdateEdu: (id: string, data: Partial<CreateEducationDto>) =>
+      runMutation(
+        () => muts.updateEducation.mutateAsync({ id, data }),
+        'Education record updated',
+      ),
+    handleDeleteEdu: async (id: string, institution: string) => {
+      requestDelete(
+        'Delete Education Record',
+        institution,
+        () => muts.deleteEducation.mutateAsync(id),
+        'Education record deleted',
+      );
+    },
+    handleAddCert: (data: CreateCertificationDto) =>
+      runMutation(
+        () => muts.addCertification.mutateAsync(data),
+        `Certification "${data.name}" added`,
+      ),
+    handleUpdateCert: (id: string, data: Partial<CreateCertificationDto>) =>
+      runMutation(
+        () => muts.updateCertification.mutateAsync({ id, data }),
+        'Certification updated',
+      ),
+    handleDeleteCert: async (id: string, name: string) => {
+      requestDelete(
+        'Delete Certification Record',
+        name,
+        () => muts.deleteCertification.mutateAsync(id),
+        'Certification deleted',
       );
     },
   };
