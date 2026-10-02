@@ -1,8 +1,28 @@
 'use client';
 
-import type { CandidatePersonal, UpdateCandidatePersonal } from '@praman/schemas';
-import { Check, Edit2, Globe, Mail, MapPin, Phone, RefreshCw, Sparkles } from 'lucide-react';
-import React, { useState } from 'react';
+import type {
+  CandidatePersonal,
+  Certification,
+  Education,
+  Experience,
+  Project,
+  Skill,
+  UpdateCandidatePersonal,
+} from '@praman/schemas';
+import {
+  Check,
+  CheckCircle2,
+  Circle,
+  Edit2,
+  Globe,
+  Mail,
+  MapPin,
+  Phone,
+  RefreshCw,
+  Sparkles,
+  TrendingUp,
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -16,18 +36,31 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import type { ProfileTabId } from './ProfileNavTabs';
 import { ResumeImportModal } from './ResumeImportModal';
 
 interface ProfileHeaderCardProps {
   personal?: CandidatePersonal | null;
+  experiences?: Experience[];
+  projects?: Project[];
+  skills?: Skill[];
+  educations?: Education[];
+  certifications?: Certification[];
   onRefresh: () => void;
   onUpdatePersonal: (personal: UpdateCandidatePersonal) => Promise<void>;
+  onNavigateTab?: (tab: ProfileTabId) => void;
 }
 
 export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   personal,
+  experiences = [],
+  projects = [],
+  skills = [],
+  educations = [],
+  certifications = [],
   onRefresh,
   onUpdatePersonal,
+  onNavigateTab,
 }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -87,49 +120,165 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     }
   };
 
+  const checklist = useMemo(() => {
+    const hasName = Boolean(personal?.name?.trim());
+    const hasTitle = Boolean(personal?.title?.trim());
+    const hasEmail = Boolean(personal?.contact?.email?.trim());
+    const hasLinksOrLocation = Boolean(
+      personal?.location?.trim() ||
+        personal?.links?.github ||
+        personal?.links?.linkedin ||
+        personal?.links?.portfolio,
+    );
+
+    const hasOneExp = (experiences?.length || 0) >= 1;
+    const hasMultipleExp = (experiences?.length || 0) >= 2;
+
+    const hasOneProj = (projects?.length || 0) >= 1;
+    const hasMultipleProj = (projects?.length || 0) >= 2;
+
+    const hasSkills = (skills?.length || 0) >= 3;
+    const hasSkillEvidence = Boolean(
+      skills?.some((s) => s.evidence && s.evidence.trim().length > 0),
+    );
+
+    const hasEdu = (educations?.length || 0) >= 1;
+    const hasCertOrEduDetails = Boolean(
+      (certifications?.length || 0) >= 1 || educations?.some((e) => e.details?.trim()),
+    );
+
+    return [
+      {
+        id: 'personal_basics',
+        label: 'Name & Title',
+        weight: 10,
+        completed: hasName && hasTitle,
+        tab: 'personal' as ProfileTabId,
+      },
+      {
+        id: 'contact_links',
+        label: 'Contact & Links',
+        weight: 10,
+        completed: hasEmail && hasLinksOrLocation,
+        tab: 'personal' as ProfileTabId,
+      },
+      {
+        id: 'experience_core',
+        label: '1+ Work Experience',
+        weight: 15,
+        completed: hasOneExp,
+        tab: 'experiences' as ProfileTabId,
+      },
+      {
+        id: 'experience_multi',
+        label: '2+ Work Experiences',
+        weight: 10,
+        completed: hasMultipleExp,
+        tab: 'experiences' as ProfileTabId,
+      },
+      {
+        id: 'projects_core',
+        label: '1+ Portfolio Project',
+        weight: 10,
+        completed: hasOneProj,
+        tab: 'projects' as ProfileTabId,
+      },
+      {
+        id: 'projects_multi',
+        label: '2+ Projects',
+        weight: 10,
+        completed: hasMultipleProj,
+        tab: 'projects' as ProfileTabId,
+      },
+      {
+        id: 'skills_min',
+        label: '3+ Skills',
+        weight: 10,
+        completed: hasSkills,
+        tab: 'skills' as ProfileTabId,
+      },
+      {
+        id: 'skills_evidence',
+        label: 'Skill Proof',
+        weight: 10,
+        completed: hasSkillEvidence,
+        tab: 'skills' as ProfileTabId,
+      },
+      {
+        id: 'education',
+        label: 'Education',
+        weight: 10,
+        completed: hasEdu,
+        tab: 'education' as ProfileTabId,
+      },
+      {
+        id: 'certs_extras',
+        label: 'Certifications',
+        weight: 5,
+        completed: hasCertOrEduDetails,
+        tab: 'certifications' as ProfileTabId,
+      },
+    ];
+  }, [personal, experiences, projects, skills, educations, certifications]);
+
+  const percentage = useMemo(() => {
+    return checklist.reduce((acc, item) => (item.completed ? acc + item.weight : acc), 0);
+  }, [checklist]);
+
+  const missingItems = useMemo(() => {
+    return checklist.filter((item) => !item.completed);
+  }, [checklist]);
+
+  const tier = useMemo(() => {
+    if (percentage === 100)
+      return {
+        label: 'Complete & Ready',
+        color: 'text-success',
+        bg: 'bg-success/10 border-success/30',
+      };
+    if (percentage >= 80)
+      return {
+        label: 'Interview Ready',
+        color: 'text-brand-cyan',
+        bg: 'bg-brand-cyan/10 border-brand-cyan/30',
+      };
+    if (percentage >= 50)
+      return {
+        label: 'Good Progress',
+        color: 'text-warning',
+        bg: 'bg-warning/10 border-warning/30',
+      };
+    return {
+      label: 'Needs Info',
+      color: 'text-brand-pink',
+      bg: 'bg-brand-pink/10 border-brand-pink/30',
+    };
+  }, [percentage]);
+
   return (
     <>
-      <Card className="relative overflow-hidden rounded-2xl border-border bg-card/80 p-6 sm:p-8 backdrop-blur-md mb-8 gap-0">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-brand-pink/10 border border-brand-pink/30 flex items-center justify-center text-brand-pink dark:bg-brand-cyan/10 dark:border-brand-cyan/30 dark:text-brand-cyan text-2xl font-bold font-mono shadow-xs shrink-0">
+      <Card className="relative overflow-hidden rounded-2xl border-border bg-card/80 p-5 sm:p-6 backdrop-blur-md mb-6 space-y-3.5 gap-0">
+        {/* Top: Identity & Primary Actions */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-brand-pink/10 border border-brand-pink/30 flex items-center justify-center text-brand-pink dark:bg-brand-cyan/10 dark:border-brand-cyan/30 dark:text-brand-cyan text-xl sm:text-2xl font-bold font-mono shadow-xs shrink-0">
               {personal?.name ? personal.name.charAt(0).toUpperCase() : 'C'}
             </div>
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                   {personal?.name || 'Candidate Profile'}
                 </h1>
                 <Badge
                   variant="outline"
-                  className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-brand-pink/10 text-brand-pink border-brand-pink/30 dark:bg-brand-cyan/10 dark:text-brand-cyan dark:border-brand-cyan/30"
+                  className="text-2xs font-medium px-2 py-0.5 rounded-full bg-brand-pink/10 text-brand-pink border-brand-pink/30 dark:bg-brand-cyan/10 dark:text-brand-cyan dark:border-brand-cyan/30"
                 >
                   Confirmed Facts Source
                 </Badge>
               </div>
-              <p className="text-muted-foreground text-sm sm:text-base mt-1">
+              <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
                 {personal?.title || 'Full-Stack Developer'}
               </p>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-3">
-                {personal?.location && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/70 text-foreground/85">
-                    <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    {personal.location}
-                  </span>
-                )}
-                {personal?.contact?.email && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/70 text-foreground/85">
-                    <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    {personal.contact.email}
-                  </span>
-                )}
-                {personal?.contact?.phone && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/70 text-foreground/85">
-                    <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    {personal.contact.phone}
-                  </span>
-                )}
-              </div>
             </div>
           </div>
 
@@ -138,7 +287,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               variant="default"
               size="sm"
               onClick={() => setIsImportOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1.5 shadow-xs font-medium"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1.5 shadow-xs font-medium h-8"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Import Resume</span>
@@ -148,7 +297,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               variant="outline"
               size="sm"
               onClick={handleOpenEdit}
-              className="text-foreground border-border bg-card hover:bg-muted text-xs gap-1.5"
+              className="text-foreground border-border bg-card hover:bg-muted text-xs gap-1.5 h-8"
             >
               <Edit2 className="w-3.5 h-3.5" />
               <span>Edit Details</span>
@@ -156,23 +305,96 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </div>
         </div>
 
-        {/* External links */}
-        {personal?.links && Object.keys(personal.links).length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mt-6 pt-5 border-t border-border">
-            {Object.entries(personal.links).map(([k, v]) => (
+        {/* Middle: Contact Info & External Links Chips in one natural flowing row */}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {personal?.location && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/40 border border-border/60 text-foreground/85">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              {personal.location}
+            </span>
+          )}
+          {personal?.contact?.email && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/40 border border-border/60 text-foreground/85">
+              <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              {personal.contact.email}
+            </span>
+          )}
+          {personal?.contact?.phone && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/40 border border-border/60 text-foreground/85">
+              <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              {personal.contact.phone}
+            </span>
+          )}
+
+          {personal?.links &&
+            Object.entries(personal.links).map(([k, v]) => (
               <a
                 key={k}
                 href={v}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1.5 text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-border/70 bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border transition-colors"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border transition-colors"
               >
                 <Globe className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 <span className="capitalize">{k}</span>
               </a>
             ))}
+        </div>
+
+        {/* Bottom: Streamlined Horizontal Completeness Bar */}
+        <div className="bg-muted/25 border border-border/50 rounded-xl px-3.5 py-2 flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+          {/* Left: Indicator & Percentage */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-brand-cyan shrink-0" />
+              <span className="text-xs font-semibold text-foreground">Completeness</span>
+            </div>
+            <Badge
+              variant="outline"
+              className={`text-2xs font-medium ${tier.bg} ${tier.color} px-1.5 py-0 rounded`}
+            >
+              {tier.label}
+            </Badge>
+            <span className="text-xs font-bold font-mono text-foreground">{percentage}%</span>
           </div>
-        )}
+
+          {/* Center: Slim Gradient Bar */}
+          <div className="flex-1 max-w-xs lg:max-w-md w-full bg-muted/60 rounded-full h-1.5 overflow-hidden border border-border/30">
+            <div
+              className="h-full bg-linear-to-r from-brand-cyan to-brand-pink transition-all duration-500 rounded-full"
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+
+          {/* Right: Status or Actionable Suggestions */}
+          <div className="shrink-0 flex items-center">
+            {missingItems.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-2xs text-muted-foreground">Add:</span>
+                {missingItems.slice(0, 3).map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onNavigateTab?.(item.tab)}
+                    className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded border border-border/60 bg-card hover:bg-muted text-foreground transition-colors cursor-pointer group"
+                    title={`Add ${item.label} (+${item.weight}%)`}
+                  >
+                    <Circle className="w-2 h-2 text-brand-pink shrink-0" />
+                    <span className="truncate max-w-28">{item.label}</span>
+                    <span className="text-muted-foreground group-hover:text-brand-cyan font-mono">
+                      +{item.weight}%
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-2xs text-success font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span>All profile dimensions populated & ready!</span>
+              </div>
+            )}
+          </div>
+        </div>
       </Card>
 
       {/* Edit Personal Details Dialog */}

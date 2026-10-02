@@ -12,7 +12,6 @@ import {
   EducationTab,
   ExperiencesTab,
   PersonalTab,
-  ProfileCompletenessCard,
   ProfileHeaderCard,
   ProfileNavTabs,
   ProfileSkeleton,
@@ -76,17 +75,13 @@ function ProfileContent() {
 
       <ProfileHeaderCard
         personal={personal}
-        onRefresh={refetch}
-        onUpdatePersonal={actions.handleUpdatePersonal}
-      />
-
-      <ProfileCompletenessCard
-        personal={personal}
         experiences={experiences}
         projects={projects}
         skills={skills}
         educations={educations}
         certifications={certifications}
+        onRefresh={refetch}
+        onUpdatePersonal={actions.handleUpdatePersonal}
         onNavigateTab={setActiveTab}
       />
 
