@@ -21,7 +21,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import { useProfileMutations } from '@/hooks/usePramanApi';
 
 interface SkillClaimTuningDialogProps {
@@ -45,8 +44,6 @@ const LEVEL_OPTIONS: {
   colorClass: string;
   borderClass: string;
   icon: typeof Award;
-  description: string;
-  impact: string;
 }[] = [
   {
     level: 'EXPERIENCED',
@@ -55,8 +52,6 @@ const LEVEL_OPTIONS: {
     colorClass: 'text-brand-cyan bg-brand-cyan/10 border-brand-cyan/30',
     borderClass: 'border-brand-cyan bg-brand-cyan/15 ring-1 ring-brand-cyan/40',
     icon: CheckCircle2,
-    description: 'Demonstrated mastery across production systems or verified deliverables.',
-    impact: 'Full 1.0x match weight. High-priority candidate strength in resume strategy.',
   },
   {
     level: 'WORKING_KNOWLEDGE',
@@ -65,8 +60,6 @@ const LEVEL_OPTIONS: {
     colorClass: 'text-success bg-success/10 border-success/30',
     borderClass: 'border-success bg-success/15 ring-1 ring-success/40',
     icon: Sparkles,
-    description: 'Capable practitioner with practical project experience or adjacent stack usage.',
-    impact: '0.5x partial match weight. Positioned as supportive competence.',
   },
   {
     level: 'LEARNING',
@@ -75,8 +68,6 @@ const LEVEL_OPTIONS: {
     colorClass: 'text-warning bg-warning/10 border-warning/30',
     borderClass: 'border-warning bg-warning/15 ring-1 ring-warning/40',
     icon: HelpCircle,
-    description: 'Currently studying or developing foundational capability.',
-    impact: 'Treated as growth area. AI prompt prevents overstating as mature competency.',
   },
   {
     level: 'NOT_LEARNED',
@@ -85,9 +76,6 @@ const LEVEL_OPTIONS: {
     colorClass: 'text-brand-pink bg-brand-pink/10 border-brand-pink/30',
     borderClass: 'border-brand-pink bg-brand-pink/15 ring-1 ring-brand-pink/40',
     icon: ShieldAlert,
-    description: 'Unverified or unfamiliar technology.',
-    impact:
-      'Strict safeguard: Enforces "Do Not Claim" rule. AI is prohibited from inventing bullet claims.',
   },
 ];
 
@@ -102,7 +90,6 @@ export function SkillClaimTuningDialog({
   const [selectedLevel, setSelectedLevel] = useState<SkillLevel>(
     existingSkill?.level || 'EXPERIENCED',
   );
-  const [evidence, setEvidence] = useState(existingSkill?.evidence || '');
   const [isSaving, setIsSaving] = useState(false);
 
   const { addSkill, updateSkill } = useProfileMutations();
@@ -110,10 +97,8 @@ export function SkillClaimTuningDialog({
   useEffect(() => {
     if (existingSkill) {
       setSelectedLevel(existingSkill.level);
-      setEvidence(existingSkill.evidence || '');
     } else {
       setSelectedLevel('EXPERIENCED');
-      setEvidence('');
     }
   }, [existingSkill, skillName]);
 
@@ -126,14 +111,13 @@ export function SkillClaimTuningDialog({
           data: {
             name: skillName,
             level: selectedLevel,
-            evidence: evidence.trim() || undefined,
+            evidence: existingSkill.evidence || undefined,
           },
         });
       } else {
         await addSkill.mutateAsync({
           name: skillName,
           level: selectedLevel,
-          evidence: evidence.trim() || undefined,
         });
       }
 
@@ -148,7 +132,7 @@ export function SkillClaimTuningDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg p-5">
+      <DialogContent className="sm:max-w-2xl p-5">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-1">
             <Badge
@@ -166,15 +150,15 @@ export function SkillClaimTuningDialog({
           <DialogTitle className="text-xl font-bold tracking-tight text-foreground flex items-center justify-between">
             <span>{skillName}</span>
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+          <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
             Adjust candidate ground-truth claim. This dictates deterministic match scoring and sets
             hard boundaries for the Stage 4 resume generator.
           </DialogDescription>
         </DialogHeader>
 
         {/* 4-Tier Interactive Selector */}
-        <div className="space-y-2 py-1">
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="flex flex-col gap-2 py-1">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Proficiency & Claim Boundary
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -187,29 +171,23 @@ export function SkillClaimTuningDialog({
                   key={opt.level}
                   type="button"
                   onClick={() => setSelectedLevel(opt.level)}
-                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start ${
                     isSelected
                       ? opt.borderClass
                       : 'border-border bg-muted/20 hover:border-border/80'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <div className="flex items-center gap-1.5 font-semibold text-xs text-foreground">
-                        <Icon className="w-3.5 h-3.5 shrink-0" />
-                        <span>{opt.title}</span>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={`text-2xs font-mono px-1.5 py-0 ${opt.colorClass}`}
-                      >
-                        {opt.badgeLabel}
-                      </Badge>
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <div className="flex items-center gap-1.5 font-semibold text-xs text-foreground">
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      <span>{opt.title}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground leading-snug">{opt.description}</p>
-                  </div>
-                  <div className="mt-2 pt-1.5 border-t border-border/40 text-2xs font-mono text-muted-foreground">
-                    {opt.impact}
+                    <Badge
+                      variant="outline"
+                      className={`text-2xs font-mono px-1.5 py-0 ${opt.colorClass}`}
+                    >
+                      {opt.badgeLabel}
+                    </Badge>
                   </div>
                 </button>
               );
@@ -217,19 +195,6 @@ export function SkillClaimTuningDialog({
           </div>
         </div>
 
-        {/* Evidence Field */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-            <span>Ground-Truth Evidence / Notes (Optional)</span>
-            <span className="text-2xs font-normal text-muted-foreground">e.g. projects, repos</span>
-          </label>
-          <Textarea
-            value={evidence}
-            onChange={(e) => setEvidence(e.target.value)}
-            placeholder="e.g. Architected microservices with Kafka in FinTech production ledger (2024)..."
-            className="text-xs h-16 resize-none bg-muted/30 border-border"
-          />
-        </div>
 
         <DialogFooter className="pt-2">
           <Button
