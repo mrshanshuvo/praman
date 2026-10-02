@@ -7,6 +7,15 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -97,105 +106,133 @@ export function ProjectsTab({ projects, onAdd, onUpdate, onDelete }: ProjectsTab
         </Button>
       </div>
 
-      {showForm && (
-        <Card className="p-5 border-brand-pink/40 dark:border-brand-cyan/40 bg-card gap-4">
-          <h4 className="text-sm font-semibold text-brand-pink dark:text-brand-cyan">
-            {editingId ? 'Edit Project Anchor' : 'New Project Anchor'}
-          </h4>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Project Name *</label>
+      {/* Project Add/Edit Modal */}
+      <Dialog
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) {
+            setEditingId(null);
+            setForm(EMPTY_PROJECT);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-2xl md:max-w-3xl bg-card border-border p-6 sm:p-7 gap-5 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-foreground">
+              {editingId ? 'Edit Project Anchor' : 'New Project Anchor'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {editingId
+                ? 'Update your verified project evidence anchor.'
+                : 'Add a verified project evidence anchor used for resume bullets.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4 py-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Project Name *</label>
                 <Input
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. CareCamp"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan text-foreground"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan text-foreground"
                 />
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Role</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Role</label>
                 <Input
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
                   placeholder="e.g. Full-Stack Developer"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan text-foreground"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan text-foreground"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">Description *</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Description *</label>
               <Textarea
                 required
-                rows={2}
+                rows={3}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="Full-stack medical management platform..."
-                className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan min-h-16 text-foreground"
+                placeholder="Full-stack medical management platform with RESTful APIs, JWT authentication, and cloud-hosted MongoDB."
+                className="bg-muted/40 border-border text-sm leading-relaxed text-foreground"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">
                   Technologies (comma separated)
                 </label>
                 <Input
                   value={form.technologies}
                   onChange={(e) => setForm({ ...form, technologies: e.target.value })}
                   placeholder="React, Node.js, MongoDB"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan text-foreground"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan text-foreground"
                 />
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">
                   Live or Code Link
                 </label>
                 <Input
                   value={form.link}
                   onChange={(e) => setForm({ ...form, link: e.target.value })}
-                  placeholder="https://..."
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan text-foreground"
+                  placeholder="https://carecamp.web.app"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan text-foreground"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">
-                Outcomes & Metrics (one per line)
-              </label>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  Outcomes & Metrics (one per line)
+                </label>
+                <span className="text-2xs text-muted-foreground">Key results achieved</span>
+              </div>
               <Textarea
-                rows={2}
+                rows={3}
                 value={form.outcomes}
                 onChange={(e) => setForm({ ...form, outcomes: e.target.value })}
-                placeholder="Engineered full-stack medical platform with responsive dashboards..."
-                className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan min-h-16 text-foreground"
+                placeholder="Engineered a full-stack medical management platform with responsive dashboards...&#10;Integrated Stripe payments and Firebase Authentication..."
+                className="bg-muted/40 border-border text-sm leading-relaxed text-foreground"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowForm(false)}
-                className="text-muted-foreground hover:text-foreground"
+            <DialogFooter className="pt-3 gap-2">
+              <DialogClose
+                render={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditingId(null);
+                      setForm(EMPTY_PROJECT);
+                    }}
+                  />
+                }
               >
                 Cancel
-              </Button>
+              </DialogClose>
               <Button
                 type="submit"
                 size="sm"
-                className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
+                className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-semibold gap-1.5 shadow-xs"
               >
                 {editingId ? 'Update Project' : 'Save Project'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
-        </Card>
-      )}
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 gap-4">
         {projects.map((proj) => (

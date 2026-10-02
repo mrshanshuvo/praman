@@ -7,6 +7,15 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -106,116 +115,163 @@ export function ExperiencesTab({ experiences, onAdd, onUpdate, onDelete }: Exper
         </Button>
       </div>
 
-      {showForm && (
-        <Card className="p-5 border-brand-pink/40 dark:border-brand-cyan/40 bg-card/90 gap-4">
-          <h4 className="text-sm font-semibold text-brand-pink dark:text-brand-cyan">
-            {editingId ? 'Edit Experience Record' : 'New Experience Record'}
-          </h4>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Company *</label>
+      {/* Experience Add/Edit Modal */}
+      <Dialog
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) {
+            setEditingId(null);
+            setForm(EMPTY_EXP);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-2xl md:max-w-3xl bg-card border-border p-6 sm:p-7 gap-5 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-foreground">
+              {editingId ? 'Edit Experience Record' : 'New Experience Record'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {editingId
+                ? 'Update your verifiable employment record and atomic truth anchors.'
+                : 'Add a verifiable employment record to your profile.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4 py-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Company *</label>
                 <Input
                   required
                   value={form.company}
                   onChange={(e) => setForm({ ...form, company: e.target.value })}
                   placeholder="e.g. Softvence Agency"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan"
                 />
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Title *</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Title *</label>
                 <Input
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="e.g. Jr. Full Stack Developer"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Start Date</label>
-                <Input
-                  value={form.startDate}
-                  onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                  placeholder="e.g. 2026-08"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">End Date</label>
-                <Input
-                  disabled={form.isCurrent}
-                  value={form.endDate}
-                  onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                  placeholder="e.g. 2026-07"
-                  className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan disabled:opacity-40"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Start Date</label>
+                <Input
+                  value={form.startDate}
+                  onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                  placeholder="e.g. 2026-08"
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">End Date</label>
+                <Input
+                  disabled={form.isCurrent}
+                  value={form.endDate}
+                  onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+                  placeholder={form.isCurrent ? 'Present' : 'e.g. 2026-07'}
+                  className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan disabled:opacity-40"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 pt-0.5">
               <input
                 type="checkbox"
                 id="isCurrent"
                 checked={form.isCurrent}
                 onChange={(e) => setForm({ ...form, isCurrent: e.target.checked })}
-                className="rounded border-border text-brand-cyan focus:ring-brand-cyan bg-muted/40"
+                className="w-4 h-4 rounded border-border text-brand-cyan focus:ring-brand-cyan bg-muted/40 accent-brand-cyan cursor-pointer"
               />
               <label
                 htmlFor="isCurrent"
-                className="text-xs text-foreground cursor-pointer select-none"
+                className="text-xs font-medium text-foreground cursor-pointer select-none"
               >
                 Currently working here
               </label>
             </div>
 
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">
-                Responsibilities (one per line)
-              </label>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  Responsibilities (one per line)
+                </label>
+                <span className="text-2xs text-muted-foreground">Each line becomes an anchor bullet</span>
+              </div>
               <Textarea
-                rows={3}
+                rows={4}
                 value={form.responsibilities}
                 onChange={(e) => setForm({ ...form, responsibilities: e.target.value })}
-                placeholder="Developed production applications using Next.js..."
-                className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan min-h-20"
+                placeholder="Developing production applications using Next.js, TypeScript, Node.js...&#10;Building AI-powered features and integrations..."
+                className="bg-muted/40 border-border text-sm leading-relaxed"
               />
             </div>
 
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  Key Achievements (one per line, optional)
+                </label>
+                <span className="text-2xs text-muted-foreground">Measurable milestones or awards</span>
+              </div>
+              <Textarea
+                rows={3}
+                value={form.achievements}
+                onChange={(e) => setForm({ ...form, achievements: e.target.value })}
+                placeholder="Reduced API latency by 45% using Redis caching...&#10;Promoted to lead engineer within 6 months..."
+                className="bg-muted/40 border-border text-sm leading-relaxed"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">
                 Technologies (comma separated)
               </label>
               <Input
                 value={form.technologies}
                 onChange={(e) => setForm({ ...form, technologies: e.target.value })}
-                placeholder="Next.js, TypeScript, PostgreSQL"
-                className="bg-muted/40 border-border text-xs focus-visible:border-brand-cyan"
+                placeholder="Next.js, TypeScript, PostgreSQL, Docker, JWT"
+                className="bg-muted/40 border-border text-sm h-10 focus-visible:border-brand-cyan"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowForm(false)}
-                className="text-muted-foreground hover:text-foreground"
+            <DialogFooter className="pt-3 gap-2">
+              <DialogClose
+                render={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditingId(null);
+                      setForm(EMPTY_EXP);
+                    }}
+                  />
+                }
               >
                 Cancel
-              </Button>
+              </DialogClose>
               <Button
                 type="submit"
                 size="sm"
-                className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-medium shadow-sm shadow-brand-pink/20"
+                className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light dark:bg-brand-cyan dark:hover:bg-brand-cyan/90 dark:text-brand-dark font-semibold gap-1.5 shadow-xs"
               >
                 {editingId ? 'Update Experience' : 'Save Experience'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
-        </Card>
-      )}
+        </DialogContent>
+      </Dialog>
 
       <div className="space-y-4">
         {experiences.map((exp) => (
