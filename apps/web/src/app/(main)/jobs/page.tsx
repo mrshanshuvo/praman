@@ -11,6 +11,7 @@ import {
   List,
   PlusCircle,
   Search,
+  X,
 } from 'lucide-react';
 import { Suspense, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -243,8 +244,21 @@ function JobsListContent() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-8 text-xs h-8 bg-card"
+              className="pl-8 pr-7 text-xs h-8 bg-card"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 bg-card border border-border rounded-lg px-2 py-1.5">

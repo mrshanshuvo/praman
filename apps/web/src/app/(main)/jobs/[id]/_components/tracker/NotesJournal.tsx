@@ -1,7 +1,7 @@
 'use client';
 
 import type { ApplicationNote, NoteTag } from '@praman/schemas';
-import { Loader2, MessageSquare, Plus, Search } from 'lucide-react';
+import { Loader2, MessageSquare, Plus, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
 import { Badge } from '@/components/ui/badge';
@@ -129,13 +129,23 @@ export const NotesJournal: React.FC<NotesJournalProps> = ({ jobId, notes }) => {
       {/* Note Search & Filter Chips */}
       <div className="space-y-2">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
             placeholder="Search notes by keyword..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 h-8 text-xs bg-muted/20 border-border"
+            className="pl-8 pr-7 h-8 text-xs bg-muted/20 border-border"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
