@@ -505,7 +505,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
           {personal?.links &&
             Object.entries(personal.links)
-              .filter(([_, v]) => Boolean(v && v.trim()))
+              .filter(([_, v]) => Boolean(v?.trim()))
               .map(([k, v]) => {
                 const username = extractUsername(k, v);
                 const href = normalizeHref(k, v);
@@ -540,14 +540,6 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               {tier.label}
             </Badge>
             <span className="text-xs font-bold font-mono text-foreground">{percentage}%</span>
-          </div>
-
-          {/* Center: Slim Gradient Bar */}
-          <div className="flex-1 max-w-xs lg:max-w-md w-full bg-muted/60 rounded-full h-1.5 overflow-hidden border border-border/30">
-            <div
-              className="h-full bg-linear-to-r from-brand-cyan to-brand-pink transition-all duration-500 rounded-full"
-              style={{ width: `${percentage}%` }}
-            />
           </div>
 
           {/* Right: Status or Actionable Suggestions */}
@@ -675,9 +667,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                 <span className="text-xs font-semibold text-foreground uppercase tracking-wider block">
                   Professional & Coding Profiles
                 </span>
-                <span className="text-2xs text-muted-foreground">
-                  Enter full URLs or usernames
-                </span>
+                <span className="text-2xs text-muted-foreground">Enter full URLs or usernames</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -690,7 +680,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                     value={form.github}
                     onChange={(e) => setForm({ ...form, github: e.target.value })}
                     placeholder="https://github.com/username or username"
-                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                    className="bg-muted/40 border-border h-10 font-mono text-xs"
                   />
                 </div>
 
@@ -703,7 +693,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                     value={form.linkedin}
                     onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
                     placeholder="https://linkedin.com/in/username or username"
-                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                    className="bg-muted/40 border-border h-10 font-mono text-xs"
                   />
                 </div>
 
@@ -716,7 +706,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                     value={form.portfolio}
                     onChange={(e) => setForm({ ...form, portfolio: e.target.value })}
                     placeholder="https://yourportfolio.dev"
-                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                    className="bg-muted/40 border-border h-10 font-mono text-xs"
                   />
                 </div>
 
@@ -729,7 +719,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                     value={form.beecrowd}
                     onChange={(e) => setForm({ ...form, beecrowd: e.target.value })}
                     placeholder="https://judge.beecrowd.com/en/profile/... or username"
-                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                    className="bg-muted/40 border-border h-10 font-mono text-xs"
                   />
                 </div>
 
@@ -742,7 +732,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                     value={form.leetcode}
                     onChange={(e) => setForm({ ...form, leetcode: e.target.value })}
                     placeholder="https://leetcode.com/username or username"
-                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                    className="bg-muted/40 border-border h-10 font-mono text-xs"
                   />
                 </div>
 
@@ -755,7 +745,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                     value={form.twitter}
                     onChange={(e) => setForm({ ...form, twitter: e.target.value })}
                     placeholder="https://x.com/username or @username"
-                    className="bg-muted/40 border-border text-sm h-10 font-mono text-xs"
+                    className="bg-muted/40 border-border h-10 font-mono text-xs"
                   />
                 </div>
               </div>
@@ -798,7 +788,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                         value={link.value}
                         onChange={(e) => updateCustomLink(idx, 'value', e.target.value)}
                         placeholder="https://..."
-                        className="bg-muted/40 border-border text-sm h-9 flex-1 font-mono text-xs"
+                        className="bg-muted/40 border-border h-9 flex-1 font-mono text-xs"
                       />
                       <Button
                         type="button"
