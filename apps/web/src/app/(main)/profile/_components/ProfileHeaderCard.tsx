@@ -13,6 +13,7 @@ import {
   Check,
   CheckCircle2,
   Circle,
+  Code2,
   Edit2,
   Globe,
   Mail,
@@ -22,6 +23,123 @@ import {
   Sparkles,
   TrendingUp,
 } from 'lucide-react';
+
+function GithubIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+function getLinkIcon(key: string, className?: string) {
+  const k = key.toLowerCase();
+  if (k.includes('github')) return <GithubIcon className={className} />;
+  if (k.includes('linkedin')) return <LinkedinIcon className={className} />;
+  if (k.includes('beecrowd') || k.includes('leetcode') || k.includes('code')) {
+    return <Code2 className={className} />;
+  }
+  return <Globe className={className} />;
+}
+
+function extractUsername(key: string, rawUrl: string): string {
+  if (!rawUrl) return '';
+  const trimmed = rawUrl.trim();
+
+  try {
+    const urlStr =
+      trimmed.startsWith('http://') || trimmed.startsWith('https://')
+        ? trimmed
+        : `https://${trimmed}`;
+    const urlObj = new URL(urlStr);
+    const pathname = urlObj.pathname.replace(/^\/+|\/+$/g, '');
+
+    const k = key.toLowerCase();
+    if (k.includes('github')) {
+      const parts = pathname.split('/');
+      return parts[0] || trimmed;
+    }
+
+    if (k.includes('linkedin')) {
+      const parts = pathname.split('/');
+      if (parts[0] === 'in' && parts[1]) {
+        return parts[1];
+      }
+      return parts[0] || trimmed;
+    }
+
+    if (k.includes('twitter') || k === 'x') {
+      const parts = pathname.split('/');
+      return parts[0] ? `@${parts[0]}` : trimmed;
+    }
+
+    if (k.includes('beecrowd')) {
+      const parts = pathname.split('/');
+      return parts[parts.length - 1] || trimmed;
+    }
+
+    if (k.includes('portfolio') || k.includes('website') || k.includes('blog')) {
+      return urlObj.hostname.replace(/^www\./, '') + (pathname ? `/${pathname}` : '');
+    }
+
+    if (pathname) {
+      const parts = pathname.split('/');
+      return parts[parts.length - 1] || trimmed;
+    }
+    return urlObj.hostname.replace(/^www\./, '') || trimmed;
+  } catch {
+    return trimmed.replace(/^@/, '');
+  }
+}
+
+function normalizeHref(key: string, rawUrl: string): string {
+  if (!rawUrl) return '#';
+  const trimmed = rawUrl.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  const k = key.toLowerCase();
+  if (k.includes('github')) {
+    return `https://github.com/${trimmed.replace(/^@/, '')}`;
+  }
+  if (k.includes('linkedin')) {
+    return trimmed.includes('linkedin.com')
+      ? `https://${trimmed}`
+      : `https://linkedin.com/in/${trimmed.replace(/^@/, '')}`;
+  }
+  return `https://${trimmed}`;
+}
 import React, { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -327,18 +445,25 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           )}
 
           {personal?.links &&
-            Object.entries(personal.links).map(([k, v]) => (
-              <a
-                key={k}
-                href={v}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border transition-colors"
-              >
-                <Globe className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <span className="capitalize">{k}</span>
-              </a>
-            ))}
+            Object.entries(personal.links)
+              .filter(([_, v]) => Boolean(v && v.trim()))
+              .map(([k, v]) => {
+                const username = extractUsername(k, v);
+                const href = normalizeHref(k, v);
+                return (
+                  <a
+                    key={k}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={`${k}: ${v}`}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border transition-colors text-xs font-medium"
+                  >
+                    {getLinkIcon(k, 'w-3.5 h-3.5 text-muted-foreground shrink-0')}
+                    <span>{username}</span>
+                  </a>
+                );
+              })}
         </div>
 
         {/* Bottom: Streamlined Horizontal Completeness Bar */}
