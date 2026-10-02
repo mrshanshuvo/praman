@@ -1,7 +1,7 @@
 'use client';
 
 import type { CandidatePersonal, UpdateCandidatePersonal } from '@praman/schemas';
-import { Award, Check, CheckCircle2, Edit2, RefreshCw, User } from 'lucide-react';
+import { Award, Check, CheckCircle2, Edit2, RefreshCw, Sparkles, User } from 'lucide-react';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
 
   const [form, setForm] = useState({
     summary: personal?.summary || '',
+    bio: personal?.bio || '',
     achievements: (personal?.achievements || []).join('\n'),
     languages: (personal?.languages || []).join(', '),
   });
@@ -36,6 +37,7 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
   const handleOpenEdit = () => {
     setForm({
       summary: personal?.summary || '',
+      bio: personal?.bio || '',
       achievements: (personal?.achievements || []).join('\n'),
       languages: (personal?.languages || []).join(', '),
     });
@@ -59,7 +61,8 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
       await onUpdate({
         ...personal,
         name: personal?.name || '',
-        summary: form.summary,
+        summary: form.summary.trim(),
+        bio: form.bio.trim() || undefined,
         achievements,
         languages,
       });
@@ -101,6 +104,18 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
         </p>
       </Card>
 
+      {personal?.bio && (
+        <Card className="rounded-xl border-border bg-card/80 p-6 gap-0">
+          <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-brand-cyan" />
+            Bio & Headline
+          </h3>
+          <p className="text-sm text-foreground/90 leading-relaxed font-sans italic">
+            "{personal.bio}"
+          </p>
+        </Card>
+      )}
+
       {personal?.achievements && personal.achievements.length > 0 && (
         <Card className="rounded-xl border-border bg-card/80 p-6 gap-0">
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
@@ -140,9 +155,9 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
 
       {/* Edit Summary & Bio Modal */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-lg bg-card border-border">
+        <DialogContent className="sm:max-w-2xl md:max-w-3xl bg-card border-border p-6 sm:p-7 gap-5 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-foreground">
+            <DialogTitle className="text-lg font-bold text-foreground">
               Edit Summary & Achievements
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
@@ -151,46 +166,61 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSave} className="space-y-4 py-2">
+          <form onSubmit={handleSave} className="space-y-4 py-1">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">
+              <label className="text-xs font-semibold text-foreground">
+                Short Bio / Headline (Optional)
+              </label>
+              <Input
+                value={form.bio}
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                placeholder="e.g. Senior Full-Stack Engineer specializing in high-performance distributed systems"
+                className="bg-muted/40 border-border text-sm h-10"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">
                 Professional Summary
               </label>
               <Textarea
-                rows={4}
+                rows={5}
                 value={form.summary}
                 onChange={(e) => setForm({ ...form, summary: e.target.value })}
                 placeholder="Brief synthesis of your career trajectory and technical strengths..."
-                className="bg-muted/40 border-border text-xs"
+                className="bg-muted/40 border-border text-sm leading-relaxed"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">
-                Key Achievements (One per line)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  Key Achievements (One per line)
+                </label>
+                <span className="text-2xs text-muted-foreground">One bullet point per line</span>
+              </div>
               <Textarea
-                rows={4}
+                rows={5}
                 value={form.achievements}
                 onChange={(e) => setForm({ ...form, achievements: e.target.value })}
-                placeholder="Led 40% latency reduction across ingestion pipelines&#10;Published IEEE paper on zero-knowledge attestation"
-                className="bg-muted/40 border-border text-xs font-mono"
+                placeholder="VC's & Dean's List Scholarship (2022–2025)&#10;ICPC & IDPC Competitor&#10;Top 4% globally on BeeCrowd (321.11 points)"
+                className="bg-muted/40 border-border text-sm font-mono leading-relaxed"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">
+              <label className="text-xs font-semibold text-foreground">
                 Languages (Comma-separated)
               </label>
               <Input
                 value={form.languages}
                 onChange={(e) => setForm({ ...form, languages: e.target.value })}
                 placeholder="English (Fluent), Bengali (Native), German (B1)"
-                className="bg-muted/40 border-border text-xs"
+                className="bg-muted/40 border-border text-sm h-10"
               />
             </div>
 
-            <DialogFooter showCloseButton={false}>
+            <DialogFooter showCloseButton={false} className="pt-2">
               <DialogClose render={<Button variant="outline" size="sm" type="button" />}>
                 Cancel
               </DialogClose>
@@ -198,7 +228,7 @@ export function PersonalTab({ personal, onUpdate }: PersonalTabProps) {
                 type="submit"
                 size="sm"
                 disabled={isSaving}
-                className="bg-brand-pink hover:bg-brand-pink/90 text-brand-light font-semibold gap-1.5 shadow-xs"
+                className="bg-brand-cyan hover:bg-brand-cyan/90 text-brand-dark font-semibold gap-1.5 shadow-xs"
               >
                 {isSaving ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
