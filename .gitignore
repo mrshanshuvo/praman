@@ -6,7 +6,6 @@ out/
 build/
 coverage/
 *.tsbuildinfo
-.env
 .env*.local
 .agents/
 .claude/
@@ -17,3 +16,4 @@ apps/*/pnpm-lock.yaml
 packages/*/pnpm-lock.yaml
 test-results/
 playwright-report/
+config.bat
