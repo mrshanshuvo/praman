@@ -3,8 +3,8 @@
   "version": "0.2.1",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
+    "dev": "node api.js && turbo dev",
+    "build": "node api.js && turbo build",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
