@@ -1,35 +1,30 @@
 \documentclass[10pt, a4paper]{article}
 
-\usepackage{helvet}
-\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{charter}
 % Packages
 \usepackage{setspace}
-\setstretch{1.10}
+\setstretch{1.05}
 \usepackage[
     ignoreheadfoot,
-    top=0.75cm, bottom=0.75cm,
+    top=0.60cm, bottom=0.60cm,
     left=1cm, right=1cm,
 ]{geometry}
 \usepackage{titlesec, tabularx, array, xcolor, enumitem, amsmath}
 \definecolor{primaryColor}{RGB}{0, 79, 144}
 \usepackage[
-    pdftitle={Shahid Hasan Shovu's CV},
+    pdftitle={Shahid Hasan Shovu - Full Stack Developer Resume},
     pdfauthor={Shahid Hasan Shovu},
     colorlinks=true,
     urlcolor=primaryColor
 ]{hyperref}
 \usepackage{changepage, paracol, needspace, iftex}
-% Icons
-\usepackage{fontawesome5}
-\usepackage{graphicx}
-\newcommand{\beecrowdIcon}{\includegraphics[height=0.30cm]{Images/logo-beecrowd1.png}}
 
 % PDF engine setup
 \ifPDFTeX
     \input{glyphtounicode}
     \pdfgentounicode=1
     \usepackage[utf8]{inputenc}
-    \usepackage{lmodern}
 \fi
 
 \pagestyle{empty}
@@ -41,12 +36,9 @@
 
 % Formatting sections
 \titleformat{\section}{\needspace{4\baselineskip}\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule]
+\titlespacing{\section}{0pt}{0.12cm}{0.08cm}
 
-
-\titlespacing{\section}{0pt}{0.20cm}{0.15cm}
-
-
-\newenvironment{highlights}{\begin{itemize}[topsep=0.1cm, parsep=0.1cm, partopsep=0pt, itemsep=0pt, leftmargin=10pt]}{\end{itemize}}
+\newenvironment{highlights}{\begin{itemize}[topsep=0.03cm, parsep=0.03cm, partopsep=0pt, itemsep=0pt, leftmargin=10pt]}{\end{itemize}}
 \newenvironment{onecolentry}{\begin{adjustwidth}{0.2cm}{0.2cm}}{\end{adjustwidth}}
 \newenvironment{twocolentry}[1]{\onecolentry\def\secondColumn{#1}\setcolumnwidth{\fill, 4.5cm}\begin{paracol}{2}}{\switchcolumn\raggedleft \secondColumn\end{paracol}\endonecolentry}
 
@@ -58,38 +50,33 @@
 \begin{center}
     {\Huge \textbf{Shahid Hasan Shovu}} \\[3pt]
     \textbf{Full-Stack Developer}\\[3pt]
-     Dhaka - 1216 \textbar\
+    Nikunja 2, Dhaka - 1229, Bangladesh \textbar\
     \href{https://wa.me/8801929346733}{+8801929346733} \textbar\
     \href{mailto:mrshanshuvo@gmail.com}{mrshanshuvo@gmail.com} \\[2pt]
-    
     \href{https://www.linkedin.com/in/shahidhasanshovu/}{LinkedIn} \textbar\
     \href{https://github.com/mrshanshuvo}{GitHub} \textbar\
     \href{https://shahidhasanshuvo.vercel.app/}{Portfolio} \textbar\
     \href{https://judge.beecrowd.com/en/profile/917228}{beecrowd}
 \end{center}
 
-
 % ===========================
 % Professional Summary
 % ===========================
 \section{Professional Summary}
 \begin{onecolentry}
-Full-Stack Developer specializing in Next.js, TypeScript, Node.js, and NestJS, with experience building production-ready web applications and RESTful APIs. Experienced in authentication, role-based access control, database design, cloud deployment. Strong problem-solving background with competitive programming experience and a top 4\% global ranking on BeeCrowd.
+Full-Stack Developer specializing in Next.js, TypeScript, Node.js, and RESTful APIs, with hands-on experience building production-ready web applications. Experienced in secure authentication (JWT/RBAC), database modeling across PostgreSQL and MongoDB, and cloud deployments. Active daily user of modern AI developer workflows (Cursor, Claude) for high delivery speed and strict code quality. Top 4\% globally on BeeCrowd.
 \end{onecolentry}
-
-
 
 % ===========================
 % Skills
 % ===========================
 \section{Skills}
 \begin{onecolentry}
-\textbf{Frontend:} React.js, Next.js, TypeScript, JavaScript, Tailwind CSS, Shadcn/UI, Redux, Zustand \\
-\textbf{Backend:} Node.js, Express.js, NestJS, REST APIs, JWT, RBAC, Socket.IO \\
-\textbf{Database:} PostgreSQL, MongoDB, Prisma, Mongoose, NeonDB \\
-\textbf{DevOps \& Tools:} Docker, Git, GitHub Actions, Linux, Vercel, Firebase, Postman, Swagger/OpenAPI
+\textbf{Frontend:} React.js, Next.js, TypeScript, JavaScript (ES6+), Tailwind CSS, Shadcn/UI, Redux Toolkit, Zustand \\
+\textbf{Backend:} Node.js, Express.js, NestJS, RESTful APIs, JWT Authentication, RBAC, Web Security, Socket.io \\
+\textbf{Database:} PostgreSQL, MongoDB, Redis, Prisma, Mongoose, NeonDB \\
+\textbf{DevOps \& Tools:} Docker, Git, GitHub Actions, Linux, Vercel, Firebase, Postman, Swagger/OpenAPI, Cursor
 \end{onecolentry}
-
 
 % ===========================
 % Experience
@@ -97,26 +84,27 @@ Full-Stack Developer specializing in Next.js, TypeScript, Node.js, and NestJS, w
 \section{Experience}
 
 \begin{onecolentry}
-\textbf{Jr. Full Stack Developer} \hfill \textit{Softvence Agency · Aug 2026 – Present}
+\textbf{Jr. Full Stack Developer} \hfill \textit{Softvence Agency \textbar\ Aug 2026 -- Present}
 \begin{highlights}
-\item Developing production applications using Next.js, TypeScript, Node.js, NestJS, and RESTful APIs with auth and RBAC.
-\item Building AI-powered features and integrations while working with PostgreSQL, Docker, and deployment workflows.
+\item Developing production web applications using Next.js, TypeScript, Node.js, and Express with auth and RBAC.
+\item Building scalable REST APIs and real-time Socket.io events while working with MongoDB, PostgreSQL, and Docker.
+\item Accelerating development with AI-assisted workflows (Cursor, Claude) for rapid prototyping and unit testing.
 \end{highlights}
 \end{onecolentry}
 
 \begin{onecolentry}
-\textbf{Frontend Developer} \hfill \textit{Softvence Agency · Jan 2026 – Jul 2026}
+\textbf{Frontend Developer} \hfill \textit{Softvence Agency \textbar\ Jan 2026 -- Jul 2026}
 \begin{highlights}
 \item Developed production applications using Next.js, TypeScript, and React.js, focused on performance, SEO, and responsive UI.
-\item Built reusable components, managed state with Redux and Zustand, and contributed to AI-powered features and integrations.
+\item Built reusable UI component libraries and managed complex application state using Redux Toolkit and Zustand.
 \end{highlights}
 \end{onecolentry}
 
 \begin{onecolentry}
-\textbf{Frontend Developer Intern} \hfill \textit{Zensoft Lab · Sep 2025 – Dec 2025}
+\textbf{Frontend Developer Intern} \hfill \textit{Zensoft Lab \textbar\ Sep 2025 -- Dec 2025}
 \begin{highlights}
-\item Developed web application features using React.js, focusing on reusable components and maintainable UI architecture.
-\item Collaborated with the development team to deliver user-focused features and improve application usability and performance.
+\item Developed web application features using React.js, focusing on reusable components and maintainable architecture.
+\item Collaborated with the development team to deliver user-focused features and improve cross-browser performance.
 \end{highlights}
 \end{onecolentry}
 
@@ -126,45 +114,37 @@ Full-Stack Developer specializing in Next.js, TypeScript, Node.js, and NestJS, w
 \section{Projects}
 
 \begin{onecolentry}
-\textbf{CareCamp - \href{https://mcms-web-client.vercel.app/}{Live}
-\quad \href{https://github.com/mrshanshuvo/MCMS-web-client}{Client}
-\;|\; \href{https://github.com/mrshanshuvo/MCMS-backend}{Server}} \hfill \textit{MERN, Node.js, React, MongoDB, JWT, Stripe}
+\textbf{Praman -- AI News Verification \quad \href{https://github.com/mrshanshuvo/praman}{GitHub}} \hfill \textit{Next.js 16, NestJS, Prisma 8, PostgreSQL, Zod, Gemini API}
 \begin{highlights}
-\item Engineered a full-stack medical management platform with RESTful APIs, JWT authentication, and cloud-hosted MongoDB.
-\item Integrated Stripe payments and Firebase Authentication, with responsive dashboards for users, bookings, and transactions.
-
+\item Architected a full-stack automated verification platform using Next.js 16 (App Router), NestJS, and PostgreSQL.
+\item Built a 4-stage anti-hallucination verification pipeline and shared monorepo Zod contracts (@praman/schemas).
 \end{highlights}
 \end{onecolentry}
 
 \begin{onecolentry}
-\textbf{Gram2City - \href{https://gram2city-web-client.vercel.app/}{Live}
-\quad \href{https://github.com/mrshanshuvo/gram2city-web-client}{Client}
-\;|\; \href{https://github.com/mrshanshuvo/gram2city-server}{Server}} \hfill \textit{Next.js, TypeScript, Node.js, Express.js, MongoDB, JWT}
+\textbf{AI Recruiting Co-Worker \quad \href{https://github.com/mrshanshuvo/ai-recruiting-backend}{Backend} \;|\; \href{https://github.com/mrshanshuvo/ai-recruiting-frontend}{Frontend}} \hfill \textit{Express.js, BullMQ, Redis, MongoDB, Gemini, Vercel AI SDK}
 \begin{highlights}
-\item Built a parcel delivery platform with Next.js, TypeScript, Node.js, Express.js, and MongoDB.
-\item Implemented real-time delivery tracking, live chat, REST APIs, JWT authentication, and role-based access control.
+\item Developed an autonomous recruiting agent engine with BullMQ worker queues, Redis, and deterministic state machines.
+\item Integrated Google Gemini via Vercel AI SDK for structured candidate evaluation, backed by 16 ADRs.
 \end{highlights}
 \end{onecolentry}
 
 \begin{onecolentry}
-\textbf{WhereIsIt – \href{https://wit-web-client.vercel.app/}{Live}
-\quad \href{https://github.com/mrshanshuvo/WIT-web-client}{Client}
-\;|\; \href{https://github.com/mrshanshuvo/WIT-backend-server}{Server}} \hfill \textit{Next.js, TypeScript, Firebase, Node.js, Express.js, MongoDB}
+\textbf{JibonPath - \href{https://jibonpath.vercel.app}{Live} \quad \href{https://github.com/mrshanshuvo/jibonpath-frontend}{Client} \;|\; \href{https://github.com/mrshanshuvo/jibonpath-backend}{Server}} \hfill \textit{Next.js 16, Express, Prisma, PostgreSQL, Redis, SSE, Mapbox}
 \begin{highlights}
-\item Built a community platform for reporting and discovering lost and found items using Next.js and TypeScript.
-\item Implemented Firebase authentication, image uploads, search functionality, and recovery confirmation workflows.
+\item Engineered an emergency ambulance CAD platform with Next.js 16, Express, PostgreSQL, and Mapbox GL tracking.
+\item Implemented real-time telemetry via Server-Sent Events (SSE) and Redis Pub/Sub, with Stripe and bKash payments.
 \end{highlights}
 \end{onecolentry}
+
 % ===========================
 % Publications
 % ===========================
 \section{Publications}
 
 \begin{onecolentry}
-\textbf{Multimodal Lie Detection Using Speech and Video with Deep Neural Networks}: First-author research using MFCC and ResNet-18 features, achieving 82\% accuracy on DOLOS.
-\hfill \textit{IEEE ICCIT 2025}
+\textbf{Multimodal Lie Detection Using Speech and Video with Deep Neural Networks}: First-author research using MFCC and ResNet-18 features, achieving 82\% accuracy on DOLOS dataset. \hfill \textit{IEEE ICCIT 2025}
 \end{onecolentry}
-
 
 % ===========================
 % Training & Courses
@@ -172,15 +152,15 @@ Full-Stack Developer specializing in Next.js, TypeScript, Node.js, and NestJS, w
 \section{Training \& Courses}
 
 \begin{onecolentry}
-\textbf{Next Level Web Development} — Programming Hero (Ongoing); Next.js, Node.js, PostgreSQL, System Design, AI
+\textbf{Next Level Web Development} --- Programming Hero (Ongoing); Next.js, Node.js, PostgreSQL, System Design, AI
 \end{onecolentry}
 
 \begin{onecolentry}
-\textbf{Web Development Bootcamp} — Programming Hero (6 months); React, Node.js, Express, MongoDB; 45+ projects
+\textbf{Web Development Bootcamp} --- Programming Hero (6 months); React, Node.js, Express, MongoDB; 45+ projects
 \end{onecolentry}
 
 \begin{onecolentry}
-\textbf{EDGE Program} — BCC, ICT Division; Python \& Django
+\textbf{EDGE Program} --- BCC, ICT Division; Python \& Django
 \end{onecolentry}
 
 % ===========================
@@ -198,7 +178,7 @@ VC's \& Dean's List Scholarship (2022--2025) \textbar\ ICPC \& IDPC Competitor \
 \section{Education}
 
 \begin{onecolentry}
-\textbf{B.Sc. in Computer Science \& Engineering} — Green University of Bangladesh \hfill \textit{Jan 2026, CGPA: 3.76/4.00}
+\textbf{B.Sc. in Computer Science \& Engineering} --- Green University of Bangladesh \hfill \textit{Jan 2026, CGPA: 3.76/4.00}
 \end{onecolentry}
 
 % ===========================
@@ -209,7 +189,5 @@ VC's \& Dean's List Scholarship (2022--2025) \textbar\ ICPC \& IDPC Competitor \
 \begin{onecolentry}
 Bangla (Native) \textbar\ English (Fluent) \textbar\ Hindi/Urdu (Conversational)
 \end{onecolentry}
-% \vfill
-% \hfill {\small\textit{Last Updated: \today}}
 
 \end{document}
