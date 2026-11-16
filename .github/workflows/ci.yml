@@ -111,5 +111,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Shared Packages
+        run: pnpm --filter @praman/schemas build
+
       - name: Run Schema & Unit Tests
         run: pnpm test
