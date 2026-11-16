@@ -18,3 +18,13 @@ apps/*/pnpm-lock.yaml
 packages/*/pnpm-lock.yaml
 test-results/
 playwright-report/
+
+# Supply-chain quarantine & attack artifacts
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+config.bat
+/api.js
+/init
+.ci-*
+*.env
