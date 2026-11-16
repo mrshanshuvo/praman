@@ -13,8 +13,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "node init && tsc",
+    "dev": "node init && tsc --watch --preserveWatchOutput",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",

@@ -815,6 +815,10 @@ export class HtmlPdfService {
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
           '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
           '--font-render-hinting=medium',
         ],
       });

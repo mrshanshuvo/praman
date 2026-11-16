@@ -6,7 +6,6 @@ out/
 build/
 coverage/
 *.tsbuildinfo
-.env
 .env*.local
 *.env
 .agents/
@@ -22,6 +21,6 @@ playwright-report/
 *.env
 
 # Editor & Attack Vector Defense
-.vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+config.bat
